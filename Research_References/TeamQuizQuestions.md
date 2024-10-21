@@ -33,3 +33,14 @@
   * Allows to be called by an external object in a transaction, can interact directly with the function
 4. If you pass in a value that will be changed in the function, what do you have to specify the value as?
   * &mut
+
+**Ashton's Q&A**
+1. What is Gas, and is it specific to the SUI blockchain?
+  * Gas isn’t specific to the SUI blockchain, it is a representation of the balance that pays for the verification of each transaction
+2. What is immutability and why is it important in regards to blockchain and what we’re doing specifically
+  * Immutability is the idea that once something is on the blockchain, it can’t be changed, to our specific use-case, this means that the public keys can’t be modified, and if we are putting the messages themselves as smart contracts, then those messages can’t be changed
+3. What does an owner mutator do to a function
+  * It allows you to make certain functions only be used by the person who deployed them, which counteracts the fact that an immutable contract means anybody could access the function.
+4. What’s the basic idea of how you can ensure that key exchange is secure
+  * Make the public key computationally difficult to decrypt, except the private key holder
+
