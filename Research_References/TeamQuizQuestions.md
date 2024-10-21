@@ -22,4 +22,14 @@
 * A blockchain event works like an announcement where the message is announced with a code that tells other viewers if the event is meant for them. People who need to hear the message look at it. It is not stored on the blockchain.
 2. How does gas differ from Sui coins?
 3. What causes a gas fee to be higher? What happens when you lower your gas budget?
-4. Who should have your private key? Who should have the public key? What are each used for?	
+4. Who should have your private key? Who should have the public key? What are each used for?
+
+**Sophia's Q&A**
+1. How can you ensure that only the owner of an object can perform certain functions in Move?
+  * Create an admin class that only when you initialize the object is the admin set (can’t be changed later)
+2. What does the ::transfer function in Move do? 
+  * Transfers ownership of an object from one account to another
+3. What does keyword “entry” do in a function definition?
+  * Allows to be called by an external object in a transaction, can interact directly with the function
+4. If you pass in a value that will be changed in the function, what do you have to specify the value as?
+  * &mut
