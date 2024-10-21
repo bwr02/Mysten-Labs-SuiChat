@@ -17,3 +17,9 @@
 * ```--gas-budget```: specifies the maximum amount of gas you're willing to spend on a transaction
 * If your transaction requires more gas than this budget, the transaction will fail with an InsufficientGas error. Actions like publishing a package can involve compiling and storing code, verifying dependencies, and executing various blockchain operations. These activities can be computationally expensive and require more gas. By increasing the gas budget, you allow the blockchain to execute more complex or resource-heavy transactions.
 
+**Ben’s Q&A**
+1. What is a blockchain event? Is it stored on the blockchain?
+* A blockchain event works like an announcement where the message is announced with a code that tells other viewers if the event is meant for them. People who need to hear the message look at it. It is not stored on the blockchain.
+2. How does gas differ from Sui coins?
+3. What causes a gas fee to be higher? What happens when you lower your gas budget?
+4. Who should have your private key? Who should have the public key? What are each used for?	
