@@ -44,3 +44,20 @@
 4. What’s the basic idea of how you can ensure that key exchange is secure
   * Make the public key computationally difficult to decrypt, except the private key holder
 
+**Bonnie's Q&A**
+1. What do “has key, store, copy, and drop” refer to?
+  * has key means that it’s going to be written to the Sui network
+  * store means you’ll be able to store the variable inside another object
+  * copy means you can duplicate
+  * drop means you can delete that struct
+2. When using Sui Move, how to make sure the compiler doesn’t throw an error when we don’t use a variable by the end of the function?
+  * Prefix the function with an underscore
+3. What’s the purpose of using capabilities?
+  * Capabilities can be used to gate admin access for functions
+  * Ex. Whoever has AdminCapability has admin privileges
+4. What are the different types of ownerships that objects can have?
+  * Owned by an address
+  * Owned by another object
+  * Shared
+  * Immutable
+
