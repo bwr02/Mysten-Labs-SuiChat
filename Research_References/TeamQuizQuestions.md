@@ -21,8 +21,12 @@
 1. What is a blockchain event? Is it stored on the blockchain?
 * A blockchain event works like an announcement where the message is announced with a code that tells other viewers if the event is meant for them. People who need to hear the message look at it. It is not stored on the blockchain.
 2. How does gas differ from Sui coins?
+* Gas is a subdivision of a Sui coin so you can more accurately evaluate how much gas you are using for each transaction.
 3. What causes a gas fee to be higher? What happens when you lower your gas budget?
-4. Who should have your private key? Who should have the public key? What are each used for?
+* Doing more computation in a transaction causes the gas fee to be higher. Using the network at a busy time can also increase the fee as you will be charged "priority gas" to make your transaction happen faster.
+* If you lower your budget too much your transaction will fail for not having enough gas. It can also make your transaction take longer to process as it is waiting for the network to become less busy as there isn't enough budget to pay the priority fee.
+4. Who should have your private key? Who should have the public key? What are each used for? 
+* Only you should have your private key. Anyone who needs to send an encrypted message to you needs your public key. The public key is used for someone to send you an encrypted message and the private key is so you can decrypt it.
 
 **Sophia's Q&A**
 1. How can you ensure that only the owner of an object can perform certain functions in Move?
