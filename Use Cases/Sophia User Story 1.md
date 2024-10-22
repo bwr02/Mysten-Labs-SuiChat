@@ -2,7 +2,7 @@
 
 **Use Case**: Submit Message through CLI
 
-**Actors**: User, CLI, User Database, New Message, NewMessage Variable
+**Actors**: User, CLI, User Database, New Message, newMessage variable, sentTo variable
 
 **Precondition**: User has an associated ID and has previously sent no messages (i.e. when querying "sent messages", it comes up as none), current state of newMessage variable = NULL, current state of sendTo = NULL
 
