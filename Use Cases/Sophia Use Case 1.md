@@ -10,7 +10,7 @@
     * sentTo --> used to store id of person recieving message
     * currID --> used to store current user ID
 
-**Precondition**: User has an associated ID and has previously sent no messages (i.e. when querying "sent messages", it comes up as none), current state of newMessage variable = NULL, current state of sendTo = NULL
+**Precondition**: User has an associated ID and current state of newMessage variable = NULL, current state of sendTo = NULL
 
 **Basic Path**:
 
@@ -31,5 +31,5 @@
 **Alternative Path**:
   1. There are no alternative paths for this use case, user must follow through the steps in order to exit out (
 
-**Postcondition**: User now has at least one "sent messages", newMessage and sendTo should both be non NULL
+**Postcondition**: newMessage and sendTo should both be non NULL
 
