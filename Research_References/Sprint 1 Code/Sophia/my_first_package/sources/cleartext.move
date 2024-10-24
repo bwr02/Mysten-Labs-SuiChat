@@ -22,6 +22,11 @@ module my_first_package::cleartext {
         self.message
     }
 
+    public fun transfer_message(message: Message, recipient: address) {
+        // Transfer the Message object to the recipient address
+        transfer::public_transfer(message, recipient);
+    }
+
     public fun messagesInput(self: &Input): u64 {
         self.messagesInput
     }
