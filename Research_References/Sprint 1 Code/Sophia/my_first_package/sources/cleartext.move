@@ -22,10 +22,12 @@ module my_first_package::cleartext {
         self.message
     }
 
+    /*
     public fun transfer_message(message: Message, recipient: address) {
         // Transfer the Message object to the recipient address
         transfer::public_transfer(message, recipient);
     }
+    */
 
     public fun messagesInput(self: &Input): u64 {
         self.messagesInput
@@ -121,5 +123,15 @@ module my_first_package::cleartext {
         scenario.end();
     }
 }
+/*
+
+----------THIS IS THE COMMAND I USED TO CREATE A NEW MESSAGE OBJECT AFTER BUILDING AND PUBLISHING:----------
+sui client ptb \
+--assign input @<OBJECT ID FOR INPUT OBJECT> \
+--assign to_address @<ADDRESS OF OWNSER> \
+--move-call <PACKAGE ID>::cleartext::newMessage input '"Hello, world"' \
+--assign message --transfer-objects "[message]" to_address \
+--gas-budget 20000000
+*/
 
 
