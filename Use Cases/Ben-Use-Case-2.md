@@ -1,4 +1,18 @@
-# Use Case 2 - Ben - Client should be able to see a list of all of users they have sent or recived messages to in the past
+# Use Case 2 - Ben - Client can see list of Conversations
+
+**Use Case**: CLI can display a list of the most recent conversations
+
+**Actors**: User, CLI, User Database
+
+**PreCondditions**: User has either sent or recived at least one message with at least one other person.
+
+**Basic Path**:
+
+  1. 
+
+
+
+Client should be able to see a list of all of users they have sent or recived messages to in the past
 
 The client should be able to see a list of all of the recent conversations they have had with others
 
