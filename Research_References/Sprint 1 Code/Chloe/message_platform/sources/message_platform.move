@@ -67,6 +67,15 @@ module message_platform::message_platform {
     public fun get_message_at_index(self: &Chat, index: u64): &Message {
         vector::borrow(&self.messages, index)
     }
+        /*
+    ----------THIS IS THE COMMAND I USED TO CREATE A NEW MESSAGE OBJECT AFTER BUILDING AND PUBLISHING:----------
+    sui client ptb --assign chat @<CHAT_OBJECT_ID> \
+    --assign sender @<SENDER_ADDRESS> \
+    --assign recipient @<RECIPIENT_ADDRESS> \
+    --assign content '"<MESSAGE_CONTENT>"' \
+    --move-call <PACKAGE_ID>::message_platform::send_message chat sender recipient content <TIMESTAMP> \
+    --gas-budget 20000000
+    */
 
     // tests
     // #[test]
