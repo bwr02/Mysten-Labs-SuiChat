@@ -4,7 +4,7 @@
 
 **Actors:** User, Client, Sui Blockchain
 
-**Preconditions:** User sent a message to another user
+**Preconditions:** User submits a message to be sent to existing smart contract
 
 **Basic Path:** 
   1. Client takes the address of the receiving user
