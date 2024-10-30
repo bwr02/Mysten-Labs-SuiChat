@@ -2,7 +2,7 @@
 
 **Use Case:** Client can decrypt a recieved message
 
-**Actors:** CLI / Client, Sui Blockchain
+**Actors:** Client, Sui Blockchain
 
 **Preconditions:** Another user sent a message to the client's user
 
