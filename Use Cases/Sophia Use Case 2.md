@@ -8,7 +8,7 @@
 
 **Scope**:
 
-Local Temporary Variables (loval ro the function)
+Local Temporary Variables (local to the function)
   * recievedMessage --> passed into function, this is the message to be displayed in WebApp
   * fromUser --> passed into function, user ID of message sender
   * currId --> id of current user
