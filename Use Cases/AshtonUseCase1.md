@@ -2,7 +2,7 @@
 
 **Use Case:** Client can encrypt a message queued to send
 
-**Actors:** User, CLI / Client, Sui Blockchain
+**Actors:** User, Client, Sui Blockchain
 
 **Preconditions:** User sent a message to another user
 
