@@ -1,19 +1,19 @@
 # Bonnie Use Case 1 - Blockchain Emits Event
 
-**Use Case**: Emit events from Blockchain
+**Use Case**: Emit transaction completition events from the blockchain
 
-**Actors**: Sui Blockchain, User, CLI
+**Actors**: Sui Blockchain, User, Web Application
 
 **Precondition**: 
-Some transaction is complete from the smart contract.
+A transaction is successfully executed via a smart contract.
 
 **Basic Path**:
-1. Smart contract allows transaction
-2. Message is sent to other user
-3. Transaction complete notifies the user
+1. The smart contract verifies and processes the transaction.
+2. Upon transaction completion, the blockchain emits an event.
+3. The web application receives and displays the event notification to the user.
 
 **Alternative Path**:
-Nothing happens, so no events emitted.
+If the transaction fails or is canceled, no event is emitted.
 
 **Postcondition**: 
-User receives an event from the blockchain, saying that transaction is complete
+The user is notified via the web application that the transaction is complete.

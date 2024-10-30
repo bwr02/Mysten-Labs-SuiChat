@@ -1,19 +1,18 @@
 # Bonnie Use Case 2 - Listener function waits to receive event from Blockchain
 
-**Use Case**: Listen for events from Blockchain
+**Use Case**: Listen for blockchain events
 
-**Actors**: User, CLI, User Database, Completed Transaction, Sui Blockchain
+**Actors**: Web Application, User Database, Sui Blockchain
 
 **Precondition**: 
-Transaction on blockchain is complete
+A transaction has been completed on the blockchain.
 
 **Basic Path**:
-1. Listen for event from blockchain
-2. Post event when received
+1. Listener function monitors the blockchain for transaction completion events.
+2. Upon receiving an event, the listener processes and posts the event data to the web application.
 
 **Alternative Path**:
-Event is not received.
-No event being emitted.
+If no event is emitted or received, no action is taken.
 
 **Postcondition**: 
-Function takes in the event, before it releases it
+The listener function captures the event and prepares it for further processing in the application.
