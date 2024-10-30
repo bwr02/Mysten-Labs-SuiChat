@@ -9,16 +9,16 @@
     * usersMessaged
     * Messages with selected person
 
-**Precondition**: User must have messaged the user ID given
+**Precondition**: User must have sent or received a message with the user ID given
 
 **Basic Path**:
 
-  1. User enters the ID of the person they are trying to access messages with
-  2. System accesses database and pulls in all the messages with the user ID given
-  3. System displayed the messages in the CLI
+  1. The function takes input of the userID for the person that messages are being accessed.
+  2. System quiries database for all messages associated with the requested userID
+  3. System prints the messages in the CLI
 
 **Alternative Path**:
   1. No messages have occured with the other user, shows an error message.
 
-**Postcondition**: Most recent messages with selected user displayed
+**Postcondition**: Most recent messages with selected user displayed in CLI
 
