@@ -1,8 +1,8 @@
 # Use Case 2 - Ben - Client can see list of Conversations
 
-**Use Case**: CLI can display a list of the most recent conversations
+**Use Case**: WebApp can display a list of the most recent conversations
 
-**Actors**: User, CLI, User Database
+**Actors**: User, WebApp, User Database
 
 **Scope**: 
   * Database Values
@@ -15,9 +15,9 @@
 
   1. User requests to see a list of their most recent conversations
   2. System accesses database and pulls in the all of the users that have sent or recived a message to/from the user along with time of the most recent message
-  3. System displays this list in CLI
+  3. System displays this list in WebApp
 
 **Alternative Path**
   * If the user hasn't messaged anyone yet display "No Conversations
 
-**PostCondition**: CLI is displaying a list of the most recent conversations sorted from most to least recent
+**PostCondition**: WebApp is displaying a list of the most recent conversations sorted from most to least recent
