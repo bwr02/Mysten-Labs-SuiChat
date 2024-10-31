@@ -1,8 +1,23 @@
-# Use Case 2 - Ben - Client should be able to see a list of all of users they have sent or recived messages to in the past
+# Use Case 2 - Ben - Client can see list of Conversations
 
-The client should be able to see a list of all of the recent conversations they have had with others
+**Use Case**: WebApp can display a list of the most recent conversations
 
-## Acceptance Criteria
-1. In the CLI a user can send a command that shows a list of all the people they have messaged in the past
-2. The client software will display to the user a list of all people that have been messaged in the past
-3. The list should be ordered in what conversation was sent or recived in most recently
+**Actors**: User, WebApp, User Database
+
+**Scope**: 
+  * Database Values
+    * usersMessaged
+      * timeOfLastMessage
+
+**PreCondditions**: User has either sent or recived at least one message with at least one other person.
+
+**Basic Path**:
+
+  1. User requests to see a list of their most recent conversations
+  2. System accesses database and pulls in the all of the users that have sent or recived a message to/from the user along with time of the most recent message
+  3. System displays this list in WebApp
+
+**Alternative Path**
+  * If the user hasn't messaged anyone yet display "No Conversations
+
+**PostCondition**: WebApp is displaying a list of the most recent conversations sorted from most to least recent
