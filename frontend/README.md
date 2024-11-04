@@ -17,13 +17,13 @@ Client dApp using the following tools:
 To install dependencies you can run
 
 ```bash
-pnpm install
+yarn install
 ```
 
 To start your dApp in development mode run
 
 ```bash
-pnpm dev
+yarn dev
 ```
 
 ## Building
@@ -31,5 +31,5 @@ pnpm dev
 To build your app for deployment you can run
 
 ```bash
-pnpm build
+yarn build
 ```
