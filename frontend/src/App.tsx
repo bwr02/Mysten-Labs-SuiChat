@@ -15,7 +15,7 @@ function App() {
         }}
       >
         <Box>
-          <Heading>dApp Starter Template</Heading>
+          <Heading>SuiChat</Heading>
         </Box>
 
         <Box>
