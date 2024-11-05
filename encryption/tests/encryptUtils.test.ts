@@ -95,3 +95,10 @@ function runTests() {
 
 // Execute the tests
 runTests();
+
+/*
+to compile TypeScript Code (make sure that tsc is insalled i.e. typescript is intalled globally):
+    tsc encryptUtils.test.ts
+To run tests:
+    node encryptUtils.test.js
+*/
