@@ -1,19 +1,21 @@
-.chat-panel-container {
-    width: 75%;
+/* .chat-panel-container {
+    width: 75%; 
     display: flex;
     flex-direction: column;
     background-color: #ffffff;
-  }
+  } */
   
   .chat-panel {
     flex-grow: 1;
     padding: 16px;
     display: flex;
     flex-direction: column;
+    height: 100vh;
   }
   .chat-recipient {
     color: black;
     font-size: 1.5rem;
+    border-bottom: 1px solid #ccc;
   }
   .chat-header {
     font-weight: bold;
@@ -26,6 +28,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    justify-content: flex-end;
   }
   
   .message {
@@ -54,6 +57,8 @@
     display: flex;
     justify-content: center;
     border-top: 1px solid #ccc;
+    position: sticky; /* Ensure it stays at the bottom */
+    bottom: 0;
   }
   
   .message-input {

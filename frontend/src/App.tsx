@@ -7,24 +7,25 @@ import './App.css';
 function App() {
   return (
     <div className="app-container">
-      {/* Main container with Sidebar and Chat Panel */}
-      <Container>
+      {/* flex with Sidebar and Chat Panel */}
         <Flex
-          mt="5"
-          pt="2"
-          px="4"
           style={{
             background: "#F3E8FF",
-            minHeight: 500,
+            height: "100vh",
             display: "flex",
+            flexDirection: "row",
           }}
         >
           <ChatSidebar className="chat-sidebar" />
           <ChatPanel className="chat-panel" />
         </Flex>
-        
-      </Container>
-      <Box>
+      <Box
+        style={{
+          position: "absolute",
+          top: "16px",
+          right: "16px",
+        }}
+      >
           <ConnectButton />
         </Box>
     </div>

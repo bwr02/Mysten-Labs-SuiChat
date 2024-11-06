@@ -2,19 +2,20 @@
     display: flex;
     height: 100vh;
     background-color: #f5f3ff; /* Light purple background */
+    flex-direction: column;
   }
   
   .chat-sidebar {
     width: 25%;
     padding: 10px;
     border-right: 1px solid #ccc;
-    background-color: #fff;
+    background-color: #f5f3ff;
   }
 
   .chat-panel {
     width: 75%;
     padding: 10px;
-    background-color: #F3E8FF;
+    background-color: white;
     display: flex;
     flex-direction: column;
   }
