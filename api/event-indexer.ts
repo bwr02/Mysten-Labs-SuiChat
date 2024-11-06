@@ -26,14 +26,14 @@ const handleMessageCreated = (events: SuiEvent[]) => {
 
 const EVENTS_TO_TRACK: EventTracker[] = [
     {
-        type: 'your_package_name::message_platform::MessageCreated', // Adjust package name
+        type: `${CONFIG.MESSAGE_CONTRACT}::send_message::MessageCreated`,
         filter: {
             MoveEventModule: {
-                module: 'message_platform',
+                module: 'send_message',
                 package: CONFIG.MESSAGE_CONTRACT, // package ID
             },
         },
-        callback: handleMessageCreated, // Function to handle the event
+        callback: handleMessageCreated,
     },
 ];
 
