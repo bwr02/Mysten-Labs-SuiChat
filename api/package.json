@@ -1,9 +1,14 @@
 {
   "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
     "@types/node": "^22.8.7"
   },
   "dependencies": {
     "@mysten/sui": "^1.14.1",
+    "@prisma/client": "5.21.1",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
     "prisma": "^5.21.1"
   }
 }

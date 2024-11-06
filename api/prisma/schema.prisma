@@ -13,23 +13,20 @@ datasource db {
 	url			= "file:./dev.db"
 }
 
-/// Our swap objects list
-model Escrow {
-	// Keeping an ID so we can use as a pagination cursor
-	// There's an issue with BigInt for sqlite, so we're using a plain ID.
-	id Int @id @default(autoincrement())
-	sender String?
-	recipient String?
-  content String?
-	timestamp Int?
-	
-	@@index([recipient])
-	@@index([sender])
+model Message {
+  id         String   @id @default(uuid()) // Unique ID for each message
+  sender     String
+  recipient  String
+  message_id String   @unique // Ensures unique message_id for upserts
+  content    Bytes
+  timestamp  Int
+  
+  @@index([message_id])
 }
 
 /// Saves the latest cursor for a given key.
 model Cursor {
-	id String @id
-	eventSeq String
-	txDigest String
+  id String @id
+  eventSeq String
+  txDigest String
 }
