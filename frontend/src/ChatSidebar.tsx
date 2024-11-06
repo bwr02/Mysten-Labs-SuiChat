@@ -1,5 +1,5 @@
 import "./ChatSidebar.css";
-
+// component to display all the chat previews on the left handside
 export function ChatSidebar() {
   const conversations = [
     { name: "Ben", message: "Just finished our prd doc!", time: "10 min" },

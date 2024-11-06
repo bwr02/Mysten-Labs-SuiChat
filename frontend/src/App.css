@@ -4,3 +4,17 @@
     background-color: #f5f3ff; /* Light purple background */
   }
   
+  .chat-sidebar {
+    width: 25%;
+    padding: 10px;
+    border-right: 1px solid #ccc;
+    background-color: #fff;
+  }
+
+  .chat-panel {
+    width: 75%;
+    padding: 10px;
+    background-color: #F3E8FF;
+    display: flex;
+    flex-direction: column;
+  }

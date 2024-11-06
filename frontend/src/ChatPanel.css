@@ -48,20 +48,19 @@
   }
 
   .message-input-container {
-    position: fixed;
-    bottom: 0;
     width: 100%;
     padding: 8px;
     background-color: #f5f3ff;
     display: flex;
     justify-content: center;
+    border-top: 1px solid #ccc;
   }
   
   .message-input {
     display: flex;
     align-items: center;
     width: 100%;
-    max-width: 800px; /* Adjust as needed */
+    max-width: 800px; 
     padding: 8px;
     background-color: #e6e6fa;
     border-radius: 24px;
@@ -91,5 +90,4 @@
     display: flex;
     align-items: center;
   }
-  
   

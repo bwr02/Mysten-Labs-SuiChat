@@ -1,6 +1,6 @@
 import "./ChatPanel.css";
-// import "./MesageInput.css"
-import MessageInput from "./Input";
+import MessageInput from "./MessageInput";
+// component to display the current open chat and its messages
 export function ChatPanel() {
   return (
     <div className="chat-panel">
@@ -14,8 +14,6 @@ export function ChatPanel() {
             <MessageInput />
         </div>
       </div>
-      {/* Message input at the bottom */}
-      
     </div>
   );
 }
