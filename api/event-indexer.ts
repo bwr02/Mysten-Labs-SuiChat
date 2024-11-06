@@ -10,9 +10,14 @@ type MessageCreatedEvent = {
     sender: string;
     recipient: string;
     message_id: string;
-    content: Uint8Array;
+    content: Buffer;
     timestamp: number;
 }
+
+type EventExecutionResult = {
+	cursor: SuiEventsCursor;
+	hasNextPage: boolean;
+};
 
 type EventTracker = {
     type: string;
@@ -21,73 +26,76 @@ type EventTracker = {
 };
 
 const handleMessageCreated = async (events: SuiEvent[], type: string) => {
-    // events.forEach(event => {
-    //     const { sender, recipient, content, timestamp } = event.parsedJson as MessageCreatedEvent;
-    //     console.log(`New message from ${sender} to ${recipient}: ${new TextDecoder().decode(content)} at ${timestamp}`);
-    // });
-
-    // // const updates: Record<string, MessageCreateInput> = {};
-
-	// // for (const event of events) {
-	// // 	if (!event.type.startsWith(type)) throw new Error('Invalid event module origin');
-	// // 	// const data = event.parsedJson as MessageCreatedEvent;
-
-	// // 	// if (!Object.hasOwn(updates, data.escrow_id)) {
-	// // 	// 	updates[data.escrow_id] = {
-	// // 	// 		objectId: data.escrow_id,
-	// // 	// 	};
-	// // 	// }
-
-	// // 	// const creationData = event.parsedJson as MessageCreatedEvent;
-
-	// // 	// // Handle creation event
-	// // 	// updates[creationData.message_id].sender = creationData.sender;
-	// // 	// updates[creationData.message_id].recipient = creationData.recipient;
-	// // 	// updates[creationData.message_id].content = creationData.content;
-	// // 	// updates[creationData.message_id].timestamp = creationData.timestamp;
-	// // }
-
-    // const promises = Object.values(updates).map((update) =>
-	// 	prisma.escrow.upsert({
-	// 		where: {
-	// 			objectId: update.objectId,
-	// 		},
-	// 		create: update,
-	// 		update,
-	// 	}),
-	// );
-	// await Promise.all(promises);
-
-    // Loop through each event and process it individually
-    const promises = events.map(async (event) => {
+    events.forEach(event => {
         const { sender, recipient, message_id, content, timestamp } = event.parsedJson as MessageCreatedEvent;
-
         console.log(`New message from ${sender} to ${recipient}: ${new TextDecoder().decode(content)} at ${timestamp}`);
-
-        // Convert Uint8Array content to Buffer
-        const contentBuffer = Buffer.from(content);
-
-        // Upsert the message into the `message` table
-        await prisma.message.upsert({
-            where: {
-                message_id: message_id, // Use `message_id` as the unique identifier
-            },
-            create: {
-                sender,
-                recipient,
-                message_id: message_id, // Ensure message_id is stored to avoid duplicates
-                content: contentBuffer,
-                timestamp,
-            },
-            update: {
-                content: contentBuffer,
-                timestamp,
-            },
-        });
     });
 
-    // Await all upsert promises to complete
-    await Promise.all(promises);
+    const updates: Record<string, MessageCreatedEvent> = {};
+
+	for (const event of events) {
+		if (!event.type.startsWith(type)) throw new Error('Invalid event module origin');
+		const data = event.parsedJson as MessageCreatedEvent;
+
+		// if (!Object.hasOwn(updates, data.message_id)) {
+		// 	updates[data.message_id] = {
+		// 		message_id: data.message_id,
+		// 	};
+		// }
+
+		const creationData = event.parsedJson as MessageCreatedEvent;
+
+        // Convert Uint8Array content to Buffer
+        // const contentBuffer = Buffer.from(creationData.content);
+
+		// Handle creation event
+		updates[creationData.message_id].sender = creationData.sender;
+		updates[creationData.message_id].recipient = creationData.recipient;
+		updates[creationData.message_id].content = creationData.content;
+		updates[creationData.message_id].timestamp = creationData.timestamp;
+	}
+
+    const promises = Object.values(updates).map((update) =>
+		prisma.message.upsert({
+			where: {
+				message_id: update.message_id,
+			},
+			create: update,
+			update,
+		}),
+	);
+	await Promise.all(promises);
+
+    // // Loop through each event and process it individually
+    // const promises = events.map(async (event) => {
+    //     const { sender, recipient, message_id, content, timestamp } = event.parsedJson as MessageCreatedEvent;
+
+    //     console.log(`New message from ${sender} to ${recipient}: ${new TextDecoder().decode(content)} at ${timestamp}`);
+
+    //     // Convert Uint8Array content to Buffer
+    //     const contentBuffer = Buffer.from(content);
+
+    //     // Upsert the message into the `message` table
+    //     await prisma.message.upsert({
+    //         where: {
+    //             message_id: message_id, // Use `message_id` as the unique identifier
+    //         },
+    //         create: {
+    //             sender,
+    //             recipient,
+    //             message_id: message_id, // Ensure message_id is stored to avoid duplicates
+    //             content: contentBuffer,
+    //             timestamp,
+    //         },
+    //         update: {
+    //             content: contentBuffer,
+    //             timestamp,
+    //         },
+    //     });
+    // });
+
+    // // Await all upsert promises to complete
+    // await Promise.all(promises);
 };
 
 const EVENTS_TO_TRACK: EventTracker[] = [
@@ -96,7 +104,7 @@ const EVENTS_TO_TRACK: EventTracker[] = [
         filter: {
             MoveEventModule: {
                 module: 'message_platform',
-                package: CONFIG.MESSAGE_CONTRACT, // package ID
+                package: CONFIG.MESSAGE_CONTRACT.packageId, // package ID
             },
         },
         callback: handleMessageCreated, // Function to handle the event
@@ -109,7 +117,7 @@ const executeEventJob = async (
     client: SuiClient,
     tracker: EventTracker,
     cursor: SuiEventsCursor,
-) => {
+): Promise<EventExecutionResult> => {
     try {
         const { data, hasNextPage, nextCursor } = await client.queryEvents({
             query: tracker.filter,
@@ -180,10 +188,16 @@ const saveLatestCursor = async (tracker: EventTracker, cursor: EventId) => {
 	});
 };
 
-// Setup the listeners
+// // Setup the listeners
+// export const setupListeners = async () => {
+//     const client = getClient(CONFIG.NETWORK); // Adjust based on your client setup
+//     for (const event of EVENTS_TO_TRACK) {
+//         runEventJob(client, event, null); // Start with a null cursor
+//     }
+// };
+
 export const setupListeners = async () => {
-    const client = getClient(CONFIG.NETWORK); // Adjust based on your client setup
-    for (const event of EVENTS_TO_TRACK) {
-        runEventJob(client, event, null); // Start with a null cursor
-    }
+	for (const event of EVENTS_TO_TRACK) {
+		runEventJob(getClient(CONFIG.NETWORK), event, await getLatestCursor(event));
+	}
 };

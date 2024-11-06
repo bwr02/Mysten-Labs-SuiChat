@@ -14,14 +14,15 @@ datasource db {
 }
 
 model Message {
-  id         String   @id @default(uuid()) // Unique ID for each message
-  sender     String
-  recipient  String
+  id Int @id @default(autoincrement())
+  sender     String?
+  recipient  String?
   message_id String   @unique // Ensures unique message_id for upserts
-  content    Bytes
-  timestamp  Int
+  content    Bytes?
+  timestamp  Int?
   
-  @@index([message_id])
+  @@index([recipient])
+  @@index([sender])
 }
 
 /// Saves the latest cursor for a given key.
