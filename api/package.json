@@ -3,6 +3,7 @@
     "@types/node": "^22.8.7"
   },
   "dependencies": {
-    "@mysten/sui": "^1.14.1"
+    "@mysten/sui": "^1.14.1",
+    "prisma": "^5.21.1"
   }
 }
