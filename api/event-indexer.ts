@@ -4,14 +4,24 @@ import { Prisma } from '@prisma/client';
 import { prisma } from './db';
 import { getClient } from './sui-utils';
 
+var id_cur = Number(1);
+
 type SuiEventsCursor = EventId | null | undefined;
 
 type MessageCreatedEvent = {
     sender: string;
     recipient: string;
-    message_id: string;
-    content: Buffer;
-    timestamp: number;
+    // message_id: string;
+    content: Uint8Array;
+    timestamp: string;
+}
+
+type MessageCreatedInput = {
+    sender: string;
+    recipient: string;
+    // message_id: string;
+    content: string;
+    timestamp: string;
 }
 
 type EventExecutionResult = {
@@ -25,78 +35,117 @@ type EventTracker = {
     callback: (events: SuiEvent[], type: string) => any;
 };
 
+// const handleMessageCreated = async (events: SuiEvent[], type: string) => {
+//     // events.forEach(event => {
+//     //     const { sender, recipient, message_id, content, timestamp } = event.parsedJson as MessageCreatedEvent;
+//     //     // console.log(`New message from ${sender} to ${recipient}: ${new TextDecoder().decode(content)} at ${timestamp}`);
+//     // });
+
+//     const updates: Record<string, MessageCreatedInput> = {};
+
+// 	for (const event of events) {
+// 		// if (!event.type.startsWith(type)) throw new Error('Invalid event module origin');
+// 		// const data = event.parsedJson as MessageCreatedEvent;
+
+// 		// if (!Object.hasOwn(updates, data.message_id)) {
+// 		// 	updates[data.message_id] = {
+// 		// 		message_id: data.message_id,
+// 		// 	};
+// 		// }
+
+// 		const creationData = event.parsedJson as MessageCreatedEvent;
+//         console.log(creationData.content);
+//         console.log(new TextDecoder().decode(new Uint8Array(creationData.content)));
+//         console.log(creationData.message_id);
+
+//         // Convert Uint8Array content to Buffer
+//         // const contentBuffer = Buffer.from(creationData.content);
+
+// 		// Handle creation event
+// 		updates[creationData.message_id].sender = creationData.sender;
+// 		updates[creationData.message_id].recipient = creationData.recipient;
+// 		updates[creationData.message_id].content = new TextDecoder().decode(new Uint8Array(creationData.content));
+// 		updates[creationData.message_id].timestamp = creationData.timestamp;
+
+//         console.log(updates)
+// 	}
+
+//     const promises = Object.values(updates).map((update) =>
+// 		prisma.message.upsert({
+// 			where: {
+// 				message_id: update.message_id,
+// 			},
+// 			create: update,
+// 			update,
+// 		}),
+// 	);
+// 	await Promise.all(promises);
+
+//     // // Loop through each event and process it individually
+//     // const promises = events.map(async (event) => {
+//     //     const { sender, recipient, message_id, content, timestamp } = event.parsedJson as MessageCreatedEvent;
+
+//     //     console.log(`New message from ${sender} to ${recipient}: ${new TextDecoder().decode(content)} at ${timestamp}`);
+
+//     //     // Convert Uint8Array content to Buffer
+//     //     const contentBuffer = Buffer.from(content);
+
+//     //     // Upsert the message into the `message` table
+//     //     await prisma.message.upsert({
+//     //         where: {
+//     //             message_id: message_id, // Use `message_id` as the unique identifier
+//     //         },
+//     //         create: {
+//     //             sender,
+//     //             recipient,
+//     //             message_id: message_id, // Ensure message_id is stored to avoid duplicates
+//     //             content: contentBuffer,
+//     //             timestamp,
+//     //         },
+//     //         update: {
+//     //             content: contentBuffer,
+//     //             timestamp,
+//     //         },
+//     //     });
+//     // });
+
+//     // // Await all upsert promises to complete
+//     // await Promise.all(promises);
+// };
+
 const handleMessageCreated = async (events: SuiEvent[], type: string) => {
-    events.forEach(event => {
-        const { sender, recipient, message_id, content, timestamp } = event.parsedJson as MessageCreatedEvent;
-        console.log(`New message from ${sender} to ${recipient}: ${new TextDecoder().decode(content)} at ${timestamp}`);
-    });
+    const updates: MessageCreatedInput[] = []; // Use an array instead of an object keyed by message_id
 
-    const updates: Record<string, MessageCreatedEvent> = {};
+    for (const event of events) {
+        const creationData = event.parsedJson as MessageCreatedEvent;
+        
+        updates.push({
+            sender: creationData.sender,
+            recipient: creationData.recipient,
+            content: new TextDecoder().decode(new Uint8Array(creationData.content)),
+            timestamp: creationData.timestamp
+        });
+    }
 
-	for (const event of events) {
-		if (!event.type.startsWith(type)) throw new Error('Invalid event module origin');
-		const data = event.parsedJson as MessageCreatedEvent;
+    // Iterate over the updates without needing message_id for `upsert`
+    const promises = updates.map((update) =>
+        prisma.message.upsert({
+            where: {
+                id: id_cur,
+                sender: update.sender, // Use a unique combination to upsert without message_id
+                recipient: update.recipient,
+                timestamp: update.timestamp
+            },
+            create: update,
+            update,
+        })
+    );
 
-		// if (!Object.hasOwn(updates, data.message_id)) {
-		// 	updates[data.message_id] = {
-		// 		message_id: data.message_id,
-		// 	};
-		// }
+    id_cur = id_cur +1;
 
-		const creationData = event.parsedJson as MessageCreatedEvent;
-
-        // Convert Uint8Array content to Buffer
-        // const contentBuffer = Buffer.from(creationData.content);
-
-		// Handle creation event
-		updates[creationData.message_id].sender = creationData.sender;
-		updates[creationData.message_id].recipient = creationData.recipient;
-		updates[creationData.message_id].content = creationData.content;
-		updates[creationData.message_id].timestamp = creationData.timestamp;
-	}
-
-    const promises = Object.values(updates).map((update) =>
-		prisma.message.upsert({
-			where: {
-				message_id: update.message_id,
-			},
-			create: update,
-			update,
-		}),
-	);
-	await Promise.all(promises);
-
-    // // Loop through each event and process it individually
-    // const promises = events.map(async (event) => {
-    //     const { sender, recipient, message_id, content, timestamp } = event.parsedJson as MessageCreatedEvent;
-
-    //     console.log(`New message from ${sender} to ${recipient}: ${new TextDecoder().decode(content)} at ${timestamp}`);
-
-    //     // Convert Uint8Array content to Buffer
-    //     const contentBuffer = Buffer.from(content);
-
-    //     // Upsert the message into the `message` table
-    //     await prisma.message.upsert({
-    //         where: {
-    //             message_id: message_id, // Use `message_id` as the unique identifier
-    //         },
-    //         create: {
-    //             sender,
-    //             recipient,
-    //             message_id: message_id, // Ensure message_id is stored to avoid duplicates
-    //             content: contentBuffer,
-    //             timestamp,
-    //         },
-    //         update: {
-    //             content: contentBuffer,
-    //             timestamp,
-    //         },
-    //     });
-    // });
-
-    // // Await all upsert promises to complete
-    // await Promise.all(promises);
+    await Promise.all(promises);
 };
+
 
 const EVENTS_TO_TRACK: EventTracker[] = [
     {

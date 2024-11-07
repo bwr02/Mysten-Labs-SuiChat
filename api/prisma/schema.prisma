@@ -17,9 +17,9 @@ model Message {
   id Int @id @default(autoincrement())
   sender     String?
   recipient  String?
-  message_id String   @unique // Ensures unique message_id for upserts
-  content    Bytes?
-  timestamp  Int?
+  //message_id String   @unique // Ensures unique message_id for upserts
+  content    String?
+  timestamp  String?
   
   @@index([recipient])
   @@index([sender])
