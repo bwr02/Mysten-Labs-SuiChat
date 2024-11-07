@@ -1,6 +1,5 @@
 import { SuiClient } from '@mysten/sui.js/client';
-
-const PACKAGE_ID = '0x6f06ff51a46a11e1eacb086822eb42405a1c4636971a4d8b8eccdf55c3b39a9d';
+import { CONFIG } from '../config';
 
 const client = new SuiClient({
     url: 'https://fullnode.testnet.sui.io:443',
@@ -52,7 +51,7 @@ async function getEventsByModule() {
     const events = await client.queryEvents({
         query: {
             MoveModule: {
-                package: PACKAGE_ID,
+                package: CONFIG.MESSAGE_CONTRACT.packageId,
                 module: 'send_message'
             }
         }
@@ -66,7 +65,7 @@ async function getEventsByModule() {
 async function getEventsByType() {
     const events = await client.queryEvents({
         query: {
-            MoveEventType: `${PACKAGE_ID}::send_message::MessageCreated`
+            MoveEventType: `${CONFIG.MESSAGE_CONTRACT.packageId}::send_message::MessageCreated`
         }
     });
     console.log('\nEvents by type:');

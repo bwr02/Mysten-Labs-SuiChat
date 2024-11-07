@@ -1,8 +1,7 @@
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 import { SuiClient } from '@mysten/sui.js/client';
 import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
-
-const PACKAGE_ID = '0x6f06ff51a46a11e1eacb086822eb42405a1c4636971a4d8b8eccdf55c3b39a9d';
+import { CONFIG } from '../config';
 
 const client = new SuiClient({
     url: 'https://fullnode.testnet.sui.io:443',
@@ -59,7 +58,7 @@ async function executeSendMessage(
         const tx = new TransactionBlock();
         
         tx.moveCall({
-            target: `${PACKAGE_ID}::send_message::send_message`,
+            target: `${CONFIG.MESSAGE_CONTRACT.packageId}::send_message::send_message`,
             arguments: [
                 tx.pure(senderAddress),
                 tx.pure(recipientAddress),
@@ -101,7 +100,7 @@ async function main() {
 
         const sender = myAddress;
         const recipient = '0xc5b4d28027c266bf80603617796513f9b7afc0f66957ead0a94b4d78e1b9671f';
-        const content = new TextEncoder().encode("Hello, world!");
+        const content = new TextEncoder().encode("message 3");
         const timestamp = Date.now();
 
         console.log('\nSending message:');
