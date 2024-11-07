@@ -8,7 +8,7 @@ const client = new SuiClient({
     url: 'https://fullnode.testnet.sui.io:443',
 });
 
-const MNEMONIC = "reveal typical birth bamboo middle urban bring ginger armor peanut bar someone";
+const MNEMONIC = "";
 const keypair = Ed25519Keypair.deriveKeypair(MNEMONIC);
 const myAddress = keypair.getPublicKey().toSuiAddress();
 
