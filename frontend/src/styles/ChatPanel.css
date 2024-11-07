@@ -1,19 +1,21 @@
-.chat-panel-container {
-    width: 75%;
+/* .chat-panel-container {
+    width: 75%; 
     display: flex;
     flex-direction: column;
     background-color: #ffffff;
-  }
+  } */
   
   .chat-panel {
     flex-grow: 1;
     padding: 16px;
     display: flex;
     flex-direction: column;
+    height: 100vh;
   }
   .chat-recipient {
     color: black;
     font-size: 1.5rem;
+    border-bottom: 1px solid #ccc;
   }
   .chat-header {
     font-weight: bold;
@@ -26,6 +28,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    justify-content: flex-end;
   }
   
   .message {
@@ -48,20 +51,21 @@
   }
 
   .message-input-container {
-    position: fixed;
-    bottom: 0;
     width: 100%;
     padding: 8px;
     background-color: #f5f3ff;
     display: flex;
     justify-content: center;
+    border-top: 1px solid #ccc;
+    position: sticky; /* Ensure it stays at the bottom */
+    bottom: 0;
   }
   
   .message-input {
     display: flex;
     align-items: center;
     width: 100%;
-    max-width: 800px; /* Adjust as needed */
+    max-width: 800px; 
     padding: 8px;
     background-color: #e6e6fa;
     border-radius: 24px;
@@ -91,5 +95,4 @@
     display: flex;
     align-items: center;
   }
-  
   
