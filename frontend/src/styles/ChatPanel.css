@@ -15,10 +15,11 @@
   .chat-recipient {
     color: black;
     font-size: 1.5rem;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 0px solid #ccc;
   }
   .chat-header {
     font-weight: bold;
+    padding: 25px;
     font-size: 1rem;
     margin-bottom: 16px;
   }
@@ -26,9 +27,11 @@
   .chat-messages {
     flex-grow: 1;
     display: flex;
+    padding: 10px;
     flex-direction: column;
     gap: 8px;
     justify-content: flex-end;
+    margin-bottom: 16px;
   }
   
   .message {
