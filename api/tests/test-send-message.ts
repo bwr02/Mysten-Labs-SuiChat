@@ -8,7 +8,11 @@ dotenv.config();
 const client = new SuiClient({
     url: 'https://fullnode.testnet.sui.io:443',
 });
+
 const MNEMONIC = process.env.WALLET_MNEMONIC;
+if (!MNEMONIC) {
+    throw new Error("WALLET_MNEMONIC is not defined in the environment variables.");
+}
 
 const keypair = Ed25519Keypair.deriveKeypair(MNEMONIC);
 const myAddress = keypair.getPublicKey().toSuiAddress();
