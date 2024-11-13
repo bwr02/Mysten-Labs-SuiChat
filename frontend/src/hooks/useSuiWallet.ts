@@ -11,7 +11,7 @@ export const useSuiWallet = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const initializeWallet = async () => {
+        const deriveKeysFromMnemonic = async () => {
             try {
                 if (!env.WALLET_MNEMONIC) {
                     throw new Error('Wallet mnemonic not configured in environment variables');
@@ -33,7 +33,7 @@ export const useSuiWallet = () => {
             }
         };
 
-        initializeWallet();
+        deriveKeysFromMnemonic();
     }, []);
 
     const refreshBalance = async () => {
