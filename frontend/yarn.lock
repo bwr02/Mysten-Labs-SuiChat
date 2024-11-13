@@ -533,7 +533,7 @@
     clsx "^2.1.1"
     zustand "^4.5.4"
 
-"@mysten/sui.js@^0.54.1":
+"@mysten/sui.js@0.54.1", "@mysten/sui.js@^0.54.1":
   version "0.54.1"
   resolved "https://registry.yarnpkg.com/@mysten/sui.js/-/sui.js-0.54.1.tgz#27b6724dd30e0e81d50b47437cb206d0cec25f8b"
   integrity sha512-TSmGIX7U9O/uS9EKIQdv7/S69KTbBhMJVelXCafJE6IJw8iB9cN9uLu0+uklkBSDrbRmLSEY70jMr3uRFjReIg==
@@ -568,6 +568,13 @@
     graphql "^16.9.0"
     tweetnacl "^1.0.3"
     valibot "^0.36.0"
+
+"@mysten/suins@0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@mysten/suins/-/suins-0.0.3.tgz#16fb635f9be2b1c69f9d10ca7aa7533b04a825bd"
+  integrity sha512-OqKjV0QGt3Jrip+WYO8Qjf8W3mhovqVnJO5DxEuHF6WAdfYYFE2kWwgBKcOFZl+QetvPP3QzK2QQO8eMZe2GQA==
+  dependencies:
+    "@mysten/sui.js" "0.54.1"
 
 "@mysten/wallet-standard@0.13.11":
   version "0.13.11"
