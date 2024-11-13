@@ -24,7 +24,6 @@ export const sendMessage = async ({
         const normalizedSenderAddress = normalizeSuiAddress(senderAddress);
         const normalizedRecipientAddress = normalizeSuiAddress(recipientAddress);
 
-
         // Check balance first
         const balanceInfo = await checkBalance(normalizedSenderAddress);
         if (BigInt(balanceInfo.totalBalance) === BigInt(0)) {
@@ -41,12 +40,9 @@ export const sendMessage = async ({
 
         // Create transaction
         const tx = new TransactionBlock();
-
-        // Make sure the package ID is correctly formatted
-        const [packageId, module, function_name] = CONFIG.MESSAGE_CONTRACT.packageId.split('::');
         
         tx.moveCall({
-            target: `${packageId}::${module || 'send_message'}::${function_name || 'send_message'}`,
+            target: `${CONFIG.MESSAGE_CONTRACT.packageId}::messenger::send_message`,
             arguments: [
                 tx.pure(normalizedSenderAddress),
                 tx.pure(normalizedRecipientAddress),
