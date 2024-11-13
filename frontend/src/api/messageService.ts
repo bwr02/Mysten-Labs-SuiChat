@@ -48,8 +48,8 @@ export const sendMessage = async ({
         tx.moveCall({
             target: `${packageId}::${module || 'send_message'}::${function_name || 'send_message'}`,
             arguments: [
-                tx.pure(senderAddress),
-                tx.pure(recipientAddress),
+                tx.pure(normalizedSenderAddress),
+                tx.pure(normalizedRecipientAddress),
                 tx.pure(Array.from(encodedContent)),
                 tx.pure(BigInt(timestamp))
             ],
