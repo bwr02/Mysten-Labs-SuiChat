@@ -1,5 +1,5 @@
 import "../styles/ChatPanel.css";
-import MessageInput from "./MessageInput";
+import MessageInputField from "./MessageInputField";
 // component to display the current open chat and its messages
 export function ChatPanel() {
   const messages = [
@@ -19,7 +19,7 @@ export function ChatPanel() {
         ))}
       </div>
       <div className="message-input-container">
-        <MessageInput />
+        <MessageInputField />
       </div>
     </div>
   );
