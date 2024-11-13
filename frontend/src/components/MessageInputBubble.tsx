@@ -33,7 +33,7 @@ export default function MessageInputBubble({
 
       const result = await sendMessage({
         senderAddress: address,
-        recipientAddress: "0xc5b4d28027c266bf80603617796513f9b7afc0f66957ead0a94b4d78e1b9671f", // Replace with actual recipient
+        recipientAddress: "0xc5b4d28027c266bf80603617796513f9b7afc0f66957ead0a94b4d78e1b9671f", // TODO: Replace with actual recipient
         content: message,
         keypair
       });

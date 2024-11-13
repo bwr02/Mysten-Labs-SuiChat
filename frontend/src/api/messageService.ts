@@ -42,7 +42,7 @@ export const sendMessage = async ({
         const tx = new TransactionBlock();
         
         tx.moveCall({
-            target: `${CONFIG.MESSAGE_CONTRACT.packageId}::messenger::send_message`,
+            target: `${CONFIG.MESSAGE_CONTRACT.packageId}::send_message::send_message`,
             arguments: [
                 tx.pure(normalizedSenderAddress),
                 tx.pure(normalizedRecipientAddress),
