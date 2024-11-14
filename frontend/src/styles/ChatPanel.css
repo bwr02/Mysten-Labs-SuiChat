@@ -58,17 +58,30 @@
     padding: 8px;
     background-color: #f5f3ff;
     display: flex;
+    flex-direction: column; /* Stack items vertically */
     justify-content: center;
-    border-top: 1px solid #ccc;
     position: sticky; /* Ensure it stays at the bottom */
     bottom: 0;
+  }
+
+  .wallet-status {
+    margin-bottom: 16px; /* Adds space below the wallet status */
+    text-align: center;
+}
+
+  .wallet-info {
+    color: black;
+  }
+
+  .transaction-status {
+    color: gray;
   }
   
   .message-input {
     display: flex;
     align-items: center;
     width: 100%;
-    max-width: 800px; 
+    max-width: 100%; 
     padding: 8px;
     background-color: #e6e6fa;
     border-radius: 24px;

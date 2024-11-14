@@ -10,14 +10,14 @@ export default function MessageInputField() {
   if (error) return <div className="error-state">Wallet Error: {error}</div>;
 
   return (
-    <div className="message-field-container">
+    <div className="message-input-container">
       <div className="wallet-status">
-        <div className="wallet-info" style={{ color: 'black' }}>
+        <div className="wallet-info">
           <p>Connected: {address?.slice(0, 6)}...{address?.slice(-4)}</p>
           <p>Balance: {balance}</p>
         </div>
         {txStatus && (
-          <div className="transaction-status" style={{ color: 'black' }}>
+          <div className="transaction-status">
             {txStatus}
           </div>
         )}
