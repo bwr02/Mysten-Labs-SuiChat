@@ -1,12 +1,11 @@
 import { Transaction } from '@mysten/sui/transactions';
+import { TransactionBlock } from '@mysten/sui.js/transactions';
 import { CONFIG } from '../config';
 import { ACTIVE_NETWORK, getActiveAddress, signAndExecute } from '../sui-utils';
 
 // A simple example of creating and sending messages.
 const createDemoMessages = async (totalMessages: number) => {
-  if (totalMessages < 5) throw new Error('Please create at least 5 messages to run this script.');
-
-  const txb = new Transaction();
+  const txb = new TransactionBlock();
   const toSend = [];
 
   txb.setGasBudget(100000000);
@@ -25,12 +24,12 @@ const createDemoMessages = async (totalMessages: number) => {
 
     // Call send_message from the message_platform package
     const messageCall = txb.moveCall({
-      target: `${CONFIG.MESSAGE_CONTRACT.packageId}::message_platform::send_message`,
+      target: `${CONFIG.MESSAGE_CONTRACT.packageId}::send_message::send_message`,
       arguments: [
-        txb.pure.address(sender),
-        txb.pure.address(recipient),
-        // txb.pure.(content), // Convert the content to vector<u8>
-        txb.pure.u64(timestamp),
+        txb.pure(sender),
+        txb.pure(recipient),
+        txb.pure(content), // Convert the content to vector<u8>
+        txb.pure(BigInt(timestamp)),
       ],
     });
 
@@ -46,4 +45,4 @@ const createDemoMessages = async (totalMessages: number) => {
   console.log('Successfully sent demo messages.');
 };
 
-createDemoMessages(30);
+createDemoMessages(1);

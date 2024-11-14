@@ -1,38 +1,34 @@
 import { ConnectButton } from "@mysten/dapp-kit";
 import { Box, Container, Flex, Heading } from "@radix-ui/themes";
-import { WalletStatus } from "./WalletStatus";
+import { ChatSidebar } from "./components/ChatSidebar";
+import { ChatPanel } from "./components/ChatPanel";
+import './styles/App.css';
 
 function App() {
   return (
-    <>
-      <Flex
-        position="sticky"
-        px="4"
-        py="2"
-        justify="between"
+    <div className="app-container">
+      {/* flex with Sidebar and Chat Panel */}
+        <Flex
+          style={{
+            background: "#F3E8FF",
+            height: "100vh",
+            display: "flex",
+            flexDirection: "row",
+          }}
+        >
+          <ChatSidebar className="chat-sidebar" />
+          <ChatPanel className="chat-panel" />
+        </Flex>
+      <Box
         style={{
-          borderBottom: "1px solid var(--gray-a2)",
+          position: "absolute",
+          top: "16px",
+          right: "16px",
         }}
       >
-        <Box>
-          <Heading>SuiChat</Heading>
-        </Box>
-
-        <Box>
           <ConnectButton />
         </Box>
-      </Flex>
-      <Container>
-        <Container
-          mt="5"
-          pt="2"
-          px="4"
-          style={{ background: "var(--gray-a2)", minHeight: 500 }}
-        >
-          <WalletStatus />
-        </Container>
-      </Container>
-    </>
+    </div>
   );
 }
 

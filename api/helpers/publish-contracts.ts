@@ -6,7 +6,7 @@ import { publishPackage } from '../sui-utils';
 /// We're publishing both as part of our demo.
 (async () => {
 	await publishPackage({
-		packagePath: __dirname + '/../../contracts',
+		packagePath: __dirname + '/../../contracts/chat',
 		network: 'testnet',
 		exportFileName: 'message-contract',
 	});

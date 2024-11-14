@@ -1,4 +1,5 @@
-import { EventId, SuiClient, SuiEvent, SuiEventFilter } from '@mysten/sui/client';
+import { EventId, SuiEvent, SuiEventFilter } from '@mysten/sui/client';
+import { SuiClient } from '@mysten/sui.js/client';
 import { CONFIG } from './config';
 import { Prisma } from '@prisma/client';
 import { prisma } from './db';
@@ -35,88 +36,11 @@ type EventTracker = {
     callback: (events: SuiEvent[], type: string) => any;
 };
 
-// const handleMessageCreated = async (events: SuiEvent[], type: string) => {
-//     // events.forEach(event => {
-//     //     const { sender, recipient, message_id, content, timestamp } = event.parsedJson as MessageCreatedEvent;
-//     //     // console.log(`New message from ${sender} to ${recipient}: ${new TextDecoder().decode(content)} at ${timestamp}`);
-//     // });
-
-//     const updates: Record<string, MessageCreatedInput> = {};
-
-// 	for (const event of events) {
-// 		// if (!event.type.startsWith(type)) throw new Error('Invalid event module origin');
-// 		// const data = event.parsedJson as MessageCreatedEvent;
-
-// 		// if (!Object.hasOwn(updates, data.message_id)) {
-// 		// 	updates[data.message_id] = {
-// 		// 		message_id: data.message_id,
-// 		// 	};
-// 		// }
-
-// 		const creationData = event.parsedJson as MessageCreatedEvent;
-//         console.log(creationData.content);
-//         console.log(new TextDecoder().decode(new Uint8Array(creationData.content)));
-//         console.log(creationData.message_id);
-
-//         // Convert Uint8Array content to Buffer
-//         // const contentBuffer = Buffer.from(creationData.content);
-
-// 		// Handle creation event
-// 		updates[creationData.message_id].sender = creationData.sender;
-// 		updates[creationData.message_id].recipient = creationData.recipient;
-// 		updates[creationData.message_id].content = new TextDecoder().decode(new Uint8Array(creationData.content));
-// 		updates[creationData.message_id].timestamp = creationData.timestamp;
-
-//         console.log(updates)
-// 	}
-
-//     const promises = Object.values(updates).map((update) =>
-// 		prisma.message.upsert({
-// 			where: {
-// 				message_id: update.message_id,
-// 			},
-// 			create: update,
-// 			update,
-// 		}),
-// 	);
-// 	await Promise.all(promises);
-
-//     // // Loop through each event and process it individually
-//     // const promises = events.map(async (event) => {
-//     //     const { sender, recipient, message_id, content, timestamp } = event.parsedJson as MessageCreatedEvent;
-
-//     //     console.log(`New message from ${sender} to ${recipient}: ${new TextDecoder().decode(content)} at ${timestamp}`);
-
-//     //     // Convert Uint8Array content to Buffer
-//     //     const contentBuffer = Buffer.from(content);
-
-//     //     // Upsert the message into the `message` table
-//     //     await prisma.message.upsert({
-//     //         where: {
-//     //             message_id: message_id, // Use `message_id` as the unique identifier
-//     //         },
-//     //         create: {
-//     //             sender,
-//     //             recipient,
-//     //             message_id: message_id, // Ensure message_id is stored to avoid duplicates
-//     //             content: contentBuffer,
-//     //             timestamp,
-//     //         },
-//     //         update: {
-//     //             content: contentBuffer,
-//     //             timestamp,
-//     //         },
-//     //     });
-//     // });
-
-//     // // Await all upsert promises to complete
-//     // await Promise.all(promises);
-// };
-
 const handleMessageCreated = async (events: SuiEvent[], type: string) => {
     const updates: MessageCreatedInput[] = []; // Use an array instead of an object keyed by message_id
 
     for (const event of events) {
+        console.log("event");
         const creationData = event.parsedJson as MessageCreatedEvent;
         
         updates.push({
@@ -152,7 +76,7 @@ const EVENTS_TO_TRACK: EventTracker[] = [
         type: `${CONFIG.MESSAGE_CONTRACT.packageId}::send_message`, // Adjust package name
         filter: {
             MoveEventModule: {
-                module: 'message_platform',
+                module: 'send_message',
                 package: CONFIG.MESSAGE_CONTRACT.packageId, // package ID
             },
         },
