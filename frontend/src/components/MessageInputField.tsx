@@ -6,8 +6,8 @@ export default function MessageInputField() {
   const { keypair, address, balance, loading, error, refreshBalance } = useSuiWallet();
   const [txStatus, setTxStatus] = useState<string>("");
 
-  if (loading) return <div className="loading-state">Connecting to wallet...</div>;
-  if (error) return <div className="error-state">Wallet Error: {error}</div>;
+  if (loading) return <div className="loading-state" style={{ color: 'black' }}>Connecting to wallet...</div>;
+  if (error) return <div className="error-state" style={{ color: 'black' }}>Wallet Error: {error}</div>;
 
   return (
     <div className="message-field-container">
