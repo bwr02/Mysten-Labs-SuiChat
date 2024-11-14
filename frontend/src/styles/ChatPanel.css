@@ -15,10 +15,11 @@
   .chat-recipient {
     color: black;
     font-size: 1.5rem;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 0px solid #ccc;
   }
   .chat-header {
     font-weight: bold;
+    padding: 25px;
     font-size: 1rem;
     margin-bottom: 16px;
   }
@@ -26,9 +27,11 @@
   .chat-messages {
     flex-grow: 1;
     display: flex;
+    padding: 10px;
     flex-direction: column;
     gap: 8px;
     justify-content: flex-end;
+    margin-bottom: 16px;
   }
   
   .message {
@@ -55,17 +58,30 @@
     padding: 8px;
     background-color: #f5f3ff;
     display: flex;
+    flex-direction: column; /* Stack items vertically */
     justify-content: center;
-    border-top: 1px solid #ccc;
     position: sticky; /* Ensure it stays at the bottom */
     bottom: 0;
+  }
+
+  .wallet-status {
+    margin-bottom: 16px; /* Adds space below the wallet status */
+    text-align: center;
+}
+
+  .wallet-info {
+    color: black;
+  }
+
+  .transaction-status {
+    color: gray;
   }
   
   .message-input {
     display: flex;
     align-items: center;
     width: 100%;
-    max-width: 800px; 
+    max-width: 100%; 
     padding: 8px;
     background-color: #e6e6fa;
     border-radius: 24px;
