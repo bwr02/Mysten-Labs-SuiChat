@@ -1,8 +1,10 @@
 {
   "devDependencies": {
-    "@types/node": "^22.8.7"
+    "@types/dotenv": "^8.2.3",
+    "@types/node": "^22.9.0"
   },
   "dependencies": {
-    "@mysten/sui.js": "^0.54.1"
+    "@mysten/sui.js": "^0.54.1",
+    "dotenv": "^16.4.5"
   }
 }
