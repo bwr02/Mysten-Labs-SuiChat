@@ -533,7 +533,7 @@
     clsx "^2.1.1"
     zustand "^4.5.4"
 
-"@mysten/sui.js@0.54.1", "@mysten/sui.js@^0.54.1":
+"@mysten/sui.js@^0.54.1":
   version "0.54.1"
   resolved "https://registry.yarnpkg.com/@mysten/sui.js/-/sui.js-0.54.1.tgz#27b6724dd30e0e81d50b47437cb206d0cec25f8b"
   integrity sha512-TSmGIX7U9O/uS9EKIQdv7/S69KTbBhMJVelXCafJE6IJw8iB9cN9uLu0+uklkBSDrbRmLSEY70jMr3uRFjReIg==
@@ -569,12 +569,30 @@
     tweetnacl "^1.0.3"
     valibot "^0.36.0"
 
-"@mysten/suins@0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@mysten/suins/-/suins-0.0.3.tgz#16fb635f9be2b1c69f9d10ca7aa7533b04a825bd"
-  integrity sha512-OqKjV0QGt3Jrip+WYO8Qjf8W3mhovqVnJO5DxEuHF6WAdfYYFE2kWwgBKcOFZl+QetvPP3QzK2QQO8eMZe2GQA==
+"@mysten/sui@^1.12.0":
+  version "1.14.3"
+  resolved "https://registry.yarnpkg.com/@mysten/sui/-/sui-1.14.3.tgz#e8ad11ddfaa4543b52ec6e87eb9d49f92eb2e41f"
+  integrity sha512-5vhOnbSAT/9daMIDPYOp7q9j+6DXqjPAYEJy7ZbR9viBsyAx4UMChCwaLyjoYcJKvhrkDn4LTdDTJEUvpj7TTg==
   dependencies:
-    "@mysten/sui.js" "0.54.1"
+    "@graphql-typed-document-node/core" "^3.2.0"
+    "@mysten/bcs" "1.1.0"
+    "@noble/curves" "^1.4.2"
+    "@noble/hashes" "^1.4.0"
+    "@scure/bip32" "^1.4.0"
+    "@scure/bip39" "^1.3.0"
+    "@suchipi/femver" "^1.0.0"
+    bech32 "^2.0.0"
+    gql.tada "^1.8.2"
+    graphql "^16.9.0"
+    tweetnacl "^1.0.3"
+    valibot "^0.36.0"
+
+"@mysten/suins@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@mysten/suins/-/suins-0.4.1.tgz#086dfa4cd3d37a871b72100ba07989d31b9bae90"
+  integrity sha512-5kkYe4VO5Z4enxioUoOTpjgviktL8HZldngDFrojlHJSinYeAs5NWmOy+bsOZOSqtOG0WkCrE8TVOd4duLK+9g==
+  dependencies:
+    "@mysten/sui" "^1.12.0"
 
 "@mysten/wallet-standard@0.13.11":
   version "0.13.11"

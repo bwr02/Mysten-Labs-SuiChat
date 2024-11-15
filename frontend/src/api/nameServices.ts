@@ -6,3 +6,5 @@ export const getSuiNInfo = async (name: string) => {
     return nameRecord;
 }
 
+console.log(getSuiNInfo('demo.sui'))
+
