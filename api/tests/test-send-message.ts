@@ -71,6 +71,17 @@ async function executeSendMessage(
             ],
         });
 
+        // Chloe's sign and execute using keypair derived from MNEMONIC
+        // const result = await client.signAndExecuteTransactionBlock({
+        //     signer: keypair,
+        //     transactionBlock: tx,
+        //     options: {
+        //         showEvents: true,
+        //         showEffects: true,
+        //     },
+        // });
+
+        // sign and execute helper doing the same thing without MNEMONIC
         const result = await signAndExecute(tx, ACTIVE_NETWORK)
 
         console.log("Transaction result:", result);
@@ -97,7 +108,7 @@ async function main() {
 
         const sender = myAddress;
         const recipient = '0xc5b4d28027c266bf80603617796513f9b7afc0f66957ead0a94b4d78e1b9671f';
-        const content = new TextEncoder().encode("ashton db test");
+        const content = new TextEncoder().encode("message 1");
         const timestamp = Date.now();
 
         console.log('\nSending message:');

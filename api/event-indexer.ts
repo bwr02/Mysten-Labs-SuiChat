@@ -3,7 +3,7 @@ import { SuiClient } from '@mysten/sui.js/client';
 import { CONFIG } from './config';
 import { Prisma } from '@prisma/client';
 import { prisma } from './db';
-import { getClient } from './sui-utils';
+import { getActiveAddress, getClient } from './sui-utils';
 
 var id_cur = Number(1);
 
@@ -40,15 +40,19 @@ const handleMessageCreated = async (events: SuiEvent[], type: string) => {
     const updates: MessageCreatedInput[] = []; // Use an array instead of an object keyed by message_id
 
     for (const event of events) {
-        console.log("event");
+        // console.log("event");
         const creationData = event.parsedJson as MessageCreatedEvent;
-        
-        updates.push({
-            sender: creationData.sender,
-            recipient: creationData.recipient,
-            content: new TextDecoder().decode(new Uint8Array(creationData.content)),
-            timestamp: creationData.timestamp
-        });
+        if(creationData.sender == getActiveAddress() || creationData.recipient == getActiveAddress()){
+            updates.push({
+                sender: creationData.sender,
+                recipient: creationData.recipient,
+                content: new TextDecoder().decode(new Uint8Array(creationData.content)),
+                timestamp: creationData.timestamp
+            });
+        }
+        else{
+            continue;
+        }
     }
 
     // Iterate over the updates without needing message_id for `upsert`

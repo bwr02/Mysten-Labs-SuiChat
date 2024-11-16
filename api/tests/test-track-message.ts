@@ -78,7 +78,7 @@ async function main() {
     const txDigest = '5aovPbd3CzWw7hfGnVxDEBx7o1PexgCBGuSKVU5JDvRn';
     
     await getEventsByTx(txDigest);
-    await getEventsBySender('0x1e331d6468eaea0ccd10d3a4a9a9530a0318545c90d0ad9594ddfa27870ff4da');
+    await getEventsBySender('0x52e9546226cc1d1616d78f3324dc76e972d5de62e0bdb357d4865a4b9c139379');
     await getEventsByModule();
     await getEventsByType();
 }
