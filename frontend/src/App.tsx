@@ -2,7 +2,7 @@ import { ConnectButton } from "@mysten/dapp-kit";
 import { Box, Container, Flex, Heading } from "@radix-ui/themes";
 import { ChatSidebar } from "./components/ChatSidebar";
 import { ChatPanel } from "./components/ChatPanel";
-
+import './styles/base.css';
 function App() {
   return (
       <div className="flex flex-col h-screen bg-purple-100">

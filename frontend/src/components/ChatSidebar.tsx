@@ -23,7 +23,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({ className }) => {
   };
 
   return (
-    <div className="chat-sidebar">
+    <div className="w-1/4 p-4 bg-purple-100 flex flex-col">
       <h1 className="chat-title">
         SuiChat
         <svg
@@ -55,16 +55,17 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({ className }) => {
         )}
       </h1>
       
-      <h2 className="conversations-heading">Conversations</h2>
-      <div className="conversations-list">
+      <h2 className="text-base font-semibold text-gray-500 mb-2">Conversations</h2>
+      <div className="flex flex-col gap-3">
         {conversations.map((conv, index) => (
-          <div key={index} className="conversation">
-            <div className="conversation-avatar" />
-            <div className="conversation-details">
-              <span className="conversation-name">{conv.name}</span>
-              <span className="conversation-message">{conv.message}</span>
+          <div key={index} className="flex items-center gap-3 cursor-pointer hover:bg-gray-200 p-1 rounded">
+            {/* Conversation Avatar, Currently not populated */}
+            <div className="w-10 h-10 bg-gray-300 rounded-full" />
+            <div className="flex-grow">
+              <span className="font-semibold text-black block">{conv.name}</span>
+              <span className="text-gray-500">{conv.message}</span>
             </div>
-            <span className="conversation-time">{conv.time}</span>
+            <span className="text-gray-500 text-sm">{conv.time}</span>
           </div>
         ))}
       </div>
