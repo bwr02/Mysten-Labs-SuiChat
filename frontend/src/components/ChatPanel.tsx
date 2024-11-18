@@ -2,6 +2,7 @@ import { useState } from "react";
 import "../styles/ChatPanel.css";
 import MessageInputField from "./MessageInputField";
 
+
 interface Message {
   sender: "sent" | "received";
   text: string;
@@ -13,7 +14,7 @@ interface ChatPanelProps {
   className?: string;
 }
 
-export const ChatPanel: React.FC<ChatPanelProps> = ({ className }) => {
+export const ChatPanel = () => {
   const [messages, setMessages] = useState<Message[]>([
     { sender: "sent", text: "Just submit the doc, see you in class"},
     { sender: "received", text: "Can't wait for our standup!"},
