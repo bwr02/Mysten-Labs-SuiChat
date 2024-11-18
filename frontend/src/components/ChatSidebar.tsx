@@ -1,15 +1,13 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 // component to display all the chat previews on the left handside
-interface ChatSidebarProps {
-  className?: string;
-}
+
 interface Conversation {
   name: string;
   message: string;
   time: string;
 }
 
-export const ChatSidebar: React.FC<ChatSidebarProps> = ({ className }) => {
+export const ChatSidebar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const conversations : Conversation[] = [
@@ -27,11 +25,11 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({ className }) => {
     setIsSearchOpen(!isSearchOpen);
   };
 
-  // Track open conversation
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
-  const handleSelectConversation = (name: string) => {
-    setSelectedConversation(name);
-  };
+  // // Track open conversation
+  // const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  // const handleSelectConversation = (name: string) => {
+  //   setSelectedConversation(name);
+  // };
 
   return (
     <div className="w-1/4 p-4 bg-purple-100 flex flex-col">
