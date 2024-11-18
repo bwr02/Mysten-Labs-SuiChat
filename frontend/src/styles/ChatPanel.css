@@ -44,7 +44,7 @@
   }
   
   .message.sent {
-    background-color: #6b7280; /* Darker purple */
+    background-color: #7c4dff;
     color: white;
     align-self: flex-end;
   }
