@@ -9,11 +9,11 @@ const client = new SuiClient({
     url: 'https://fullnode.testnet.sui.io:443',
 });
 
-// const MNEMONIC = "";
-// const keypair = Ed25519Keypair.deriveKeypair(MNEMONIC);
-// const myAddress = keypair.getPublicKey().toSuiAddress();
+const MNEMONIC = "";
+const keypair = Ed25519Keypair.deriveKeypair(MNEMONIC);
+const myAddress = keypair.getPublicKey().toSuiAddress();
 
-const myAddress = getActiveAddress()
+// const myAddress = getActiveAddress()
 
 async function getCoins() {
     try {
@@ -72,17 +72,17 @@ async function executeSendMessage(
         });
 
         // Chloe's sign and execute using keypair derived from MNEMONIC
-        // const result = await client.signAndExecuteTransactionBlock({
-        //     signer: keypair,
-        //     transactionBlock: tx,
-        //     options: {
-        //         showEvents: true,
-        //         showEffects: true,
-        //     },
-        // });
+        const result = await client.signAndExecuteTransactionBlock({
+            signer: keypair,
+            transactionBlock: tx,
+            options: {
+                showEvents: true,
+                showEffects: true,
+            },
+        });
 
         // sign and execute helper doing the same thing without MNEMONIC
-        const result = await signAndExecute(tx, ACTIVE_NETWORK)
+        // const result = await signAndExecute(tx, ACTIVE_NETWORK)
 
         console.log("Transaction result:", result);
         return result;
