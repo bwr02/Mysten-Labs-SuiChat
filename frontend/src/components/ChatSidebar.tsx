@@ -1,7 +1,8 @@
 import  { useState } from "react";
 // component to display all the chat previews on the left handside
 
-interface Conversation {
+export interface SidebarConversationParams {
+  address: string;
   name: string;
   message: string;
   time: string;
@@ -10,14 +11,14 @@ interface Conversation {
 export const ChatSidebar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const conversations : Conversation[] = [
-    { name: "Ben", message: "Just finished our prd doc!", time: "10 min" },
-    { name: "Ashton", message: "LGTM", time: "14 min" },
-    { name: "Sophia", message: "Can’t wait for our standup!", time: "21 min" },
-    { name: "Chloe", message: "Has anyone seen PR?", time: "23 min" },
-    { name: "Bonnie", message: "Where are we meeting...", time: "24 min" },
-    { name: "Jane", message: "Have you done 171 HW?", time: "36 min" },
-    { name: "John", message: "What time is midterm?", time: "45 min" },
+  const conversations : SidebarConversationParams[] = [
+    { address:"0xplaceholder", name: "Ben", message: "Just finished our prd doc!", time: "10 min" },
+    { address:"0xplaceholder", name: "Ashton", message: "LGTM", time: "14 min" },
+    { address:"0xplaceholder", name: "Sophia", message: "Can’t wait for our standup!", time: "21 min" },
+    { address:"0xplaceholder", name: "Chloe", message: "Has anyone seen PR?", time: "23 min" },
+    { address:"0xplaceholder", name: "Bonnie", message: "Where are we meeting...", time: "24 min" },
+    { address:"0xplaceholder", name: "Jane", message: "Have you done 171 HW?", time: "36 min" },
+    { address:"0xplaceholder", name: "John", message: "What time is midterm?", time: "45 min" },
   ];
 
   // Toggle address book search input visibility

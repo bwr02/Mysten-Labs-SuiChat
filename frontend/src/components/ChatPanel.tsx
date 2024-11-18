@@ -10,9 +10,6 @@ interface Message {
   txDigest?: string;
 }
 
-interface ChatPanelProps {
-  className?: string;
-}
 
 export const ChatPanel = () => {
   const [messages, setMessages] = useState<Message[]>([
