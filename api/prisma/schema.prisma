@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+	provider = "prisma-client-js"
+}
+
+/// We can setup the provider to our database
+/// For this DEMO, we're using sqlite, which allows us to not
+/// have external dependencies.
+datasource db {
+	provider = "sqlite"
+	url			= "file:./dev.db"
+}
+
+model Message {
+  id Int @id @default(autoincrement())
+  sender     String?
+  recipient  String?
+  //message_id String   @unique // Ensures unique message_id for upserts
+  content    String?
+  timestamp  String?
+  
+  @@index([recipient])
+  @@index([sender])
+}
+
+/// Saves the latest cursor for a given key.
+model Cursor {
+  id String @id
+  eventSeq String
+  txDigest String
+}
