@@ -3,10 +3,16 @@ import React, { useState } from "react";
 interface ChatSidebarProps {
   className?: string;
 }
+interface Conversation {
+  name: string;
+  message: string;
+  time: string;
+}
+
 export const ChatSidebar: React.FC<ChatSidebarProps> = ({ className }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const conversations = [
+  const conversations : Conversation[] = [
     { name: "Ben", message: "Just finished our prd doc!", time: "10 min" },
     { name: "Ashton", message: "LGTM", time: "14 min" },
     { name: "Sophia", message: "Can’t wait for our standup!", time: "21 min" },
@@ -19,6 +25,12 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({ className }) => {
   // Toggle address book search input visibility
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
+  };
+
+  // Track open conversation
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const handleSelectConversation = (name: string) => {
+    setSelectedConversation(name);
   };
 
   return (
