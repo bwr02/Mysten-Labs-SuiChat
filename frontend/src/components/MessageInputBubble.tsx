@@ -7,13 +7,15 @@ interface MessageInputBubbleProps {
   keypair: Ed25519Keypair | null;
   onStatusUpdate: (status: string) => void;
   onMessageSent: () => Promise<void>;
+  onMessageDisplayed: (message: string, timestamp: number, txDigest: string) => void;
 }
 
 export default function MessageInputBubble({ 
   address, 
   keypair, 
   onStatusUpdate, 
-  onMessageSent 
+  onMessageSent,
+  onMessageDisplayed
 }: MessageInputBubbleProps) {
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
@@ -39,9 +41,9 @@ export default function MessageInputBubble({
       });
       
       onStatusUpdate(`Message sent! Transaction ID: ${result.txId}`);
+      onMessageDisplayed(message, result.timestamp, result.txId);
       setMessage("");
       
-      // Update parent component
       await onMessageSent();
     } catch (error) {
       onStatusUpdate(`Error: ${error instanceof Error ? error.message : 'Failed to send message'}`);
