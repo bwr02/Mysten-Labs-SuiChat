@@ -1,12 +1,6 @@
 import  { useState } from "react";
+import {SidebarConversationParams} from "@/types/SidebarType";
 // component to display all the chat previews on the left handside
-
-export interface SidebarConversationParams {
-  address: string;
-  name: string;
-  message: string;
-  time: string;
-}
 
 export const ChatSidebar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
