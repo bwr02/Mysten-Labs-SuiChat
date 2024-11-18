@@ -2,16 +2,11 @@ import { useState } from "react";
 import "../styles/ChatPanel.css";
 import MessageInputField from "./MessageInputField";
 
-
 interface Message {
   sender: "sent" | "received";
   text: string;
   timestamp?: number;
   txDigest?: string;
-}
-
-interface ChatPanelProps {
-  className?: string;
 }
 
 export const ChatPanel = () => {
@@ -48,7 +43,7 @@ export const ChatPanel = () => {
                     rel="noopener noreferrer"
                     className="transaction-link"
                   >
-                    View Transaction on Chain
+                    View on Chain
                   </a>
                 </>
               )}
