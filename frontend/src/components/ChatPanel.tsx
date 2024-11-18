@@ -1,10 +1,8 @@
 import "../styles/ChatPanel.css";
 import MessageInputField from "./MessageInputField";
 // component to display the current open chat and its messages
-interface ChatPanelProps {
-  className?: string;
-}
-export const ChatPanel: React.FC<ChatPanelProps> = ({ className }) => {
+
+export const ChatPanel = () => {
   const messages = [
     { sender: "sent", text: "Just submit the doc, see you in class"},
     { sender: "received", text: "Can’t wait for our standup!"},

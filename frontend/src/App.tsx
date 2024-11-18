@@ -9,7 +9,7 @@ function App() {
           {/* flex with Sidebar and Chat Panel */}
           <Flex className="h-full flex-row" style={{ background: "#F3E8FF" }}>
               <ChatSidebar  />
-              <ChatPanel className="w-3/4 flex-1 bg-white" />
+              <ChatPanel  />
           </Flex>
           <Box
               style={{
