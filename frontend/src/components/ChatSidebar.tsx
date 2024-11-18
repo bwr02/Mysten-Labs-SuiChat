@@ -12,13 +12,13 @@ export const ChatSidebar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const conversations : SidebarConversationParams[] = [
-    { address:"0xplaceholder", name: "Ben", message: "Just finished our prd doc!", time: "10 min" },
-    { address:"0xplaceholder", name: "Ashton", message: "LGTM", time: "14 min" },
-    { address:"0xplaceholder", name: "Sophia", message: "Can’t wait for our standup!", time: "21 min" },
-    { address:"0xplaceholder", name: "Chloe", message: "Has anyone seen PR?", time: "23 min" },
-    { address:"0xplaceholder", name: "Bonnie", message: "Where are we meeting...", time: "24 min" },
-    { address:"0xplaceholder", name: "Jane", message: "Have you done 171 HW?", time: "36 min" },
-    { address:"0xplaceholder", name: "John", message: "What time is midterm?", time: "45 min" },
+    { address:"0xPlaceholder", name: "Ben", message: "Just finished our prd doc!", time: "10 min" },
+    { address:"0xPlaceholder", name: "Ashton", message: "LGTM", time: "14 min" },
+    { address:"0xPlaceholder", name: "Sophia", message: "Can’t wait for our standup!", time: "21 min" },
+    { address:"0xPlaceholder", name: "Chloe", message: "Has anyone seen PR?", time: "23 min" },
+    { address:"0xPlaceholder", name: "Bonnie", message: "Where are we meeting...", time: "24 min" },
+    { address:"0xPlaceholder", name: "Jane", message: "Have you done 171 HW?", time: "36 min" },
+    { address:"0xPlaceholder", name: "John", message: "What time is midterm?", time: "45 min" },
   ];
 
   // Toggle address book search input visibility
