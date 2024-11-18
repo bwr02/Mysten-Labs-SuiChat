@@ -2,15 +2,18 @@ import { TransactionBlock } from '@mysten/sui.js/transactions';
 import { SuiClient } from '@mysten/sui.js/client';
 import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
 import { CONFIG } from '../config';
+import { ACTIVE_NETWORK, getActiveAddress, signAndExecute } from '../sui-utils';
 
 
 const client = new SuiClient({
     url: 'https://fullnode.testnet.sui.io:443',
 });
 
-const MNEMONIC = "";
-const keypair = Ed25519Keypair.deriveKeypair(MNEMONIC);
-const myAddress = keypair.getPublicKey().toSuiAddress();
+// const MNEMONIC = "";
+// const keypair = Ed25519Keypair.deriveKeypair(MNEMONIC);
+// const myAddress = keypair.getPublicKey().toSuiAddress();
+
+const myAddress = getActiveAddress()
 
 async function getCoins() {
     try {
@@ -68,14 +71,18 @@ async function executeSendMessage(
             ],
         });
 
-        const result = await client.signAndExecuteTransactionBlock({
-            signer: keypair,
-            transactionBlock: tx,
-            options: {
-                showEvents: true,
-                showEffects: true,
-            },
-        });
+        // Chloe's sign and execute using keypair derived from MNEMONIC
+        // const result = await client.signAndExecuteTransactionBlock({
+        //     signer: keypair,
+        //     transactionBlock: tx,
+        //     options: {
+        //         showEvents: true,
+        //         showEffects: true,
+        //     },
+        // });
+
+        // sign and execute helper doing the same thing without MNEMONIC
+        const result = await signAndExecute(tx, ACTIVE_NETWORK)
 
         console.log("Transaction result:", result);
         return result;
@@ -101,7 +108,7 @@ async function main() {
 
         const sender = myAddress;
         const recipient = '0xc5b4d28027c266bf80603617796513f9b7afc0f66957ead0a94b4d78e1b9671f';
-        const content = new TextEncoder().encode("message 3");
+        const content = new TextEncoder().encode("message 1");
         const timestamp = Date.now();
 
         console.log('\nSending message:');
