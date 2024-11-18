@@ -2,7 +2,6 @@ import { ConnectButton } from "@mysten/dapp-kit";
 import { Box, Container, Flex, Heading } from "@radix-ui/themes";
 import { ChatSidebar } from "./components/ChatSidebar";
 import { ChatPanel } from "./components/ChatPanel";
-import './styles/App.css';
 
 function App() {
   return (
