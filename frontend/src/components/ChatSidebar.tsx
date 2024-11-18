@@ -24,10 +24,10 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({ className }) => {
 
   return (
     <div className="w-1/4 p-4 bg-purple-100 flex flex-col">
-      <h1 className="chat-title">
+      <h1 className="text-xl font-bold mb-4 flex items-center gap-2 text-black">
         SuiChat
         <svg
-          className="book-icon"
+          className="text-xl font-bold flex items-center gap-2 text-black"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           width="24"
