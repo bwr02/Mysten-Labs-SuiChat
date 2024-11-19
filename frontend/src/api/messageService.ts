@@ -41,10 +41,12 @@ export const sendMessage = async ({
         // Check balance first
         const balanceInfo = await checkBalance(normalizedSenderAddress);
         if (BigInt(balanceInfo.totalBalance) === BigInt(0)) {
+            console.log("5");
             throw new Error('No balance available. Please request tokens from the faucet.');
         }
 
         if (balanceInfo.coins.length === 0) {
+            console.log("7");
             throw new Error('No coin objects found. Please request tokens from the faucet.');
         }
 
@@ -54,6 +56,8 @@ export const sendMessage = async ({
 
         // Create transaction
         const tx = new Transaction();
+        // gas budget needs to be set by us in order for 
+        tx.setGasBudget(10000000);
         
         tx.moveCall({
             target: `${CONFIG.MESSAGE_CONTRACT.packageId}::send_message::send_message`,
@@ -67,8 +71,8 @@ export const sendMessage = async ({
 
         // Execute transaction
         const result = await suiClient.signAndExecuteTransaction({
-            signer: keypair,
             transaction: tx,
+            signer: keypair,
             options: {
                 showEvents: true,
                 showEffects: true,
