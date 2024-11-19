@@ -27,7 +27,7 @@ export const ChatPanel = () => {
   return (
     <div className="chat-panel">
       <div className="chat-header">
-        <span className="chat-recipient">Sophia</span>
+        <span className="chat-recipient">Sophia </span>
       </div>
       <div className="chat-messages">
         {messages.map((message, index) => (

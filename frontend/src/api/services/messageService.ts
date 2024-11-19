@@ -1,11 +1,9 @@
-import { Transaction } from '@mysten/sui/transactions';
-import { suiClient } from './suiClient';
-import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
-import { CONFIG } from './config';
+import { TransactionBlock } from '@mysten/sui.js/transactions';
+import { suiClient } from '../suiClient';
+import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
+import { CONFIG } from '../config';
 import { checkBalance } from './walletService';
-import { normalizeSuiAddress } from '@mysten/sui/utils';
-import { bcs } from '@mysten/sui/bcs';
-
+import { normalizeSuiAddress } from '@mysten/sui.js/utils';
 
 export interface SendMessageParams {
     senderAddress: string;
@@ -24,6 +22,7 @@ export const sendMessage = async ({
     try {
         // Normalize addresses
         const normalizedSenderAddress = normalizeSuiAddress(senderAddress);
+        const normalizedRecipientAddress = normalizeSuiAddress(recipientAddress);
 
         // Check balance first
         const balanceInfo = await checkBalance(normalizedSenderAddress);
@@ -36,25 +35,26 @@ export const sendMessage = async ({
         }
 
         // Prepare message content
+        const encodedContent = new TextEncoder().encode(content);
         const timestamp = Date.now();
 
         // Create transaction
-        const tx = new Transaction();
+        const tx = new TransactionBlock();
         
         tx.moveCall({
             target: `${CONFIG.MESSAGE_CONTRACT.packageId}::send_message::send_message`,
             arguments: [
-                tx.pure(bcs.Address.serialize(senderAddress)),
-                tx.pure(bcs.Address.serialize(recipientAddress)),
-                tx.pure(bcs.String.serialize(content)),
-                tx.pure(bcs.U64.serialize(timestamp))
+                tx.pure(normalizedSenderAddress),
+                tx.pure(normalizedRecipientAddress),
+                tx.pure(Array.from(encodedContent)),
+                tx.pure(BigInt(timestamp))
             ],
         });
 
         // Execute transaction
-        const result = await suiClient.signAndExecuteTransaction({
-            transaction: tx,
+        const result = await suiClient.signAndExecuteTransactionBlock({
             signer: keypair,
+            transactionBlock: tx,
             options: {
                 showEvents: true,
                 showEffects: true,
