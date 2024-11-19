@@ -9,10 +9,9 @@ import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { Transaction } from '@mysten/sui/transactions';
 import { fromB64 } from '@mysten/sui/utils';
+import { bcs } from '@mysten/sui/bcs';
 
 export type Network = 'mainnet' | 'testnet' | 'devnet' | 'localnet';
-
-export const encoder = new TextEncoder();
 
 export const ACTIVE_NETWORK = (process.env.NETWORK as Network) || 'testnet';
 
@@ -89,7 +88,7 @@ export const publishPackage = async ({
     });
 
     // Transfer the upgrade capability to the sender so they can upgrade the package later if they want.
-    tx.transferObjects([upgradeCap], tx.pure(encoder.encode(getActiveAddress())));
+    tx.transferObjects([upgradeCap], tx.pure(bcs.Address.serialize(getActiveAddress())));
 
     const results = await signAndExecute(tx, network);
 

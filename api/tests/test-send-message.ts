@@ -3,6 +3,7 @@ import { SuiClient } from '@mysten/sui/client';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { CONFIG } from '../config';
 import { ACTIVE_NETWORK, getActiveAddress, signAndExecute } from '../sui-utils';
+import { bcs } from '@mysten/sui/bcs';
 
 
 const client = new SuiClient({
@@ -13,19 +14,6 @@ const MNEMONIC = "";
 const keypair = Ed25519Keypair.deriveKeypair(MNEMONIC);
 const myAddress = keypair.getPublicKey().toSuiAddress();
 
-export const encoder = new TextEncoder();
-
-export function bigintToUint8Array(value: bigint): Uint8Array {
-    const byteLength = Math.ceil(value.toString(2).length / 8); // Calculate required byte length
-    const uint8Array = new Uint8Array(byteLength);
-
-    for (let i = 0; i < byteLength; i++) {
-        uint8Array[byteLength - i - 1] = Number(value & BigInt(0xff)); // Extract the last byte
-        value >>= BigInt(8); // Shift the bigint 8 bits to the right
-    }
-
-    return uint8Array;
-}
 
 // const myAddress = getActiveAddress()
 
@@ -78,10 +66,10 @@ async function executeSendMessage(
         tx.moveCall({
             target: `${CONFIG.MESSAGE_CONTRACT.packageId}::send_message::send_message`,
             arguments: [
-                tx.pure(encoder.encode(senderAddress)),
-                tx.pure(encoder.encode(recipientAddress)),
+                tx.pure(bcs.Address.serialize(senderAddress)),
+                tx.pure(bcs.Address.serialize(recipientAddress)),
                 tx.pure(content),
-                tx.pure(bigintToUint8Array(BigInt(timestamp)))
+                tx.pure(bcs.U64.serialize(timestamp))
             ],
         });
 

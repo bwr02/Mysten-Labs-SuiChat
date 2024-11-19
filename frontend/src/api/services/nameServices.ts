@@ -1,4 +1,4 @@
-import { suinsClient } from "./suinsClient";
+import { suinsClient } from "../suinsClient";
 
 export const getSuiNInfo = async (name: string) => {
     const nameRecord = await suinsClient.getNameRecord(name);
