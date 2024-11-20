@@ -1,8 +1,11 @@
-import  { useState } from "react";
+import  React, { useState } from "react";
 import {SidebarConversationParams} from "@/types/SidebarType";
-
 // component to display all the chat previews on the left handside
-export const ChatSidebar = () => {
+
+interface ChatSidebarProps {
+  setRecipientAddress: (address: string) => void;
+}
+export const ChatSidebar = ({ setRecipientAddress }: ChatSidebarProps) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const conversations : SidebarConversationParams[] = [
@@ -25,12 +28,27 @@ export const ChatSidebar = () => {
   // const handleSelectConversation = (name: string) => {
   //   setSelectedConversation(name);
   // };
+  const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+  };
+  const handleSearchForUser = async () => {
+    setRecipientAddress(searchText);
+    console.log("Recipient address stored:", searchText);
+    setSearchText("");
+  }
+  const handleSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSearchForUser();
+      event.stopPropagation();
+    }
+  };
 
   return (
     <div className="w-1/4 p-4 bg-purple-100 flex flex-col">
       <h1 className="text-xl font-bold mb-4 flex items-center gap-2 text-black">
         SuiChat
-        {/* Search Icon */}
+        {/* Address Book Search Icon */}
         <button className="bg-none border-none cursor-pointer p-1 w-8 h-8" onClick={toggleSearch}>
           <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -47,15 +65,16 @@ export const ChatSidebar = () => {
         </button>
       </h1>
 
-      {/* Search Input */}
+      {/* Address Book Search Input */}
       {isSearchOpen && (
           <div className="mb-4">
             <input
                 type="text"
                 className="border border-gray-300 rounded-full px-3 py-2 w-full bg-gray-100 text-gray-800 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Search..."
+                placeholder="Search for address"
                 value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
+                onChange={handleSearchInputChange}
+                onKeyDown={handleSearchKeyDown}
             />
           </div>
       )}
