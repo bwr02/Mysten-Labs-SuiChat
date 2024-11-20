@@ -43,13 +43,14 @@ export const sendMessage = async ({
         const tx = new Transaction();
 
         const encryptedContent = encryptMessage(content, keypair.getPublicKey().toString());
+        console.log("ENCRYPTED:" + encryptedContent);
         
         tx.moveCall({
             target: `${CONFIG.MESSAGE_CONTRACT.packageId}::send_message::send_message`,
             arguments: [
                 tx.pure(bcs.Address.serialize(senderAddress)),
                 tx.pure(bcs.Address.serialize(recipientAddress)),
-                tx.pure(encryptedContent),
+                tx.pure(bcs.String.serialize(content)),
                 tx.pure(bcs.U64.serialize(timestamp))
             ],
         });
