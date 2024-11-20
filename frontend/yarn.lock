@@ -559,7 +559,7 @@
     superstruct "^1.0.3"
     tweetnacl "^1.0.3"
 
-"@mysten/sui@1.14.3", "@mysten/sui@^1.14.1":
+"@mysten/sui@1.14.3":
   version "1.14.3"
   resolved "https://registry.yarnpkg.com/@mysten/sui/-/sui-1.14.3.tgz#e8ad11ddfaa4543b52ec6e87eb9d49f92eb2e41f"
   integrity sha512-5vhOnbSAT/9daMIDPYOp7q9j+6DXqjPAYEJy7ZbR9viBsyAx4UMChCwaLyjoYcJKvhrkDn4LTdDTJEUvpj7TTg==
@@ -576,6 +576,31 @@
     graphql "^16.9.0"
     tweetnacl "^1.0.3"
     valibot "^0.36.0"
+
+"@mysten/sui@^1.12.0", "@mysten/sui@^1.14.4":
+  version "1.14.4"
+  resolved "https://registry.yarnpkg.com/@mysten/sui/-/sui-1.14.4.tgz#c2022a0250e4afd25d3dcfbc33eafc6b093653f2"
+  integrity sha512-9d79tu7PUfRXc8TNYIHqxfH+iJN29j0I8Fc913w6wywUSOaCnUDMtjKcPr1o/8yILjaB86vswsK3mqTXX0QFrA==
+  dependencies:
+    "@graphql-typed-document-node/core" "^3.2.0"
+    "@mysten/bcs" "1.1.0"
+    "@noble/curves" "^1.4.2"
+    "@noble/hashes" "^1.4.0"
+    "@scure/bip32" "^1.4.0"
+    "@scure/bip39" "^1.3.0"
+    "@suchipi/femver" "^1.0.0"
+    bech32 "^2.0.0"
+    gql.tada "^1.8.2"
+    graphql "^16.9.0"
+    tweetnacl "^1.0.3"
+    valibot "^0.36.0"
+
+"@mysten/suins@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@mysten/suins/-/suins-0.4.1.tgz#086dfa4cd3d37a871b72100ba07989d31b9bae90"
+  integrity sha512-5kkYe4VO5Z4enxioUoOTpjgviktL8HZldngDFrojlHJSinYeAs5NWmOy+bsOZOSqtOG0WkCrE8TVOd4duLK+9g==
+  dependencies:
+    "@mysten/sui" "^1.12.0"
 
 "@mysten/wallet-standard@0.13.12":
   version "0.13.12"
@@ -1208,6 +1233,11 @@
     "@radix-ui/react-visually-hidden" "^1.1.0"
     classnames "^2.3.2"
     react-remove-scroll-bar "^2.3.6"
+
+"@remix-run/router@1.21.0":
+  version "1.21.0"
+  resolved "https://registry.yarnpkg.com/@remix-run/router/-/router-1.21.0.tgz#c65ae4262bdcfe415dbd4f64ec87676e4a56e2b5"
+  integrity sha512-xfSkCAchbdG5PnbrKqFWwia4Bi61nH+wm8wLEqfHDyp7Y3dZzgqS2itV8i4gAq9pC2HsTpwyBC6Ds8VHZ96JlA==
 
 "@rollup/plugin-node-resolve@^15.2.3":
   version "15.3.0"
@@ -3747,6 +3777,21 @@ react-remove-scroll@2.6.0:
     tslib "^2.1.0"
     use-callback-ref "^1.3.0"
     use-sidecar "^1.1.2"
+
+react-router-dom@^6.28.0:
+  version "6.28.0"
+  resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-6.28.0.tgz#f73ebb3490e59ac9f299377062ad1d10a9f579e6"
+  integrity sha512-kQ7Unsl5YdyOltsPGl31zOjLrDv+m2VcIEcIHqYYD3Lp0UppLjrzcfJqDJwXxFw3TH/yvapbnUvPlAj7Kx5nbg==
+  dependencies:
+    "@remix-run/router" "1.21.0"
+    react-router "6.28.0"
+
+react-router@6.28.0:
+  version "6.28.0"
+  resolved "https://registry.yarnpkg.com/react-router/-/react-router-6.28.0.tgz#29247c86d7ba901d7e5a13aa79a96723c3e59d0d"
+  integrity sha512-HrYdIFqdrnhDw0PqG/AKjAqEqM7AvxCz0DQ4h2W8k6nqmc5uRBYDag0SBxx9iYz5G8gnuNVLzUe13wl9eAsXXg==
+  dependencies:
+    "@remix-run/router" "1.21.0"
 
 react-style-singleton@^2.2.1:
   version "2.2.1"

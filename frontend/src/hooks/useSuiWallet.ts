@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
-import { checkBalance } from '../api/walletService';
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+import { checkBalance } from '../api/services/walletService';
 import { env } from '../config/env';
 
 export const useSuiWallet = () => {

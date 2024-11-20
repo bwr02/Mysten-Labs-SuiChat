@@ -5,10 +5,11 @@ import { execSync } from 'child_process';
 import { readFileSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
 import path from 'path';
-import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
-import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
-import { TransactionBlock } from '@mysten/sui.js/transactions';
-import { fromB64 } from '@mysten/sui.js/utils';
+import { getFullnodeUrl, SuiClient } from '@mysten/sui/client'; 
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+import { Transaction } from '@mysten/sui/transactions';
+import { fromB64 } from '@mysten/sui/utils';
+import { bcs } from '@mysten/sui/bcs';
 
 export type Network = 'mainnet' | 'testnet' | 'devnet' | 'localnet';
 
@@ -49,12 +50,12 @@ export const getClient = (network: Network) => {
 };
 
 /** A helper to sign & execute a transaction. */
-export const signAndExecute = async (tx: TransactionBlock, network: Network) => {
+export const signAndExecute = async (tx: Transaction, network: Network) => {
     const client = getClient(network);
     const signer = getSigner();
 
-    return client.signAndExecuteTransactionBlock({
-        transactionBlock: tx,
+    return client.signAndExecuteTransaction({
+        transaction: tx,
         signer,
         options: {
             showEffects: true,
@@ -73,7 +74,7 @@ export const publishPackage = async ({
     network: Network;
     exportFileName: string;
 }) => {
-    const tx = new TransactionBlock();
+    const tx = new Transaction();
 
     const { modules, dependencies } = JSON.parse(
         execSync(`${SUI_BIN} move build --dump-bytecode-as-base64 --path ${packagePath}`, {
@@ -87,7 +88,7 @@ export const publishPackage = async ({
     });
 
     // Transfer the upgrade capability to the sender so they can upgrade the package later if they want.
-    tx.transferObjects([upgradeCap], tx.pure(getActiveAddress()));
+    tx.transferObjects([upgradeCap], tx.pure(bcs.Address.serialize(getActiveAddress())));
 
     const results = await signAndExecute(tx, network);
 

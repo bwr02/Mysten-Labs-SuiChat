@@ -1,5 +1,5 @@
 import { EventId, SuiEvent, SuiEventFilter } from '@mysten/sui/client';
-import { SuiClient } from '@mysten/sui.js/client';
+import { SuiClient } from '@mysten/sui/client';
 import { CONFIG } from './config';
 import { Prisma } from '@prisma/client';
 import { prisma } from './db';

@@ -1,8 +1,9 @@
-import { TransactionBlock } from '@mysten/sui.js/transactions';
-import { SuiClient } from '@mysten/sui.js/client';
-import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
+import { Transaction } from '@mysten/sui/transactions';
+import { SuiClient } from '@mysten/sui/client';
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { CONFIG } from '../config';
 import { ACTIVE_NETWORK, getActiveAddress, signAndExecute } from '../sui-utils';
+import { bcs } from '@mysten/sui/bcs';
 
 
 const client = new SuiClient({
@@ -12,6 +13,7 @@ const client = new SuiClient({
 const MNEMONIC = "";
 const keypair = Ed25519Keypair.deriveKeypair(MNEMONIC);
 const myAddress = keypair.getPublicKey().toSuiAddress();
+
 
 // const myAddress = getActiveAddress()
 
@@ -59,22 +61,22 @@ async function executeSendMessage(
             throw new Error('No coin objects found. Please request tokens from the faucet.');
         }
         
-        const tx = new TransactionBlock();
+        const tx = new Transaction();
         
         tx.moveCall({
             target: `${CONFIG.MESSAGE_CONTRACT.packageId}::send_message::send_message`,
             arguments: [
-                tx.pure(senderAddress),
-                tx.pure(recipientAddress),
-                tx.pure(Array.from(content)),
-                tx.pure(BigInt(timestamp))
+                tx.pure(bcs.Address.serialize(senderAddress)),
+                tx.pure(bcs.Address.serialize(recipientAddress)),
+                tx.pure(content),
+                tx.pure(bcs.U64.serialize(timestamp))
             ],
         });
 
         // Chloe's sign and execute using keypair derived from MNEMONIC
-        const result = await client.signAndExecuteTransactionBlock({
+        const result = await client.signAndExecuteTransaction({
             signer: keypair,
-            transactionBlock: tx,
+            transaction: tx,
             options: {
                 showEvents: true,
                 showEffects: true,

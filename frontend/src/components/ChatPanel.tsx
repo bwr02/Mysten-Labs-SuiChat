@@ -2,7 +2,6 @@ import { useState } from "react";
 import "../styles/ChatPanel.css";
 import MessageInputField from "./MessageInputField";
 
-
 interface Message {
   sender: "sent" | "received";
   text: string;
@@ -32,7 +31,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   return (
     <div className="chat-panel">
       <div className="chat-header">
-        <span className="chat-recipient">Sophia</span>
+        <span className="chat-recipient">Sophia </span>
       </div>
       <div className="chat-messages">
         {messages.map((message, index) => (
@@ -48,7 +47,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
                     rel="noopener noreferrer"
                     className="transaction-link"
                   >
-                    View Transaction on Chain
+                    View on Chain
                   </a>
                 </>
               )}
