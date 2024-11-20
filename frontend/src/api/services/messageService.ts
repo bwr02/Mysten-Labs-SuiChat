@@ -5,6 +5,7 @@ import { CONFIG } from '../config';
 import { checkBalance } from './walletService';
 import { normalizeSuiAddress } from '@mysten/sui/utils';
 import { bcs } from '@mysten/sui/bcs';
+import { encryptMessage } from '../../../../encryption/src/encryptUtils.ts';
 
 
 export interface SendMessageParams {
@@ -40,13 +41,15 @@ export const sendMessage = async ({
 
         // Create transaction
         const tx = new Transaction();
+
+        const encryptedContent = encryptMessage(content, keypair.getPublicKey().toString());
         
         tx.moveCall({
             target: `${CONFIG.MESSAGE_CONTRACT.packageId}::send_message::send_message`,
             arguments: [
                 tx.pure(bcs.Address.serialize(senderAddress)),
                 tx.pure(bcs.Address.serialize(recipientAddress)),
-                tx.pure(bcs.String.serialize(content)),
+                tx.pure(encryptedContent),
                 tx.pure(bcs.U64.serialize(timestamp))
             ],
         });
