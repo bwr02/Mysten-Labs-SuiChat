@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { sendMessage } from '../api/services/messageService';
 
 interface MessageInputBubbleProps {
