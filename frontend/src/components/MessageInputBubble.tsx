@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
-import { sendMessage } from '../api/messageService';
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+import { sendMessage } from '../api/services/messageService';
 
 interface MessageInputBubbleProps {
   address: string | null;
   keypair: Ed25519Keypair | null;
+  recipientAddress: string | null;
   onStatusUpdate: (status: string) => void;
   onMessageSent: () => Promise<void>;
   onMessageDisplayed: (message: string, timestamp: number, txDigest: string) => void;
@@ -12,7 +13,8 @@ interface MessageInputBubbleProps {
 
 export default function MessageInputBubble({ 
   address, 
-  keypair, 
+  keypair,
+  recipientAddress,
   onStatusUpdate, 
   onMessageSent,
   onMessageDisplayed
@@ -27,7 +29,7 @@ export default function MessageInputBubble({
   const handleSendMessage = async (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
     
-    if (!keypair || !address || !message.trim()) return;
+    if (!keypair || !address || !recipientAddress || !message.trim()) return;
 
     try {
       setSending(true);
@@ -35,7 +37,7 @@ export default function MessageInputBubble({
 
       const result = await sendMessage({
         senderAddress: address,
-        recipientAddress: "0xc5b4d28027c266bf80603617796513f9b7afc0f66957ead0a94b4d78e1b9671f", // TODO: Replace with actual recipient
+        recipientAddress,
         content: message,
         keypair
       });

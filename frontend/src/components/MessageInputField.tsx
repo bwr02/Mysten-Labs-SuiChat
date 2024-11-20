@@ -3,10 +3,11 @@ import { useSuiWallet } from '../hooks/useSuiWallet';
 import MessageInputBubble from './MessageInputBubble';
 
 interface MessageInputFieldProps {
+  recipientAddress: string | null;
   onMessageSent: (message: string, timestamp: number, txDigest: string) => void;
 }
 
-export default function MessageInputField({ onMessageSent }: MessageInputFieldProps) {
+export default function MessageInputField({ recipientAddress, onMessageSent }: MessageInputFieldProps) {
   const { keypair, address, balance, loading, error, refreshBalance } = useSuiWallet();
   const [txStatus, setTxStatus] = useState<string>("");
 
@@ -29,6 +30,7 @@ export default function MessageInputField({ onMessageSent }: MessageInputFieldPr
       <MessageInputBubble 
         address={address}
         keypair={keypair}
+        recipientAddress={recipientAddress}
         onStatusUpdate={setTxStatus}
         onMessageSent={refreshBalance}
         onMessageDisplayed={onMessageSent}
