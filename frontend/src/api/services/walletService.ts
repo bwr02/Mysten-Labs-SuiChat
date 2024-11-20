@@ -1,4 +1,4 @@
-import { suiClient } from './suiClient';
+import { suiClient } from '../suiClient';
 
 export interface BalanceInfo {
     coins: any[];
