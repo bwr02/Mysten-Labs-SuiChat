@@ -11,10 +11,10 @@ interface Message {
 }
 
 interface ChatPanelProps {
-  className?: string;
+  recipientAddress: string | null;
 }
 
-export const ChatPanel = () => {
+export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([
     { sender: "sent", text: "Just submit the doc, see you in class"},
     { sender: "received", text: "Can't wait for our standup!"},
@@ -57,7 +57,7 @@ export const ChatPanel = () => {
         ))}
       </div>
       <div className="message-input-container">
-        <MessageInputField onMessageSent={handleMessageSent} />
+        <MessageInputField recipientAddress={recipientAddress} onMessageSent={handleMessageSent} />
       </div>
     </div>
   );
