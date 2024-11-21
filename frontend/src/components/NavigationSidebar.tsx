@@ -4,7 +4,7 @@ import { Sidebar } from "flowbite-react";
 import { HiAnnotation } from "react-icons/hi";
 import { FaAddressBook } from "react-icons/fa";
 
-export function SidePanel() {
+export function NavigationSidebar() {
   return (
     <div className="h-screen relative" style={{ width: "48px" }}>
       <Sidebar

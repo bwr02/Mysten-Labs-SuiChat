@@ -5,7 +5,7 @@ import {SidebarConversationParams} from "@/types/SidebarType";
 interface ChatSidebarProps {
   setRecipientAddress: (address: string) => void;
 }
-export const ChatSidebar = ({ setRecipientAddress }: ChatSidebarProps) => {
+export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const conversations : SidebarConversationParams[] = [
