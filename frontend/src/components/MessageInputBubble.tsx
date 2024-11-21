@@ -61,26 +61,28 @@ export default function MessageInputBubble({
   };
 
   return (
-    <div className="message-input">
+    <div className="relative w-full">
       <input
         id="message"
         name="message"
         type="text"
         placeholder="Type your message here"
-        className="message-input-box"
+        className="w-full px-5 py-4 text-sm text-gray-800 bg-purple-100 border-none rounded-full outline-none placeholder-gray-500 pr-10"
         value={message}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         disabled={sending}
       />
-      <button 
-        type="submit" 
-        className="message-send-button" 
+      <button
+        type="submit"
+        className={`absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 ${
+          sending || !message.trim() || !address ? "opacity-50 cursor-not-allowed" : "hover:text-gray-800"
+        }`}
         onClick={handleSendMessage}
         disabled={sending || !message.trim() || !address}
       >
         {sending ? (
-          <div className="loading-spinner" />
+          <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
         ) : (
           <svg
             xmlns="http://www.w3.org/2000/svg"
