@@ -1,6 +1,6 @@
 import { ConnectButton } from "@mysten/dapp-kit";
 import { Box, Flex } from "@radix-ui/themes";
-import { ChatSidebar } from "../components/ChatSidebar";
+import { ConversationSidebar } from "../components/ConversationSidebar.tsx";
 import { ChatPanel } from "../components/ChatPanel";
 import '../styles/base.css';
 import { useState } from "react";
@@ -11,7 +11,7 @@ export default function HomePage() {
         <div className="flex flex-col h-screen bg-purple-100">
             {/* flex with Sidebar and Chat Panel */}
             <Flex className="h-full flex-row" style={{ background: "#F3E8FF" }}>
-                <ChatSidebar setRecipientAddress={setRecipientAddress} />
+                <ConversationSidebar setRecipientAddress={setRecipientAddress} />
                 <ChatPanel recipientAddress={recipientAddress} />
             </Flex>
             <Box
