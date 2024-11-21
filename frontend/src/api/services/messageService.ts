@@ -5,7 +5,7 @@ import { CONFIG } from '../config';
 import { checkBalance } from './walletService';
 import { normalizeSuiAddress } from '@mysten/sui/utils';
 import { bcs } from '@mysten/sui/bcs';
-import { encryptMessage } from '../../../../encryption/src/encryptUtils.ts';
+import { encryptMessage, decryptMessage, generateKeyPair } from '../../../../encryption/src/encryptUtils.ts';
 
 
 export interface SendMessageParams {
@@ -42,7 +42,9 @@ export const sendMessage = async ({
         // Create transaction
         const tx = new Transaction();
 
-        const encryptedContent = encryptMessage(content, keypair.getPublicKey().toString());
+        const {publicKey, privateKey} = generateKeyPair();
+
+        const encryptedContent = encryptMessage(content, publicKey.toString());
         console.log("ENCRYPTED:" + encryptedContent);
         
         tx.moveCall({
@@ -50,10 +52,13 @@ export const sendMessage = async ({
             arguments: [
                 tx.pure(bcs.Address.serialize(senderAddress)),
                 tx.pure(bcs.Address.serialize(recipientAddress)),
-                tx.pure(bcs.String.serialize(content)),
+                tx.pure(bcs.String.serialize(encryptedContent)),
                 tx.pure(bcs.U64.serialize(timestamp))
             ],
         });
+
+        const decryptedContent = decryptMessage(encryptedContent, privateKey.toString());
+        console.log("DECRYPTED:" + decryptedContent);
 
         // Execute transaction
         const result = await suiClient.signAndExecuteTransaction({

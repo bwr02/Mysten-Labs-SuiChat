@@ -1,29 +1,28 @@
-//import { publicEncrypt, privateDecrypt } from 'crypto';
-import * as crypto from "crypto-browserify";
+import * as forge from "node-forge";
 
-
-// Function to encrypt a message with the recipient's public key
-
-export function encryptMessage(message: string, publicKey: string): Uint8Array {
-    return crypto.publicEncrypt(publicKey, Uint8Array.from(Buffer.from(message, "utf8")));
+// Function to generate RSA key pair
+export function generateKeyPair(): { publicKey: string; privateKey: string } {
+    const keys = forge.pki.rsa.generateKeyPair({ bits: 2048, e: 0x10001 });
+    const publicKey = forge.pki.publicKeyToPem(keys.publicKey);
+    const privateKey = forge.pki.privateKeyToPem(keys.privateKey);
+    return { publicKey, privateKey };
 }
 
-// Function to decrypt a message with the recipient's private key
-export function decryptMessage(encryptedMessage: Uint8Array, privateKey: string): string {
-    return crypto.privateDecrypt(privateKey, Buffer.from(encryptedMessage)).toString("utf8");
+// Function to encrypt a message using the public key
+export function encryptMessage(message: string, publicKey: string): string {
+    const publicKeyObj = forge.pki.publicKeyFromPem(publicKey);
+    const encrypted = publicKeyObj.encrypt(message, "RSA-OAEP", {
+        md: forge.md.sha256.create(),
+    });
+    return forge.util.encode64(encrypted); // Return Base64 encoded ciphertext
 }
 
-
-/*
-import { publicEncrypt, privateDecrypt } from 'crypto';
-
-// Function to encrypt a message with the recipient's public key
-export function encryptMessage(message: string, publicKey: string): Uint8Array {
-    return publicEncrypt(publicKey, Uint8Array.from(Buffer.from(message, "utf8")));
+// Function to decrypt a message using the private key
+export function decryptMessage(encryptedMessage: string, privateKey: string): string {
+    const privateKeyObj = forge.pki.privateKeyFromPem(privateKey);
+    const encryptedBytes = forge.util.decode64(encryptedMessage); // Decode Base64
+    const decrypted = privateKeyObj.decrypt(encryptedBytes, "RSA-OAEP", {
+        md: forge.md.sha256.create(),
+    });
+    return decrypted; // Return plaintext
 }
-
-// Function to decrypt a message with the recipient's private key
-export function decryptMessage(encryptedMessage: Uint8Array, privateKey: string): string {
-    return privateDecrypt(privateKey, Buffer.from(encryptedMessage)).toString("utf8");
-}
-    */
