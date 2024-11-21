@@ -42,8 +42,10 @@ export const sendMessage = async ({
         // Create transaction
         const tx = new Transaction();
 
+        // TODO: this needs to be done somewhere else so that it is only intizalied once....right now I do it here just for the purposes of showing that we can encrypt it this way
         const {publicKey, privateKey} = generateKeyPair();
 
+        // TODO: will look into this being a publicReciever + privateSender encryption scheme
         const encryptedContent = encryptMessage(content, publicKey.toString());
         console.log("ENCRYPTED:" + encryptedContent);
         
@@ -57,6 +59,7 @@ export const sendMessage = async ({
             ],
         });
 
+        // TODO: take out this decryption later....this is for testing purposes to ensure that the encrypted message that is sent can be decrypted proeprly
         const decryptedContent = decryptMessage(encryptedContent, privateKey.toString());
         console.log("DECRYPTED:" + decryptedContent);
 
