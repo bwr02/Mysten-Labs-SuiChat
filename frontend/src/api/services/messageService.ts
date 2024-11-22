@@ -5,13 +5,13 @@ import { normalizeSuiAddress } from '@mysten/sui/utils';
 import { bcs } from '@mysten/sui/bcs';
 import { deriveKeyFromSignature, generateSharedSecret, encryptMessage } from './cryptoService';
 import type { SuietWallet } from '../../types';
-
+import type { SuiSignPersonalMessageOutput } from '@mysten/wallet-standard';
 
 export interface SendMessageParams {
     senderAddress: string;
     recipientAddress: string;
     content: string;
-    signature: string;
+    signatureData: SuiSignPersonalMessageOutput;
 }
 
 const getSuietWallet = (): SuietWallet => {
@@ -26,7 +26,7 @@ export const sendMessage = async ({
     senderAddress,
     recipientAddress,
     content,
-    signature
+    signatureData
 }: SendMessageParams) => {
     try {
         const normalizedSenderAddress = normalizeSuiAddress(senderAddress);
@@ -35,7 +35,7 @@ export const sendMessage = async ({
             throw new Error('Insufficient balance. Please request tokens from the faucet.');
         }
 
-        const tempKey = deriveKeyFromSignature(signature);
+        const tempKey = deriveKeyFromSignature(signatureData.signature);
         const sharedSecret = generateSharedSecret(tempKey, recipientAddress);
         const encryptedContent = encryptMessage(content, sharedSecret);
         const tx = new Transaction();
