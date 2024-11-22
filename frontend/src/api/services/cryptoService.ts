@@ -6,9 +6,9 @@ import nacl from 'tweetnacl';
 export function deriveKeyFromSignature(signature: string) {
   try {
     const signatureBytes = fromBase64(signature);
-    const privateKey = signatureBytes.slice(0, 32);  // taking first 32 bytes of signature as the private key
-    console.log('Private key:', privateKey, );
-    return privateKey;
+    const tempPrivateKey = signatureBytes.slice(0, 32);  // taking first 32 bytes of signature as the private key
+    console.log('Temp private key:', tempPrivateKey);
+    return tempPrivateKey;
   } catch (error) {
     console.error('Error in deriveKeyFromSignature:', error);
     throw error;

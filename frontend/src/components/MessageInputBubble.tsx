@@ -29,35 +29,36 @@ export default function MessageInputBubble({
   const handleSendMessage = async (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
     
-    if (!address || !recipientAddress || !message.trim()) return;
+    if (!address || !recipientAddress || !message.trim() || !wallet) {
+      onStatusUpdate("Missing required information to send a message.");
+      return;
+    }
 
     try {
       setSending(true);
       onStatusUpdate("Signing message...");
-      
-      // Get signature for temporary key derivation
-      const messageBytes = new TextEncoder().encode("Random message for key derivation");
-      const signatureData = await wallet?.signPersonalMessage({
-        message: messageBytes
-      });
 
-      if (!signatureData?.signature) {
-        throw new Error("Signature is undefined.");
+      // Retrieve cached signature or request a new one
+      let signature = localStorage.getItem('walletSignature');
+      if (!signature) {
+        console.log('No cached signature.')
+        const messageBytes = new TextEncoder().encode("Random message for key derivation");
+        const signatureData = await wallet?.signPersonalMessage({
+          message: messageBytes
+        });
+        if (!signatureData?.signature) {
+          throw new Error("Failed to obtain a valid signature.");
+        }
+        signature = signatureData.signature;
+        localStorage.setItem('walletSignature', signature);
       }
-
-      if (!wallet) {
-        throw new Error("Wallet is null.");
-      }
-
-      console.log('Signature data:', signatureData);
 
       onStatusUpdate("Sending message...");
-    
       const result = await sendMessage({
         senderAddress: address,
         recipientAddress,
         content: message,
-        signatureData,
+        signature,
         wallet,
       });
       

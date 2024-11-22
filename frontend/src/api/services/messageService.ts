@@ -4,21 +4,20 @@ import { checkBalance } from './walletService';
 import { normalizeSuiAddress } from '@mysten/sui/utils';
 import { bcs } from '@mysten/sui/bcs';
 import { deriveKeyFromSignature, generateSharedSecret, encryptMessage } from './cryptoService';
-import type { SuiSignPersonalMessageOutput } from '@mysten/wallet-standard';
 import { WalletContextState } from '@suiet/wallet-kit';
 
 export interface SendMessageParams {
     senderAddress: string;
     recipientAddress: string;
     content: string;
-    signatureData: SuiSignPersonalMessageOutput;
+    signature: string;
 }
 
 export const sendMessage = async ({
     senderAddress,
     recipientAddress,
     content,
-    signatureData,
+    signature,
     wallet
 }: SendMessageParams & { wallet: WalletContextState }) => {
     try {
@@ -28,8 +27,8 @@ export const sendMessage = async ({
             throw new Error('Insufficient balance. Please request tokens from the faucet.');
         }
 
-        const tempKey = deriveKeyFromSignature(signatureData.signature);
-        const sharedSecret = generateSharedSecret(tempKey, recipientAddress);
+        const tempPrivKey = deriveKeyFromSignature(signature);
+        const sharedSecret = generateSharedSecret(tempPrivKey, recipientAddress);
         const encryptedContent = encryptMessage(content, sharedSecret);
         const tx = new Transaction();
         const timestamp = Date.now();
