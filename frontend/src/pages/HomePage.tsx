@@ -1,4 +1,5 @@
-import { ConnectButton } from "@mysten/dapp-kit";
+import { ConnectButton } from "@suiet/wallet-kit";
+import "@suiet/wallet-kit/style.css";
 import { Box, Flex } from "@radix-ui/themes";
 import { ConversationSidebar } from "../components/ConversationSidebar.tsx";
 import { ChatPanel } from "../components/ChatPanel";
@@ -21,7 +22,7 @@ export default function HomePage() {
                     right: "16px",
                 }}
             >
-                <ConnectButton/>
+            <ConnectButton/>
             </Box>
         </div>
     );
