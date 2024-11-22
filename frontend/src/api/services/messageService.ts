@@ -4,8 +4,8 @@ import { checkBalance } from './walletService';
 import { normalizeSuiAddress } from '@mysten/sui/utils';
 import { bcs } from '@mysten/sui/bcs';
 import { deriveKeyFromSignature, generateSharedSecret, encryptMessage } from './cryptoService';
-import type { SuietWallet } from '../../types';
 import type { SuiSignPersonalMessageOutput } from '@mysten/wallet-standard';
+import { useSuiWallet } from '../../hooks/useSuiWallet';
 
 export interface SendMessageParams {
     senderAddress: string;
@@ -13,14 +13,6 @@ export interface SendMessageParams {
     content: string;
     signatureData: SuiSignPersonalMessageOutput;
 }
-
-const getSuietWallet = (): SuietWallet => {
-    if (!window.suiet) {
-        throw new Error('Suiet wallet not found');
-    }
-    return window.suiet;
-};
-
 
 export const sendMessage = async ({
     senderAddress,
@@ -51,8 +43,8 @@ export const sendMessage = async ({
             ],
         });
 
-        const suiet = getSuietWallet();
-        const result = await suiet.signAndExecuteTransaction({
+        const { wallet } = useSuiWallet();
+        const result = await wallet.signAndExecuteTransaction({
             transaction: tx,
         });
 
