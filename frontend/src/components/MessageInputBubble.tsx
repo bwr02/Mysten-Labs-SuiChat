@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { sendMessage } from '../api/services/messageService';
 
 interface MessageInputBubbleProps {
   address: string | null;
-  keypair: Ed25519Keypair | null;
   recipientAddress: string | null;
+  signMessage: (message: string) => Promise<string>;
   onStatusUpdate: (status: string) => void;
   onMessageSent: () => Promise<void>;
   onMessageDisplayed: (message: string, timestamp: number, txDigest: string) => void;
@@ -13,8 +12,8 @@ interface MessageInputBubbleProps {
 
 export default function MessageInputBubble({ 
   address, 
-  keypair,
   recipientAddress,
+  signMessage,
   onStatusUpdate, 
   onMessageSent,
   onMessageDisplayed
@@ -29,17 +28,20 @@ export default function MessageInputBubble({
   const handleSendMessage = async (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
     
-    if (!keypair || !address || !recipientAddress || !message.trim()) return;
+    if (!address || !recipientAddress || !message.trim()) return;
 
     try {
       setSending(true);
       onStatusUpdate("Sending message...");
 
+      // Get signature for temporary key derivation
+      const signature = await signMessage("Random message for key derivation");
+
       const result = await sendMessage({
         senderAddress: address,
         recipientAddress,
         content: message,
-        keypair
+        signature,
       });
       
       onStatusUpdate(`Message sent! Transaction ID: ${result.txId}`);

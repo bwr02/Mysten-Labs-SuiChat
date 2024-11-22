@@ -8,7 +8,7 @@ interface MessageInputFieldProps {
 }
 
 export default function MessageInputField({ recipientAddress, onMessageSent }: MessageInputFieldProps) {
-  const { keypair, address, balance, loading, error, refreshBalance } = useSuiWallet();
+  const { address, balance, loading, error, refreshBalance, signMessage } = useSuiWallet();
   const [txStatus, setTxStatus] = useState<string>("");
 
   if (loading) return <div className="loading-state" style={{ color: 'black' }}>Connecting to wallet...</div>;
@@ -31,8 +31,8 @@ export default function MessageInputField({ recipientAddress, onMessageSent }: M
       </div>
       <MessageInputBubble 
         address={address}
-        keypair={keypair}
         recipientAddress={recipientAddress}
+        signMessage={signMessage}
         onStatusUpdate={setTxStatus}
         onMessageSent={refreshBalance}
         onMessageDisplayed={onMessageSent}
