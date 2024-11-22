@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useSuiWallet } from '../hooks/useSuiWallet';
 import MessageInputBubble from './MessageInputBubble';
-import { useAccountBalance } from '@suiet/wallet-kit';
 
 interface MessageInputFieldProps {
   recipientAddress: string | null;
