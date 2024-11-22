@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { sendMessage } from '../api/services/messageService';
+import { WalletContextState } from '@suiet/wallet-kit'
 
 interface MessageInputBubbleProps {
   address: string | null;
   recipientAddress: string | null;
-  signMessage: (message: string) => Promise<string>;
+  wallet: WalletContextState | null;
   onStatusUpdate: (status: string) => void;
   onMessageSent: () => Promise<void>;
   onMessageDisplayed: (message: string, timestamp: number, txDigest: string) => void;
@@ -13,7 +14,7 @@ interface MessageInputBubbleProps {
 export default function MessageInputBubble({ 
   address, 
   recipientAddress,
-  signMessage,
+  wallet,
   onStatusUpdate, 
   onMessageSent,
   onMessageDisplayed
@@ -32,16 +33,32 @@ export default function MessageInputBubble({
 
     try {
       setSending(true);
-      onStatusUpdate("Sending message...");
-
+      onStatusUpdate("Signing message...");
+      
       // Get signature for temporary key derivation
-      const signature = await signMessage("Random message for key derivation");
+      const messageBytes = new TextEncoder().encode("Random message for key derivation");
+      const signatureData = await wallet?.signPersonalMessage({
+        message: messageBytes
+      });
 
+      if (!signatureData?.signature) {
+        throw new Error("Signature is undefined.");
+      }
+
+      if (!wallet) {
+        throw new Error("Wallet is null.");
+      }
+
+      console.log('Signature data:', signatureData);
+
+      onStatusUpdate("Sending message...");
+    
       const result = await sendMessage({
         senderAddress: address,
         recipientAddress,
         content: message,
-        signature,
+        signatureData,
+        wallet,
       });
       
       onStatusUpdate(`Message sent! Transaction ID: ${result.txId}`);
@@ -50,6 +67,7 @@ export default function MessageInputBubble({
       
       await onMessageSent();
     } catch (error) {
+      console.error('Error:', error);
       onStatusUpdate(`Error: ${error instanceof Error ? error.message : 'Failed to send message'}`);
     } finally {
       setSending(false);

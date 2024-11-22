@@ -1,27 +1,42 @@
-import { blake2b } from '@noble/hashes/blake2b';
-import { x25519 } from '@noble/curves/ed25519';
-import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
+import { fromBase64 } from '@mysten/bcs';
+import nacl from 'tweetnacl';
 
-export const deriveKeyFromSignature = (signature: string) => {
-    // Hash the signature to get a 32-byte seed
-    const seed = blake2b(hexToBytes(signature), { dkLen: 32 });
-    return bytesToHex(seed);
-};
 
-export const generateSharedSecret = (tempPrivateKey: string, publicAddress: string) => {
-    const privateKeyBytes = hexToBytes(tempPrivateKey);
-    const publicKeyBytes = hexToBytes(publicAddress.slice(2)); // Remove '0x' prefix, adjust depending on how we want to derive public key
-    const sharedSecret = x25519.getSharedSecret(privateKeyBytes, publicKeyBytes);
-    return bytesToHex(sharedSecret);
-};
 
-export const encryptMessage = (message: string, sharedSecret: string) => {
+export function deriveKeyFromSignature(signature: string) {
+  try {
+    const signatureBytes = fromBase64(signature);
+    const privateKey = signatureBytes.slice(0, 32);  // taking first 32 bytes of signature as the private key
+    console.log('Private key:', privateKey, );
+    return privateKey;
+  } catch (error) {
+    console.error('Error in deriveKeyFromSignature:', error);
+    throw error;
+  }
+}
+
+
+export function generateSharedSecret(privateKey: Uint8Array, publicKeyHex: string) {
+  try {
+    // Convert public key from hex to bytes
+    const publicKey = Buffer.from(publicKeyHex.replace('0x', ''), 'hex');
+    
+    // Ensure privateKey is converted to the scalar for ed25519
+    const sharedSecret = nacl.scalarMult(privateKey, publicKey);
+    return sharedSecret;
+  } catch (error) {
+    console.error('Error in generateSharedSecret:', error);
+    throw error;
+  }
+}
+
+export const encryptMessage = (message: string, sharedSecret: Uint8Array) => {
     // TODO: Implement encryption using the shared secret
     // You might want to use AES or another symmetric encryption algorithm
     return message;
 };
 
-export const decryptMessage = (encryptedMessage: string, sharedSecret: string) => {
+export const decryptMessage = (encryptedMessage: string, sharedSecret: Uint8Array) => {
     // TODO: Implement decryption using the shared secret
     return encryptedMessage;
 };

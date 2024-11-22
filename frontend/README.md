@@ -33,10 +33,3 @@ To build your app for deployment you can run
 ```bash
 yarn build
 ```
-
-## ENV Setup
-To run this app you must have a .env from .env.sample To populate the VITE_WALLET_MNEMONIC generate a new sui address with
-```bash
-sui client new-address ed25519
-```
-Copy the phrase from that into VITE_WALLET_MNEMONIC

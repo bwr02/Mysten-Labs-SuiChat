@@ -5,7 +5,7 @@ import { normalizeSuiAddress } from '@mysten/sui/utils';
 import { bcs } from '@mysten/sui/bcs';
 import { deriveKeyFromSignature, generateSharedSecret, encryptMessage } from './cryptoService';
 import type { SuiSignPersonalMessageOutput } from '@mysten/wallet-standard';
-import { useSuiWallet } from '../../hooks/useSuiWallet';
+import { WalletContextState } from '@suiet/wallet-kit';
 
 export interface SendMessageParams {
     senderAddress: string;
@@ -18,8 +18,9 @@ export const sendMessage = async ({
     senderAddress,
     recipientAddress,
     content,
-    signatureData
-}: SendMessageParams) => {
+    signatureData,
+    wallet
+}: SendMessageParams & { wallet: WalletContextState }) => {
     try {
         const normalizedSenderAddress = normalizeSuiAddress(senderAddress);
         const balanceInfo = await checkBalance(normalizedSenderAddress);
@@ -43,7 +44,6 @@ export const sendMessage = async ({
             ],
         });
 
-        const { wallet } = useSuiWallet();
         const result = await wallet.signAndExecuteTransaction({
             transaction: tx,
         });
