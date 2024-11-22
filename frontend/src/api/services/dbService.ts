@@ -1,5 +1,5 @@
-import { prisma } from '../../../api/db'
-import { getActiveAddress } from '../../../api/sui-utils'
+import { prisma } from '../../../../api/db'
+import { getActiveAddress } from '../../../../api/sui-utils'
 
 interface MessageParams {
     id: number;
