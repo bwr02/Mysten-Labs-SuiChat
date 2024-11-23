@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { sendMessage } from '../api/services/messageService';
+import { WalletContextState } from '@suiet/wallet-kit'
 
 interface MessageInputBubbleProps {
   address: string | null;
-  keypair: Ed25519Keypair | null;
   recipientAddress: string | null;
+  wallet: WalletContextState | null;
   onStatusUpdate: (status: string) => void;
   onMessageSent: () => Promise<void>;
   onMessageDisplayed: (message: string, timestamp: number, txDigest: string) => void;
@@ -13,8 +13,8 @@ interface MessageInputBubbleProps {
 
 export default function MessageInputBubble({ 
   address, 
-  keypair,
   recipientAddress,
+  wallet,
   onStatusUpdate, 
   onMessageSent,
   onMessageDisplayed
@@ -29,17 +29,37 @@ export default function MessageInputBubble({
   const handleSendMessage = async (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
     
-    if (!keypair || !address || !recipientAddress || !message.trim()) return;
+    if (!address || !recipientAddress || !message.trim() || !wallet) {
+      onStatusUpdate("Missing required information to send a message.");
+      return;
+    }
 
     try {
       setSending(true);
-      onStatusUpdate("Sending message...");
+      onStatusUpdate("Signing message...");
 
+      // Retrieve cached signature or request a new one
+      let signature = localStorage.getItem('walletSignature');
+      if (!signature) {
+        console.log('No cached signature.')
+        const messageBytes = new TextEncoder().encode("Random message for key derivation");
+        const signatureData = await wallet?.signPersonalMessage({
+          message: messageBytes
+        });
+        if (!signatureData?.signature) {
+          throw new Error("Failed to obtain a valid signature.");
+        }
+        signature = signatureData.signature;
+        localStorage.setItem('walletSignature', signature);
+      }
+
+      onStatusUpdate("Sending message...");
       const result = await sendMessage({
         senderAddress: address,
         recipientAddress,
         content: message,
-        keypair
+        signature,
+        wallet,
       });
       
       onStatusUpdate(`Message sent! Transaction ID: ${result.txId}`);
@@ -48,6 +68,7 @@ export default function MessageInputBubble({
       
       await onMessageSent();
     } catch (error) {
+      console.error('Error:', error);
       onStatusUpdate(`Error: ${error instanceof Error ? error.message : 'Failed to send message'}`);
     } finally {
       setSending(false);

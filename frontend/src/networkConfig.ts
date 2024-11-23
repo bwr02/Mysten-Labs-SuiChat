@@ -1,3 +1,5 @@
+// TODO: Decide if file is necessary; note use of dapp-kit
+
 import { getFullnodeUrl } from "@mysten/sui/client";
 import { createNetworkConfig } from "@mysten/dapp-kit";
 

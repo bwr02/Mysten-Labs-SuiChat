@@ -1,51 +1,54 @@
-import { useState, useEffect } from 'react';
-import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+import { useWallet } from '@suiet/wallet-kit';
 import { checkBalance } from '../api/services/walletService';
-import { env } from '../config/env';
 
 export const useSuiWallet = () => {
-    const [keypair, setKeypair] = useState<Ed25519Keypair | null>(null);
-    const [address, setAddress] = useState<string | null>(null);
-    const [balance, setBalance] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const wallet = useWallet();
 
-    useEffect(() => {
-        const deriveKeysFromMnemonic = async () => {
-            try {
-                if (!env.WALLET_MNEMONIC) {
-                    throw new Error('Wallet mnemonic not configured in environment variables');
-                }
-
-                const kp = Ed25519Keypair.deriveKeypair(env.WALLET_MNEMONIC);
-                const addr = kp.getPublicKey().toSuiAddress();
-                
-                setKeypair(kp);
-                setAddress(addr);
-
-                const balanceInfo = await checkBalance(addr);
-                setBalance(balanceInfo.formattedBalance);
-            } catch (err) {
-                console.error('Wallet initialization error:', err);
-                setError(err instanceof Error ? err.message : 'Failed to initialize wallet');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        deriveKeysFromMnemonic();
-    }, []);
-
+    /**
+     * Refresh the user's wallet balance.
+     * @returns The formatted balance or null if an error occurs.
+     */
     const refreshBalance = async () => {
-        if (address) {
-            try {
-                const balanceInfo = await checkBalance(address);
-                setBalance(balanceInfo.formattedBalance);
-            } catch (error) {
-                console.error('Failed to refresh balance:', error);
-            }
+        if (!wallet.account?.address) return null;
+
+        try {
+            const balanceInfo = await checkBalance(wallet.account.address);
+            return balanceInfo.formattedBalance;
+        } catch (error) {
+            console.error(`Failed to refresh balance for address ${wallet.account?.address}:`, error);
+            return null;
         }
     };
 
-    return { keypair, address, balance, loading, error, refreshBalance };
+    /**
+     * Sign a personal message using the connected wallet.
+     * @param message - The message to sign.
+     * @returns The signed message data.
+     * @throws Error if the wallet is not connected or signing fails.
+     */
+    const signPersonalMessage = async (message: string) => {
+        if (!wallet.connected) {
+            throw new Error('Wallet not connected. Please connect your wallet to sign messages.');
+        }
+
+        try {
+            const signedMessage = await wallet.signPersonalMessage({
+                message: new TextEncoder().encode(message),
+            });
+            return signedMessage;
+        } catch (error) {
+            console.error(`Failed to sign message: ${message}`, error);
+            throw error;
+        }
+    };
+
+    return { 
+        address: wallet.account?.address ?? null,
+        connected: wallet.connected,
+        loading: wallet.connecting,
+        error: wallet.status === 'disconnected' ? 'Wallet disconnected' : null,
+        refreshBalance,
+        signPersonalMessage,
+        wallet
+    };
 };

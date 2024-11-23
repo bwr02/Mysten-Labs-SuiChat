@@ -8,7 +8,7 @@ interface MessageInputFieldProps {
 }
 
 export default function MessageInputField({ recipientAddress, onMessageSent }: MessageInputFieldProps) {
-  const { keypair, address, balance, loading, error, refreshBalance } = useSuiWallet();
+  const { address, loading, error, refreshBalance, wallet } = useSuiWallet();
   const [txStatus, setTxStatus] = useState<string>("");
 
   if (loading) return <div className="loading-state" style={{ color: 'black' }}>Connecting to wallet...</div>;
@@ -17,12 +17,6 @@ export default function MessageInputField({ recipientAddress, onMessageSent }: M
   return (
     <div className="w-full p-2 bg-purple-50 sticky bottom-0 flex flex-col justify-center">
       <div className="mb-4 text-center">
-        <div className="text-black">
-          <p>
-            Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
-          </p>
-          <p>Balance: {balance}</p>
-        </div>
         {txStatus && (
           <div className="text-gray-500">
             {txStatus}
@@ -31,10 +25,10 @@ export default function MessageInputField({ recipientAddress, onMessageSent }: M
       </div>
       <MessageInputBubble 
         address={address}
-        keypair={keypair}
         recipientAddress={recipientAddress}
+        wallet={wallet}
         onStatusUpdate={setTxStatus}
-        onMessageSent={refreshBalance}
+        onMessageSent={async () => { await refreshBalance(); }}
         onMessageDisplayed={onMessageSent}
       />
     </div>
