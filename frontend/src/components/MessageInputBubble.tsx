@@ -29,8 +29,23 @@ export default function MessageInputBubble({
   const handleSendMessage = async (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
     
-    if (!address || !recipientAddress || !message.trim() || !wallet) {
-      onStatusUpdate("Missing required information to send a message.");
+    if (!address) {
+      onStatusUpdate("Sender address is missing.");
+      return;
+    }
+
+    if (!recipientAddress) {
+      onStatusUpdate("Recipient address is missing.");
+      return;
+    }
+
+    if (!message.trim()) {
+      onStatusUpdate("Message cannot be empty.");
+      return;
+    }
+
+    if (!wallet) {
+      onStatusUpdate("Wallet is not connected.");
       return;
     }
 
