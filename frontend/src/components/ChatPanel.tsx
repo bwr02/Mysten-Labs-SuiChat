@@ -1,9 +1,10 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MessageInputField from "./MessageInputField";
+import { getAllBySender, getAllByRecipient, getAllMessages, getAllContactedAddresses } from "../api/services/dbService";
 
 interface Message {
   sender: "sent" | "received";
-  text: string;
+  text: string | null;
   timestamp?: number;
   txDigest?: string;
 }
@@ -13,10 +14,15 @@ interface ChatPanelProps {
 }
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    { sender: "sent", text: "Just submit the doc, see you in class" },
-    { sender: "received", text: "Can't wait for our standup!" },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  useEffect(() => {
+    const fetchMessages = async () => {
+      const data = await getAllMessages();
+      setMessages(data);
+    };
+
+    fetchMessages();
+  }, [recipientAddress]);
 
   const handleMessageSent = (newMessage: string, timestamp: number, txDigest: string) => {
     setMessages((prevMessages) => [
@@ -40,22 +46,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
                 : "bg-gray-200 text-black self-start"
             }`}
           >
-            <span>
-              {message.text}
-              {message.txDigest && (
-                <>
-                  <br />
-                  <a
-                    href={`https://suiscan.xyz/testnet/tx/${message.txDigest}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 underline"
-                  >
-                    View on Chain
-                  </a>
-                </>
-              )}
-            </span>
+            <span>{message.text}</span>
           </div>
         ))}
       </div>
