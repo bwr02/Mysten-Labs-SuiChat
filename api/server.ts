@@ -68,9 +68,9 @@ app.get('/messages/by-sender', async (req, res) => {
     }
 });
 
-app.get('/messages/by-recipient', async (req, res) => {
-    // const { recipient } = req.params;
-	const recipient = getActiveAddress()
+app.get('/messages/by-recipient/:recipient', async (req, res) => {
+    const { recipient } = req.params;
+	// const recipient = getActiveAddress()
 
     try {
         const messages = await prisma.message.findMany({

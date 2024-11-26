@@ -39,10 +39,10 @@ export async function getAllBySender(): Promise<Message[]> {
     }
 }
 
-export async function getAllByRecipient(): Promise<Message[]> {
+export async function getAllByRecipient(recipient: string): Promise<Message[]> {
     try {
         // console.log(`Calling API for recipient: ${recipient}`);
-        const response = await fetch(`http://localhost:3000/messages/by-recipient`);
+        const response = await fetch(`http://localhost:3000/messages/by-recipient/${recipient}`);
         if (!response.ok) {
             console.error("Failed to fetch messages. Status:", response.status);
             throw new Error('Failed to fetch messages');
