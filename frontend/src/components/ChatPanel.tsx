@@ -46,7 +46,22 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
                 : "bg-gray-200 text-black self-start"
             }`}
           >
-            <span>{message.text}</span>
+            <span>
+              {message.text}
+              {message.txDigest && (
+                <>
+                  <br />
+                  <a
+                    href={`https://suiscan.xyz/testnet/tx/${message.txDigest}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 underline"
+                  >
+                    View on Chain
+                  </a>
+                </>
+              )}
+            </span>
           </div>
         ))}
       </div>
