@@ -32,7 +32,10 @@ export function generateSharedSecret(privateKey: Uint8Array, publicKeyHex: strin
 }
 
 
-export function encryptMessage(message: string, sharedSecret: Uint8Array): string {
+export function encryptMessage(message: string | null, sharedSecret: Uint8Array): string {
+  if(!message){
+    return ""
+  }
   const key = forge.util.createBuffer(sharedSecret).bytes(); // Ensure the key is in the correct format
   const iv = forge.random.getBytesSync(16); // Generate a random 16-byte IV
 
@@ -47,7 +50,10 @@ export function encryptMessage(message: string, sharedSecret: Uint8Array): strin
   return forge.util.encode64(encrypted); // Return Base64 encoded ciphertext
 }
 
-export function decryptMessage(encryptedBase64: string, sharedSecret: Uint8Array): string {
+export function decryptMessage(encryptedBase64: string | null, sharedSecret: Uint8Array): string {
+  if(!encryptedBase64){
+    return ""
+  }
   const key = forge.util.createBuffer(sharedSecret).bytes(); // Ensure the key is in the correct format
   const encryptedBytes = forge.util.decode64(encryptedBase64); // Decode from Base64
 
