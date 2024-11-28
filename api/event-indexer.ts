@@ -4,6 +4,7 @@ import { CONFIG } from './config';
 import { Prisma } from '@prisma/client';
 import { prisma } from './db';
 import { getActiveAddress, getClient } from './sui-utils';
+import { WebSocketServer } from "ws"
 
 var id_cur = Number(1);
 
@@ -36,6 +37,18 @@ type EventTracker = {
     callback: (events: SuiEvent[], type: string) => any;
 };
 
+// Initialize a WebSocket server (if not already done)
+const wss = new WebSocketServer({ port: 8080 });
+
+// Function to broadcast messages to all connected clients
+const broadcastMessage = (data: object) => {
+    wss.clients.forEach((client) => {
+        if (client.readyState === client.OPEN) {
+            client.send(JSON.stringify(data));
+        }
+    });
+};
+
 const handleMessageCreated = async (events: SuiEvent[], type: string) => {
     const updates: MessageCreatedInput[] = []; // Use an array instead of an object keyed by message_id
 
@@ -55,19 +68,31 @@ const handleMessageCreated = async (events: SuiEvent[], type: string) => {
         }
     }
 
-    // Iterate over the updates without needing message_id for `upsert`
-    const promises = updates.map((update) =>
-        prisma.message.upsert({
+    const promises = updates.map(async (update) => {
+        const result = await prisma.message.upsert({
             where: {
                 id: id_cur,
-                sender: update.sender, // Use a unique combination to upsert without message_id
+                sender: update.sender,
                 recipient: update.recipient,
-                timestamp: update.timestamp
+                timestamp: update.timestamp,
             },
             create: update,
             update,
-        })
-    );
+        });
+
+        // Broadcast the message to ws after a successful upsert
+        broadcastMessage({
+            type: 'new-message',
+            message: {
+                sender: result.sender,
+                recipient: result.recipient,
+                text: result.content,
+                timestamp: result.timestamp,
+            },
+        });
+
+        return result;
+    });
 
     id_cur = id_cur +1;
 
