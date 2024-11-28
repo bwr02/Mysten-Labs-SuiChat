@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import MessageInputField from "./MessageInputField";
 import { getAllBySender, getAllByRecipient, getAllMessages, getMessagesWithAddress, getAllContactedAddresses } from "../api/services/dbService";
+import { useSuiWallet } from "@/hooks/useSuiWallet";
 
 interface Message {
   sender: "sent" | "received";
@@ -13,9 +14,12 @@ interface ChatPanelProps {
   recipientAddress: string | null;
 }
 
+
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+
+  const { wallet } = useSuiWallet();
 
   // WebSocket connection
   useEffect(() => {
@@ -41,7 +45,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   // Fetch initial messages
   useEffect(() => {
       const fetchMessages = async () => {
-          const initialMessages = await getMessagesWithAddress(recipientAddress);
+          const initialMessages = await getMessagesWithAddress(recipientAddress, wallet);
           setMessages(initialMessages);
       };
 

@@ -1,5 +1,6 @@
 import { useSuiWallet } from '../../hooks/useSuiWallet'
 import { decryptMessage, deriveKeyFromSignature, generateSharedSecret } from './cryptoService';
+import { WalletContextState } from '@suiet/wallet-kit'
 interface Message {
     sender: "sent" | "received";
     text: string|null;
@@ -59,7 +60,9 @@ export async function getAllByRecipient(recipient: string): Promise<Message[]> {
     }
 }
 
-export async function getMessagesWithAddress(otherAddr: string|null): Promise<Message[]> {
+
+ 
+export async function getMessagesWithAddress(otherAddr: string|null, wallet: WalletContextState | null): Promise<Message[]> {
     try {
         const response = await fetch(`http://localhost:3000/messages/with-given-address/${otherAddr}`);
         if (!response.ok) {
@@ -67,7 +70,6 @@ export async function getMessagesWithAddress(otherAddr: string|null): Promise<Me
             throw new Error('Failed to fetch messages');
         }
 
-        const { wallet } = useSuiWallet();
         if (!wallet) {
             console.log("Wallet is not connected.");
             return [];
