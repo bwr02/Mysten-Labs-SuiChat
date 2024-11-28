@@ -24,6 +24,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
     fetchMessages();
   }, [recipientAddress]);
 
+  useEffect(() => {
+    if (recipientAddress) {
+      setMessages([]);
+    }
+  }, [recipientAddress]);
+
   const handleMessageSent = (newMessage: string, timestamp: number, txDigest: string) => {
     setMessages((prevMessages) => [
       ...prevMessages,
@@ -34,7 +40,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   return (
     <div className="flex flex-col h-screen w-3/4 p-0 bg-white">
       <div className="font-bold text-lg px-6 py-4 mb-4">
-        <span className="text-black text-2xl">Sophia</span>
+        <span className="text-black text-2xl">
+          {recipientAddress
+            ? `${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`
+            : "Sophia"}
+        </span>
       </div>
       <div className="flex-grow flex flex-col gap-2 px-4 py-2 justify-end mb-4">
         {messages.map((message, index) => (
