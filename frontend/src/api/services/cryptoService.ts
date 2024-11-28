@@ -1,12 +1,11 @@
-import { fromB64 } from '@mysten/bcs';
+import { fromBase64 } from '@mysten/bcs';
 import nacl from 'tweetnacl';
-import * as forge from 'node-forge';
 
 
 
 export function deriveKeyFromSignature(signature: string) {
   try {
-    const signatureBytes = fromB64(signature);
+    const signatureBytes = fromBase64(signature);
     const tempPrivateKey = signatureBytes.slice(0, 32);  // taking first 32 bytes of signature as the private key
     console.log('Temp private key:', tempPrivateKey);
     return tempPrivateKey;
