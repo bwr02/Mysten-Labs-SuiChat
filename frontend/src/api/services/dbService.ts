@@ -57,6 +57,22 @@ export async function getAllByRecipient(recipient: string): Promise<Message[]> {
     }
 }
 
+export async function getMessagesWithAddress(otherAddr: string|null): Promise<Message[]> {
+    try {
+        const response = await fetch(`http://localhost:3000/messages/with-given-address/${otherAddr}`);
+        if (!response.ok) {
+            console.error("Failed to fetch messages. Status:", response.status);
+            throw new Error('Failed to fetch messages');
+        }
+
+        const messages: Message[] = await response.json();
+        return messages;
+    } catch (error) {
+        console.error('Error fetching messages:', error);
+        return [];
+    }
+}
+
 export async function getAllContactedAddresses(): Promise<string[]> {
     try {
         const response = await fetch('http://localhost:3000/contacts');

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import MessageInputField from "./MessageInputField";
-import { getAllBySender, getAllByRecipient, getAllMessages, getAllContactedAddresses } from "../api/services/dbService";
+import { getAllBySender, getAllByRecipient, getAllMessages, getMessagesWithAddress, getAllContactedAddresses } from "../api/services/dbService";
 
 interface Message {
   sender: "sent" | "received";
@@ -15,19 +15,37 @@ interface ChatPanelProps {
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  useEffect(() => {
-    const fetchMessages = async () => {
-      const data = await getAllMessages();
-      setMessages(data);
-    };
+  const [newMessage, setNewMessage] = useState('');
 
-    fetchMessages();
+  // WebSocket connection
+  useEffect(() => {
+      const ws = new WebSocket('ws://localhost:8080');
+
+      ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          if (data.type === 'new-message') {
+              const { sender, recipient } = data.message;
+
+              // Check if the new message is between the current user and `recipientAddress`
+              if (
+                  (sender === recipientAddress || recipient === recipientAddress)
+              ) {
+                  setMessages((prevMessages) => [...prevMessages, data.message]);
+              }
+          }
+      };
+
+      return () => ws.close(); // Cleanup on unmount
   }, [recipientAddress]);
 
+  // Fetch initial messages
   useEffect(() => {
-    if (recipientAddress) {
-      setMessages([]);
-    }
+      const fetchMessages = async () => {
+          const initialMessages = await getMessagesWithAddress(recipientAddress);
+          setMessages(initialMessages);
+      };
+
+      fetchMessages();
   }, [recipientAddress]);
 
   const handleMessageSent = (newMessage: string, timestamp: number, txDigest: string) => {

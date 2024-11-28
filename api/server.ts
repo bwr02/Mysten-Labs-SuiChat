@@ -92,6 +92,36 @@ app.get('/messages/by-recipient/:recipient', async (req, res) => {
     }
 });
 
+app.get('/messages/with-given-address/:otherAddr', async (req, res) => {
+	const myAddress = getActiveAddress();
+    const { otherAddr } = req.params
+
+    try {
+        const messages = await prisma.message.findMany({
+            where: {
+                OR: [
+                    { sender: myAddress, recipient: otherAddr },
+                    { sender: otherAddr, recipient: myAddress },
+                ],
+            },
+            orderBy: {
+                timestamp: 'asc',
+            },
+        });
+
+        const formattedMessages = messages.map((message) => ({
+            sender: message.sender === myAddress ? "sent" : "received",
+            text: message.content,
+            timestamp: message.timestamp,
+        }));
+
+        res.json(formattedMessages);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch messages' });
+    }
+});
+
 app.get('/contacts', async (req, res) => {
     try {
         const myAddress = getActiveAddress()
