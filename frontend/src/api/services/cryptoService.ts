@@ -1,5 +1,6 @@
 import { fromBase64 } from '@mysten/bcs';
 import nacl from 'tweetnacl';
+import * as forge from 'node-forge';
 
 
 
