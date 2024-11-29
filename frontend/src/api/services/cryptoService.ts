@@ -46,29 +46,37 @@ export function encryptMessage(message: string | null, sharedSecret: Uint8Array)
   cipher.update(forge.util.createBuffer(message));
   cipher.finish();
 
-  console.log("NON IV (Encrypt): " + cipher.output.getBytes());
+  const output = cipher.output.getBytes();
 
+  console.log("NON IV (Encrypt): " + forge.util.encode64(output));
+
+  console.log("IV Encrypted Bytes Length (before):", iv.length);
+  console.log("Cipher Encrypted Bytes Length (before):", output);
   // Concatenate IV and encrypted data for ease of use
-  const encrypted = iv + cipher.output.getBytes();
-  //return forge.util.encode64(encrypted); // Return Base64 encoded ciphertext
-  return encrypted;
+  const encrypted = iv + output;
+  console.log("ENCRYPTED SENDING: " + forge.util.encode64(encrypted));
+  console.log("Encrypted Bytes Length (before):", encrypted.length);
+  return forge.util.encode64(encrypted); // Return Base64 encoded ciphertext
+  //return encrypted;
 }
 
 export function decryptMessage(encryptedBase64: string | null, sharedSecret: Uint8Array): string {
   if(!encryptedBase64){
-    return ""
+    return "failed"
   }
+
 
   console.log("ENCRYPTED: " + encryptedBase64);
   console.log("SHARED SECRET: " + sharedSecret);
   const key = forge.util.createBuffer(sharedSecret).bytes(); // Ensure the key is in the correct format
   const encryptedBytes = forge.util.decode64(encryptedBase64); // Decode from Base64
-
+  console.log("Encrypted Bytes Length:", encryptedBytes.length);
+  //const encryptedBytes = encryptedBase64;
   // Extract IV and ciphertext
   const iv = encryptedBytes.slice(0, 16); // First 16 bytes are the IV
   console.log("IV (Decrypt):", forge.util.bytesToHex(iv)); // this is different between encrypt and decrypt rn
   const ciphertext = encryptedBytes.slice(16);
-  console.log("NON IV (Decrypt): " + ciphertext);
+  console.log("NON IV (Decrypt): " + forge.util.bytesToHex(ciphertext));
 
   // Initialize the AES decipher in CBC mode
   const decipher = forge.cipher.createDecipher('AES-CBC', key);
@@ -76,9 +84,11 @@ export function decryptMessage(encryptedBase64: string | null, sharedSecret: Uin
   decipher.update(forge.util.createBuffer(ciphertext));
   const success = decipher.finish();
 
+
   if (!success) {
       throw new Error("Decryption failed");
   }
 
   return decipher.output.toString(); // Return the decrypted message
+
 }

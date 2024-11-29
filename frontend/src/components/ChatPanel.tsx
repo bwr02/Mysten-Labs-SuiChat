@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import MessageInputField from "./MessageInputField";
-import { getAllBySender, getAllByRecipient, getAllMessages, getMessagesWithAddress, getAllContactedAddresses } from "../api/services/dbService";
+import { getAllBySender, getAllByRecipient, getAllMessages, getMessagesWithAddress, getAllContactedAddresses, getDecryptedMessage } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
+import { deriveKeyFromSignature } from "@/api/services/cryptoService";
 
 interface Message {
   sender: "sent" | "received";
@@ -27,6 +28,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
 
       ws.onmessage = (event) => {
           const data = JSON.parse(event.data);
+          console.log(data);
           if (data.type === 'new-message') {
               const { sender, recipient } = data.message;
 
@@ -34,7 +36,24 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
               if (
                   (sender === recipientAddress || recipient === recipientAddress)
               ) {
-                  setMessages((prevMessages) => [...prevMessages, data.message]);
+                const handleNewMessage = async () => {
+                  try {
+                      const decryptedMessages = await getDecryptedMessage(
+                          recipientAddress,
+                          wallet,
+                          data.message
+                      );
+                      setMessages((prevMessages) => [
+                          ...prevMessages,
+                          ...decryptedMessages,
+                      ]);
+                  } catch (error) {
+                      console.error('Error decrypting message:', error);
+                  }
+              };
+
+              handleNewMessage();
+                  //setMessages((prevMessages) => [...prevMessages, data.message]);
               }
           }
       };

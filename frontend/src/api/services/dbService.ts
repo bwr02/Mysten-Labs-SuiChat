@@ -1,4 +1,3 @@
-import { useSuiWallet } from '../../hooks/useSuiWallet'
 import { decryptMessage, deriveKeyFromSignature, generateSharedSecret } from './cryptoService';
 import { WalletContextState } from '@suiet/wallet-kit'
 interface Message {
@@ -60,6 +59,40 @@ export async function getAllByRecipient(recipient: string): Promise<Message[]> {
     }
 }
 
+export async function getDecryptedMessage(otherAddr: string|null, wallet: WalletContextState|null, message: Message): Promise<Message[]> {
+    if (!wallet) {
+        console.log("Wallet is not connected.");
+        return [];
+    }
+
+    let signature = localStorage.getItem('walletSignature');
+    if (!signature) {
+        console.log('No cached signature.')
+        const messageBytes = new TextEncoder().encode("Random message for key derivation");
+        const signatureData = await wallet?.signPersonalMessage({
+        message: messageBytes
+        });
+        if (!signatureData?.signature) {
+        throw new Error("Failed to obtain a valid signature.");
+        }
+        signature = signatureData.signature;
+        localStorage.setItem('walletSignature', signature);
+    }
+
+    const tempPrivKey = deriveKeyFromSignature(signature);
+    if (!otherAddr) {
+        console.log("Other address is not specified.");
+        return [];
+    }
+    const sharedSecret = generateSharedSecret(tempPrivKey, otherAddr);
+    const decryptedText = message.text ? decryptMessage(message.text, sharedSecret) : null;
+    const decryptedMessage: Message = {
+        ...message,
+        text: decryptedText,
+    };
+
+    return [decryptedMessage];
+}
 
  
 export async function getMessagesWithAddress(otherAddr: string|null, wallet: WalletContextState | null): Promise<Message[]> {
