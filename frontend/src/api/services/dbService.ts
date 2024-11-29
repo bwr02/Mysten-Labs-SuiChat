@@ -101,7 +101,7 @@ export async function getMessagesWithAddress(otherAddr: string|null, wallet: Wal
             ({
                 ...message,
                 text: decryptMessage(message.text, sharedSecret), // Apply the transformation to the content field
-              }));
+            }));
     } catch (error) {
         console.error('Error fetching messages:', error);
         return [];
