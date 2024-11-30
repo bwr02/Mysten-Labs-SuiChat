@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import MessageInputField from "./MessageInputField";
-import { getAllBySender, getAllByRecipient, getAllMessages, getMessagesWithAddress, getAllContactedAddresses, getDecryptedMessage } from "../api/services/dbService";
+import { getMessagesWithAddress, getDecryptedMessage } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
-import { deriveKeyFromSignature } from "@/api/services/cryptoService";
 
 interface Message {
   sender: "sent" | "received";
@@ -18,7 +17,7 @@ interface ChatPanelProps {
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
+  //const [newMessage, setNewMessage] = useState('');
 
   const { wallet } = useSuiWallet();
 
