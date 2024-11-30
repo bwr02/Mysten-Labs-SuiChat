@@ -24,13 +24,15 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
       ws.onmessage = (event) => {
           const data = JSON.parse(event.data);
           if (data.type === 'new-message') {
-              const { sender, recipient } = data.message;
+              const { messageType, sender, recipient, text, timestamp } = data.message;
 
               // Check if the new message is between the current user and `recipientAddress`
               if (
                   (sender === recipientAddress || recipient === recipientAddress)
               ) {
-                  setMessages((prevMessages) => [...prevMessages, data.message]);
+                  setMessages((prevMessages) => [...prevMessages, 
+                    {sender: messageType, text: text, timestamp: timestamp}
+                  ]);
               }
           }
       };
@@ -51,7 +53,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const handleMessageSent = (newMessage: string, timestamp: number, txDigest: string) => {
     setMessages((prevMessages) => [
       ...prevMessages,
-      { sender: "sent", text: newMessage, timestamp, txDigest },
+      // { sender: "sent", text: newMessage, timestamp, txDigest },
     ]);
   };
 
