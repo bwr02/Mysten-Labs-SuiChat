@@ -24,14 +24,19 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
       ws.onmessage = (event) => {
           const data = JSON.parse(event.data);
           if (data.type === 'new-message') {
-              const { sender, recipient } = data.message;
+            const { sender, recipient, txDigest } = data.message;
 
-              // Check if the new message is between the current user and `recipientAddress`
-              if (
-                  (sender === recipientAddress || recipient === recipientAddress)
-              ) {
-                  setMessages((prevMessages) => [...prevMessages, data.message]);
-              }
+            setMessages((prevMessages) => {
+                const isDuplicate = prevMessages.some(
+                    (msg) => msg.txDigest === txDigest
+                );
+                if (isDuplicate) return prevMessages;
+
+                if (sender === recipientAddress || recipient === recipientAddress) {
+                    return [...prevMessages, data.message];
+                }
+                return prevMessages;
+            });
           }
       };
 
