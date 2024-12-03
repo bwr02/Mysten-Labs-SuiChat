@@ -24,37 +24,33 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   // WebSocket connection
   useEffect(() => {
       const ws = new WebSocket('ws://localhost:8080');
-
       ws.onmessage = (event) => {
-          const data = JSON.parse(event.data);
-          console.log(data);
-          if (data.type === 'new-message') {
-              const { sender, recipient } = data.message;
+        const data = JSON.parse(event.data);
+        if (data.type === 'new-message') {
+            const { messageType, sender, recipient, text, timestamp } = data.message;
 
-              // Check if the new message is between the current user and `recipientAddress`
-              if (
-                  (sender === recipientAddress || recipient === recipientAddress)
-              ) {
-                const handleNewMessage = async () => {
-                  try {
-                      const decryptedMessages = await getDecryptedMessage(
-                          recipientAddress,
-                          wallet,
-                          data.message
-                      );
-                      setMessages((prevMessages) => [
-                          ...prevMessages,
-                          ...decryptedMessages,
-                      ]);
-                  } catch (error) {
-                      console.error('Error decrypting message:', error);
-                  }
-              };
-
-              handleNewMessage();
-                  //setMessages((prevMessages) => [...prevMessages, data.message]);
+            // Check if the new message is between the current user and `recipientAddress`
+            if (
+                (sender === recipientAddress || recipient === recipientAddress)
+            ) {
+              const handleNewMessage = async () => {
+                try {
+                    const decryptedMessage = await getDecryptedMessage(
+                        recipientAddress,
+                        wallet,
+                        text
+                    );
+              
+                  setMessages((prevMessages) => [...prevMessages, 
+                    {sender: messageType, text: decryptedMessage, timestamp: timestamp}
+                  ]);
+                } catch (error) {
+                  console.error('Error decrypting message:', error);
               }
+              handleNewMessage();
+            }
           }
+        };
       };
 
       return () => ws.close(); // Cleanup on unmount
@@ -73,7 +69,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const handleMessageSent = (newMessage: string, timestamp: number, txDigest: string) => {
     setMessages((prevMessages) => [
       ...prevMessages,
-      { sender: "sent", text: newMessage, timestamp, txDigest },
+      //{ sender: "sent", text: newMessage, timestamp, txDigest },
     ]);
   };
 
