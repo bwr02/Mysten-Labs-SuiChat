@@ -69,7 +69,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const handleMessageSent = (newMessage: string, timestamp: number, txDigest: string) => {
     setMessages((prevMessages) => [
       ...prevMessages,
-      //{ sender: "sent", text: newMessage, timestamp, txDigest },
+      { sender: "sent", text: newMessage, timestamp, txDigest },
     ]);
   };
 
