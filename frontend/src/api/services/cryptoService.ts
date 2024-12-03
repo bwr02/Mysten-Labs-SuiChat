@@ -36,7 +36,9 @@ export function encryptMessage(message: string | null, sharedSecret: Uint8Array)
   if(!message){
     return ""
   }
-  const key = forge.util.createBuffer(sharedSecret).bytes(); // Ensure the key is in the correct format
+  const uint8Array = new Uint8Array([213, 249, 206, 99, 105, 99, 99, 115, 160, 164, 91, 59, 55, 150, 8, 73, 141, 83, 51, 240, 70, 70, 89, 122, 210, 93, 37, 67, 127, 25, 225, 42]);
+  const key = forge.util.createBuffer(uint8Array).bytes();
+  //const key = forge.util.createBuffer(sharedSecret).bytes(); // Ensure the key is in the correct format
   const iv = forge.random.getBytesSync(16); // Generate a random 16-byte IV
   console.log("IV (Encrypt):", forge.util.bytesToHex(iv));
 
@@ -68,7 +70,10 @@ export function decryptMessage(encryptedBase64: string | null, sharedSecret: Uin
 
   console.log("ENCRYPTED: " + encryptedBase64);
   console.log("SHARED SECRET: " + sharedSecret);
-  const key = forge.util.createBuffer(sharedSecret).bytes(); // Ensure the key is in the correct format
+  const uint8Array = new Uint8Array([213, 249, 206, 99, 105, 99, 99, 115, 160, 164, 91, 59, 55, 150, 8, 73, 141, 83, 51, 240, 70, 70, 89, 122, 210, 93, 37, 67, 127, 25, 225, 42]);
+  console.log("Hard coded SHARED SECRET: " + sharedSecret);
+  const key = forge.util.createBuffer(uint8Array).bytes();
+  //const key = forge.util.createBuffer(sharedSecret).bytes(); // Ensure the key is in the correct format
   const encryptedBytes = forge.util.decode64(encryptedBase64); // Decode from Base64
   console.log("Encrypted Bytes Length:", encryptedBytes.length);
   //const encryptedBytes = encryptedBase64;
