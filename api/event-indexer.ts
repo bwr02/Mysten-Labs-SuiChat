@@ -84,6 +84,7 @@ const handleMessageCreated = async (events: SuiEvent[], type: string) => {
         broadcastMessage({
             type: 'new-message',
             message: {
+                messageType: result.sender === getActiveAddress() ? "sent" : "received",
                 sender: result.sender,
                 recipient: result.recipient,
                 text: result.content,
