@@ -47,8 +47,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
                 } catch (error) {
                   console.error('Error decrypting message:', error);
               }
-              handleNewMessage();
             }
+            handleNewMessage();
           }
         };
       };
@@ -69,9 +69,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const handleMessageSent = (newMessage: string, timestamp: number, txDigest: string) => {
     setMessages((prevMessages) => [
       ...prevMessages,
-      { sender: "sent", text: newMessage, timestamp, txDigest },
+      //{ sender: "sent", text: newMessage, timestamp, txDigest },
     ]);
   };
+
+  
 
   return (
     <div className="flex flex-col h-screen w-3/4 p-0 bg-white">
