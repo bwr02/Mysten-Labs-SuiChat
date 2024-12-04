@@ -34,7 +34,7 @@ Run the faucet command to get tokens:
 ### 4. Pull the Code
 Clone the repository containing the application code.
 
-`git clone `
+`git clone git@github.com:bwr02/Mysten-Labs-SuiChat.git`
 
 ### 5. Install Yarn
 If you don't have Yarn installed, run:
