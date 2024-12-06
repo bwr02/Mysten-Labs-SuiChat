@@ -76,9 +76,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   
 
   return (
-    <div className="flex flex-col h-screen w-3/4 p-0 bg-white">
+    <div className="flex flex-col h-screen w-3/4 p-0 bg-white overflow-auto">
       <div className="font-bold text-lg px-6 py-4 mb-4">
-        <span className="text-black text-2xl">
+        <span className="fixed text-black text-2xl">
           {recipientAddress
             ? `${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`
             : "Sophia"}

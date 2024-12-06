@@ -16,6 +16,9 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
     { address:"0xPlaceholder", name: "Bonnie", message: "Where are we meeting...", time: "24 min" },
     { address:"0xPlaceholder", name: "Jane", message: "Have you done 171 HW?", time: "36 min" },
     { address:"0xPlaceholder", name: "John", message: "What time is midterm?", time: "45 min" },
+    { address:"0xPlaceholder", name: "Adam", message: "I requested changes on your PR", time: "49 min" },
+    { address:"0xPlaceholder", name: "Ryan", message: "What is on the quiz?", time: "53 min" },
+    { address:"0xPlaceholder", name: "Emma", message: "Did you study yet?", time: "56 min" },
   ];
 
   // Toggle address book search input visibility
@@ -45,7 +48,7 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
   };
 
   return (
-    <div className="w-1/4 p-4 bg-purple-100 flex flex-col">
+    <div className="w-1/4 p-4 bg-purple-100 flex flex-col overflow-auto">
       <h1 className="text-xl font-bold mb-4 flex items-center gap-2 text-black">
         SuiChat
         {/* Address Book Search Icon */}
