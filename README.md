@@ -3,7 +3,7 @@
 ## Steps to Set Up and Run the Application
 
 ### Compatibility Notice
-This application currently only officially supports MacOS 12 and later, which is what this guide targets. It may work on other operating systems, but it has not been tested on them and support will not be offered for them as of now.
+This application currently only officially supports MacOS 13 and later, which is what this guide targets. It may work on other operating systems, but it has not been tested on them and support will not be offered for them as of now.
 
 This application is designed to run on Chrome with the Suiet Sui Wallet extension. It may not function as expected on other browsers or without the extension.
 
