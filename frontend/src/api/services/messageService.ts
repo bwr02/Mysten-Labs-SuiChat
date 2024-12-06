@@ -29,6 +29,7 @@ export const sendMessage = async ({
 
         const tempPrivKey = deriveKeyFromSignature(signature);
         const sharedSecret = generateSharedSecret(tempPrivKey, recipientAddress);
+        console.log("SENDER SHARED SECRET: " + sharedSecret);
         const encryptedContent = encryptMessage(content, sharedSecret);
         const tx = new Transaction();
         const timestamp = Date.now();

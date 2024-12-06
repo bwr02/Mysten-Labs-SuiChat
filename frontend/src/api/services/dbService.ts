@@ -1,3 +1,5 @@
+import { decryptMessage, deriveKeyFromSignature, generateSharedSecret } from './cryptoService';
+import { WalletContextState } from '@suiet/wallet-kit'
 interface Message {
     sender: "sent" | "received";
     text: string|null;
@@ -57,7 +59,38 @@ export async function getAllByRecipient(recipient: string): Promise<Message[]> {
     }
 }
 
-export async function getMessagesWithAddress(otherAddr: string|null): Promise<Message[]> {
+export async function getDecryptedMessage(otherAddr: string|null, wallet: WalletContextState|null, message: string): Promise<string> {
+    if (!wallet) {
+        console.log("Wallet is not connected.");
+        return "";
+    }
+
+    let signature = localStorage.getItem('walletSignature');
+    if (!signature) {
+        console.log('No cached signature.')
+        const messageBytes = new TextEncoder().encode("Random message for key derivation");
+        const signatureData = await wallet?.signPersonalMessage({
+        message: messageBytes
+        });
+        if (!signatureData?.signature) {
+        throw new Error("Failed to obtain a valid signature.");
+        }
+        signature = signatureData.signature;
+        localStorage.setItem('walletSignature', signature);
+    }
+
+    const tempPrivKey = deriveKeyFromSignature(signature);
+    if (!otherAddr) {
+        console.log("Other address is not specified.");
+        return "";
+    }
+    const sharedSecret = generateSharedSecret(tempPrivKey, otherAddr);
+    const decryptedText = decryptMessage(message, sharedSecret);
+    return decryptedText;
+}
+
+ 
+export async function getMessagesWithAddress(otherAddr: string|null, wallet: WalletContextState | null): Promise<Message[]> {
     try {
         const response = await fetch(`http://localhost:3000/messages/with-given-address/${otherAddr}`);
         if (!response.ok) {
@@ -65,8 +98,38 @@ export async function getMessagesWithAddress(otherAddr: string|null): Promise<Me
             throw new Error('Failed to fetch messages');
         }
 
+        if (!wallet) {
+            console.log("Wallet is not connected.");
+            return [];
+        }
+
+        let signature = localStorage.getItem('walletSignature');
+        if (!signature) {
+            console.log('No cached signature.')
+            const messageBytes = new TextEncoder().encode("Random message for key derivation");
+            const signatureData = await wallet?.signPersonalMessage({
+            message: messageBytes
+            });
+            if (!signatureData?.signature) {
+            throw new Error("Failed to obtain a valid signature.");
+            }
+            signature = signatureData.signature;
+            localStorage.setItem('walletSignature', signature);
+        }
+
+        const tempPrivKey = deriveKeyFromSignature(signature);
+        if (!otherAddr) {
+            console.log("Other address is not specified.");
+            return [];
+        }
+        const sharedSecret = generateSharedSecret(tempPrivKey, otherAddr);
+
         const messages: Message[] = await response.json();
-        return messages;
+        return messages.map((message) =>
+            ({
+                ...message,
+                text: decryptMessage(message.text, sharedSecret), // Apply the transformation to the content field
+            }));
     } catch (error) {
         console.error('Error fetching messages:', error);
         return [];
@@ -88,3 +151,4 @@ export async function getAllContactedAddresses(): Promise<string[]> {
         return [];
     }
 }
+

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import MessageInputField from "./MessageInputField";
-import { getAllBySender, getAllByRecipient, getAllMessages, getMessagesWithAddress, getAllContactedAddresses } from "../api/services/dbService";
+import { getMessagesWithAddress, getDecryptedMessage } from "../api/services/dbService";
+import { useSuiWallet } from "@/hooks/useSuiWallet";
 
 interface Message {
   sender: "sent" | "received";
@@ -13,28 +14,43 @@ interface ChatPanelProps {
   recipientAddress: string | null;
 }
 
+
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
+  //const [newMessage, setNewMessage] = useState('');
+
+  const { wallet } = useSuiWallet();
 
   // WebSocket connection
   useEffect(() => {
       const ws = new WebSocket('ws://localhost:8080');
-
       ws.onmessage = (event) => {
-          const data = JSON.parse(event.data);
-          if (data.type === 'new-message') {
-              const { messageType, sender, recipient, text, timestamp } = data.message;
+        const data = JSON.parse(event.data);
+        if (data.type === 'new-message') {
+            const { messageType, sender, recipient, text, timestamp } = data.message;
 
-              // Check if the new message is between the current user and `recipientAddress`
-              if (
-                  (sender === recipientAddress || recipient === recipientAddress)
-              ) {
+            // Check if the new message is between the current user and `recipientAddress`
+            if (
+                (sender === recipientAddress || recipient === recipientAddress)
+            ) {
+              const handleNewMessage = async () => {
+                try {
+                    const decryptedMessage = await getDecryptedMessage(
+                        recipientAddress,
+                        wallet,
+                        text
+                    );
+              
                   setMessages((prevMessages) => [...prevMessages, 
-                    {sender: messageType, text: text, timestamp: timestamp}
+                    {sender: messageType, text: decryptedMessage, timestamp: timestamp}
                   ]);
+                } catch (error) {
+                  console.error('Error decrypting message:', error);
               }
+            }
+            handleNewMessage();
           }
+        };
       };
 
       return () => ws.close(); // Cleanup on unmount
@@ -43,7 +59,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   // Fetch initial messages
   useEffect(() => {
       const fetchMessages = async () => {
-          const initialMessages = await getMessagesWithAddress(recipientAddress);
+          const initialMessages = await getMessagesWithAddress(recipientAddress, wallet);
           setMessages(initialMessages);
       };
 
@@ -53,9 +69,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const handleMessageSent = (newMessage: string, timestamp: number, txDigest: string) => {
     setMessages((prevMessages) => [
       ...prevMessages,
-      // { sender: "sent", text: newMessage, timestamp, txDigest },
+      //{ sender: "sent", text: newMessage, timestamp, txDigest },
     ]);
   };
+
+  
 
   return (
     <div className="flex flex-col h-screen w-3/4 p-0 bg-white overflow-auto">
