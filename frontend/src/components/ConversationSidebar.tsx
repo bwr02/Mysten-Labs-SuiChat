@@ -1,7 +1,6 @@
 import  React, { useState } from "react";
 import {SidebarConversationParams} from "@/types/SidebarType";
 import { getSuiNInfo } from "@/api/services/nameServices";
-import { isStringObject } from "util/types";
 // component to display all the chat previews on the left handside
 
 interface ChatSidebarProps {
