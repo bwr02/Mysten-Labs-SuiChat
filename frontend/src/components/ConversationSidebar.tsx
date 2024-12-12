@@ -1,5 +1,7 @@
 import  React, { useState } from "react";
 import {SidebarConversationParams} from "@/types/SidebarType";
+import { getSuiNInfo } from "@/api/services/nameServices";
+import { isStringObject } from "util/types";
 // component to display all the chat previews on the left handside
 
 interface ChatSidebarProps {
@@ -35,9 +37,19 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
     setSearchText(event.target.value);
   };
   const handleSearchForUser = async () => {
-    setRecipientAddress(searchText);
-    console.log("Recipient address stored:", searchText);
-    setSearchText("");
+    try {
+      const targetAddress = await getSuiNInfo("@" + searchText); // Await the result
+      if (targetAddress) {
+        setRecipientAddress(targetAddress); // Ensure targetAddress is a string
+        console.log("Recipient address stored:", targetAddress);
+      } else {
+        console.log("No target address found for the given name.");
+      }
+      setSearchText("");
+    } catch (error) {
+      console.error("Error fetching target address:", error);
+    }
+    
   }
   const handleSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
