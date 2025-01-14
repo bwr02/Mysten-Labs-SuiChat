@@ -16,7 +16,7 @@ interface ChatPanelProps {
 
 const RecipientBar: React.FC<{ recipientAddress: string | null }> = ({ recipientAddress }) => {
   return (
-    <div className="w-full bg-purple-500 text-white py-4 px-6 flex items-center justify-between shadow-md sticky top-0">
+    <div className="w-full bg-purple-300 text-black py-4 px-6 flex items-center justify-between shadow-md sticky top-0">
       <h1 className="text-2xl font-bold">
         {recipientAddress
           ? `${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`
