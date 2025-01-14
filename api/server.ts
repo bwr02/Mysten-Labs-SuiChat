@@ -151,5 +151,52 @@ app.get('/contacts', async (req, res) => {
     }
 });
 
+app.get('/contacts/metadata', async (req, res) => {
+    try {
+        const myAddress = getActiveAddress();
+
+        // Fetch all messages involving the current user
+        const messages = await prisma.message.findMany({
+            where: {
+                OR: [
+                    { sender: myAddress },
+                    { recipient: myAddress },
+                ],
+            },
+            orderBy: {
+                timestamp: 'desc', // Order by timestamp descending for easy aggregation
+            },
+        });
+
+        // Aggregate the most recent message for each contact
+        const contactMap: Record<string, { mostRecentMessage: string | null; timestamp: string | null }> = {};
+
+        messages.forEach((message) => {
+            const otherAddress = message.sender === myAddress ? message.recipient : message.sender;
+
+            if (!otherAddress) return;
+
+            if (!contactMap[otherAddress]) {
+                contactMap[otherAddress] = {
+                    mostRecentMessage: message.content,
+                    timestamp: message.timestamp,
+                };
+            }
+        });
+
+        // Convert the contact map to an array
+        const contacts = Object.entries(contactMap).map(([address, { mostRecentMessage, timestamp }]) => ({
+            address,
+            mostRecentMessage,
+            timestamp,
+        }));
+
+        res.json(contacts);
+    } catch (error) {
+        console.error('Error fetching contacts:', error);
+        res.status(500).json({ error: 'Failed to fetch contacts' });
+    }
+});
+
 
 app.listen(3000, () => console.log(`🚀 Server ready at: http://localhost:3000`));

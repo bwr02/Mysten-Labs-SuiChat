@@ -1,5 +1,7 @@
-import  React, { useState } from "react";
+import  React, { useEffect, useState } from "react";
 import {SidebarConversationParams} from "@/types/SidebarType";
+import {getAllContactedAddresses} from "../api/services/dbService";
+
 // component to display all the chat previews on the left handside
 
 interface ChatSidebarProps {
@@ -20,6 +22,17 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
     { address:"0xPlaceholder", name: "Ryan", message: "What is on the quiz?", time: "53 min" },
     { address:"0xPlaceholder", name: "Emma", message: "Did you study yet?", time: "56 min" },
   ];
+
+  // Fetch initial messages
+  useEffect(() => {
+    const fetchContacts = async () => {
+      const initialMessages = await getAllContactedAddresses();
+      console.log(initialMessages);
+    };
+
+    fetchContacts();
+  }, );
+
 
   // Toggle address book search input visibility
   const toggleSearch = () => {

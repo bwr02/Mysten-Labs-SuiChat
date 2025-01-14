@@ -136,9 +136,11 @@ export async function getMessagesWithAddress(otherAddr: string|null, wallet: Wal
     }
 }
 
-export async function getAllContactedAddresses(): Promise<string[]> {
+export async function getAllContactedAddresses(): Promise<
+    { address: string; mostRecentMessage: string | null; timestamp: string | null }[]
+> {
     try {
-        const response = await fetch('http://localhost:3000/contacts');
+        const response = await fetch('http://localhost:3000/contacts/metadata');
         if (!response.ok) {
             console.error('Failed to fetch contacted addresses. Status:', response.status);
             throw new Error('Failed to fetch contacted addresses');
