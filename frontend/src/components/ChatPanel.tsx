@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import MessageInputField from "./MessageInputField";
 import { getMessagesWithAddress, getDecryptedMessage } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
@@ -28,11 +28,18 @@ const RecipientBar: React.FC<{ recipientAddress: string | null }> = ({ recipient
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  //const [newMessage, setNewMessage] = useState('');
-
   const { wallet } = useSuiWallet();
 
-  // WebSocket connection
+    // Ref for auto-scrolling
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    // Scroll to bottom whenever messages update
+    useEffect(() => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messages]);
+
+    // WebSocket connection
   useEffect(() => {
       const ws = new WebSocket('ws://localhost:8080');
       ws.onmessage = (event) => {
@@ -117,6 +124,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
             </span>
           </div>
         ))}
+          {/* Ref element to keep the scroll at the bottom */}
+          <div ref={messagesEndRef} />
       </div>
       <div className="w-full p-2 bg-purple-50 flex flex-col justify-center sticky bottom-0">
         <MessageInputField
