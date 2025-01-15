@@ -91,7 +91,9 @@ export function decryptMessage(encryptedBase64: string | null, sharedSecret: Uin
 
 
   if (!success) {
-      throw new Error("Decryption failed");
+      console.log("Decryption Failed")
+      return "Decryption Failed, encrypted message: " + encryptedBase64.toString();
+      //throw new Error("Decryption failed");
   }
 
   return decipher.output.toString(); // Return the decrypted message
