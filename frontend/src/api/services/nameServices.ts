@@ -7,13 +7,14 @@ export const getSuiNInfo = async (name: string) => {
     return nameRecord;
 }
 
+
 interface ResolveNameServiceResponse {
     data: string[]; // Array of resolved names
     nextCursor?: string | null; // Cursor for pagination (optional)
     hasNextPage: boolean; // Whether there are more pages
 }
 
-async function reverseLookupSuiNS(address: string): Promise<string | null> {
+export const reverseLookupSuiNS = async (address: string): Promise<string | null>  => {
     try {
     // Call the suix_resolveNameServiceNames method
     const response = await suiClient.call('suix_resolveNameServiceNames', [address]);
@@ -32,6 +33,7 @@ async function reverseLookupSuiNS(address: string): Promise<string | null> {
   }
 }
 
+
 // Example usage
 (async () => {
   const address = '0xcb4634806b80bfc969935294391fa38169b42da5d66303b2710d93af101c9509';
@@ -43,5 +45,6 @@ async function reverseLookupSuiNS(address: string): Promise<string | null> {
     console.log('No SuiNS name found for the address.');
   }
 })();
+
 
 
