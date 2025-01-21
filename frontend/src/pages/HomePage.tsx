@@ -18,7 +18,7 @@ export default function HomePage() {
             <Box
                 style={{
                     position: "absolute",
-                    top: "16px",
+                    top: "8px",
                     right: "16px",
                 }}
             >

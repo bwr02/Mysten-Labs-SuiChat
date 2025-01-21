@@ -14,6 +14,17 @@ interface ChatPanelProps {
   recipientAddress: string | null;
 }
 
+const RecipientBar: React.FC<{ recipientAddress: string | null }> = ({ recipientAddress }) => {
+  return (
+    <div className="w-full bg-purple-300 text-black py-4 px-6 flex items-center justify-between shadow-md sticky top-0">
+      <h1 className="text-2xl font-bold">
+        {recipientAddress
+          ? `${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`
+          : "Sophia"}
+      </h1>
+    </div>
+  );
+};
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -84,13 +95,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
 
   return (
     <div className="flex flex-col h-screen w-3/4 p-0 bg-white overflow-auto">
-      <div className="font-bold text-lg px-6 py-4 mb-4">
-        <span className="fixed text-black text-2xl">
-          {recipientAddress
-            ? `${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`
-            : "Sophia"}
-        </span>
-      </div>
+      <RecipientBar recipientAddress={recipientAddress} />
       <div className="flex-grow flex flex-col gap-2 px-4 py-2 justify-end mb-4">
         {messages.map((message, index) => (
           <div

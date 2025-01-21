@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {SidebarConversationParams} from "@/types/SidebarType";
 import {getAllContactedAddresses, getDecryptedMessage} from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
-
+import { getSuiNInfo } from "@/api/services/nameServices";
 
 // component to display all the chat previews on the left hand-side
 
@@ -17,6 +17,7 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
   const [conversations, setConversations] = useState<SidebarConversationParams[]>([]);
   // Track which conversation is selected (for highlighting)
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
+
 
 // Pull in your wallet context (used for key derivation)
   const { wallet } = useSuiWallet();
