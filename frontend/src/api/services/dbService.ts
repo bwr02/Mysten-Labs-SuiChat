@@ -149,7 +149,7 @@ export async function getAllContactedAddresses(): Promise<SidebarConversationPar
         // Now we expect an array of SidebarConversationParams from the server
         // Note as of now the server is passing in encrypted messages and the name is address
         const data: SidebarConversationParams[] = await response.json();
-        console.log('Fetched contacted addresses:', data);
+        // console.log('Fetched contacted addresses:', data);
         return data;
     } catch (error) {
         console.error('Error fetching contacted addresses:', error);
