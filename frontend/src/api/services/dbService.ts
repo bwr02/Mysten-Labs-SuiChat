@@ -1,6 +1,6 @@
 import { decryptMessage, deriveKeyFromSignature, generateSharedSecret } from './cryptoService';
 import { WalletContextState } from '@suiet/wallet-kit'
-import { SidebarConversationParams } from "@/types/SidebarType"; // adjust path as necessary
+import { SidebarConversationParams } from "@/types/SidebarType";
 
 interface Message {
     sender: "sent" | "received";
