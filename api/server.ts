@@ -155,7 +155,7 @@ app.get('/contacts/metadata', async (req, res) => {
     try {
         const myAddress = getActiveAddress();
 
-        // Fetch all messages involving the current user
+        // Fetch all messages involving the current SuiChat user
         const messages = await prisma.message.findMany({
             where: {
                 OR: [
@@ -168,14 +168,16 @@ app.get('/contacts/metadata', async (req, res) => {
             },
         });
 
-        // Aggregate the most recent message for each contact
+        // contactMap will store info about each contact
+        // key = contactAddress, value = { mostRecentMessage, timestamp }
         const contactMap: Record<string, { mostRecentMessage: string | null; timestamp: string | null }> = {};
 
+        // Build our map with the first (i.e. most recent) message
         messages.forEach((message) => {
             const otherAddress = message.sender === myAddress ? message.recipient : message.sender;
-
             if (!otherAddress) return;
 
+            // If we haven't seen this address yet, store the most recent message
             if (!contactMap[otherAddress]) {
                 contactMap[otherAddress] = {
                     mostRecentMessage: message.content,
@@ -184,11 +186,13 @@ app.get('/contacts/metadata', async (req, res) => {
             }
         });
 
-        // Convert the contact map to an array
+        // Now convert the map to the shape of SidebarConversationParams
+        // For now, "name" will be set to the same address string
         const contacts = Object.entries(contactMap).map(([address, { mostRecentMessage, timestamp }]) => ({
-            address,
-            mostRecentMessage,
-            timestamp,
+            address: address,
+            name: address, // Fill the name field with the address
+            message: mostRecentMessage || "",
+            time: timestamp ? new Date(timestamp).toLocaleTimeString() : "", // Passes localized time
         }));
 
         res.json(contacts);
