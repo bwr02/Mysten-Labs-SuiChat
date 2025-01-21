@@ -65,11 +65,11 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
     }, [handleSearchForUser]);
 
   return (
-    <div className="w-1/4 p-4 bg-[#2e3845] flex flex-col overflow-auto">
+    <div className="w-1/4 p-4 bg-medium-blue flex flex-col overflow-auto">
       <div className="mb-4">
         <input
           type="text"
-          className="border border-gray-800 rounded px-3 py-1 w-full bg-[#1f2936] text-gray-300 text-base focus:ring-0"
+          className="border border-gray-800 rounded px-3 py-1 w-full bg-dark-blue text-gray-300 text-base focus:ring-0"
           placeholder="Find a conversation"
           value={searchText}
           onChange={handleSearchInputChange}
