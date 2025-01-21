@@ -188,12 +188,23 @@ app.get('/contacts/metadata', async (req, res) => {
 
         // Now convert the map to the shape of SidebarConversationParams
         // For now, "name" will be set to the same address string
-        const contacts = Object.entries(contactMap).map(([address, { mostRecentMessage, timestamp }]) => ({
-            address: address,
-            name: address, // Fill the name field with the address
-            message: mostRecentMessage || "",
-            time: timestamp ? new Date(timestamp).toLocaleTimeString() : "", // Passes localized time
-        }));
+        const contacts = Object.entries(contactMap).map(([address, { mostRecentMessage, timestamp }]) => {
+            let timeString = "";
+            if (timestamp) {
+                const numericTimestamp = parseInt(timestamp, 10);
+                // If it’s valid, convert to local time
+                if (!isNaN(numericTimestamp)) {
+                    timeString = new Date(numericTimestamp).toLocaleTimeString();
+                }
+            }
+
+            return {
+                address,
+                name: address,        // Fill 'name' with 'address' for now
+                message: mostRecentMessage || "",
+                time: timeString,     // This will be something like '1:30:15 PM'
+            };
+        });
 
         res.json(contacts);
     } catch (error) {
