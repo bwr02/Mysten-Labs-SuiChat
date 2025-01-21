@@ -10,29 +10,20 @@ interface ChatSidebarProps {
 export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const conversations : SidebarConversationParams[] = [
-    { address:"0xPlaceholder", name: "Ben", message: "Just finished our prd doc!", time: "10 min" },
-    { address:"0xPlaceholder", name: "Ashton", message: "LGTM", time: "14 min" },
-    { address:"0xPlaceholder", name: "Sophia", message: "Can’t wait for our standup!", time: "21 min" },
-    { address:"0xPlaceholder", name: "Chloe", message: "Has anyone seen PR?", time: "23 min" },
-    { address:"0xPlaceholder", name: "Bonnie", message: "Where are we meeting...", time: "24 min" },
-    { address:"0xPlaceholder", name: "Jane", message: "Have you done 171 HW?", time: "36 min" },
-    { address:"0xPlaceholder", name: "John", message: "What time is midterm?", time: "45 min" },
-    { address:"0xPlaceholder", name: "Adam", message: "I requested changes on your PR", time: "49 min" },
-    { address:"0xPlaceholder", name: "Ryan", message: "What is on the quiz?", time: "53 min" },
-    { address:"0xPlaceholder", name: "Emma", message: "Did you study yet?", time: "56 min" },
-  ];
+
+// This is now controlled by fetched data
+  const [conversations, setConversations] = useState<SidebarConversationParams[]>([]);
 
   // Fetch initial messages
   useEffect(() => {
     const fetchContacts = async () => {
-      const initialMessages = await getAllContactedAddresses();
-      console.log(initialMessages);
+      const initialContacts = await getAllContactedAddresses();
+      // console.log("Contacts from server:", initialContacts);
+      setConversations(initialContacts);
     };
 
     fetchContacts();
-  }, );
-
+  }, []);
 
   // Toggle address book search input visibility
   const toggleSearch = () => {
