@@ -20,7 +20,7 @@ const RecipientBar: React.FC<{ recipientAddress: string | null }> = ({ recipient
       <h1 className="text-2xl font-bold">
         {recipientAddress
           ? `${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`
-          : "Sophia"}
+          : "No Contact Selected"}
       </h1>
     </div>
   );
