@@ -17,21 +17,20 @@ const ConversationItem = React.memo(({
   isSelected: boolean;
   onSelect: () => void;
 }) => (
-  <div
-    onClick={onSelect}
-    className={`flex items-center gap-3 cursor-pointer p-1 rounded
-      ${isSelected 
-        ? "bg-blue-800" 
-        : "hover:bg-gray-600"
-      }`}
-  >
-    <img src="user.png" alt="avatar" className="w-10 h-10 rounded-full object-cover" />
-    <div className="flex-grow">
-      <span className="font-semibold text-gray-300 block">{conv.name}</span>
-      <span className="text-gray-400">{conv.message}</span>
+    <div
+        onClick={onSelect}
+        className={`flex flex-col gap-3 cursor-pointer p-1 rounded
+      ${isSelected ? "bg-blue-800" : "hover:bg-gray-600"}`}
+    >
+      <img src="user.png" alt="avatar" className="w-10 h-10 rounded-full object-cover"/>
+      <div className="flex items-center justify-between gap-2">
+        <div className="font-semibold text-gray-300 text-sm truncate max-w-[70%]">{conv.name}</div>
+        <div className="text-gray-400 text-xs whitespace-nowrap">{conv.time}</div>
+      </div>
+      <div className="text-gray-400 text-sm line-clamp-2 max-h-10 overflow-hidden">
+        {conv.message}
+      </div>
     </div>
-    <span className="text-gray-400 text-sm">{conv.time}</span>
-  </div>
 ));
 
 ConversationItem.displayName = 'ConversationItem';
@@ -112,7 +111,7 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
   }, [setRecipientAddress]);
 
   return (
-    <div className="w-1/4 p-4 bg-medium-blue flex flex-col overflow-auto">      
+    <div className="w-1/4 p-4 bg-medium-blue flex flex-col overflow-y-auto overflow-x-hidden">
       <div className="mb-4">
         <input
           type="text"
