@@ -15,14 +15,12 @@ export default function MessageInputField({ recipientAddress, onMessageSent }: M
   if (error) return <div className="error-state" style={{ color: 'black' }}>Wallet Error: {error}</div>;
 
   return (
-    <div className="w-full p-2 bg-purple-50 sticky bottom-0 flex flex-col justify-center">
-      <div className="mb-4 text-center">
-        {txStatus && (
-          <div className="text-gray-500">
-            {txStatus}
-          </div>
-        )}
-      </div>
+    <>
+      {txStatus && (
+        <div className="text-gray-500">
+          {txStatus}
+        </div>
+      )}
       <MessageInputBubble 
         address={address}
         recipientAddress={recipientAddress}
@@ -31,6 +29,6 @@ export default function MessageInputField({ recipientAddress, onMessageSent }: M
         onMessageSent={async () => { await refreshBalance(); }}
         onMessageDisplayed={onMessageSent}
       />
-    </div>
+    </>
   );
 }
