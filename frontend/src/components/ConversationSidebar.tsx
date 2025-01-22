@@ -19,16 +19,17 @@ const ConversationItem = React.memo(({
 }) => (
     <div
         onClick={onSelect}
-        className={`flex flex-col gap-3 cursor-pointer p-1 rounded
-      ${isSelected ? "bg-blue-800" : "hover:bg-gray-600"}`}
-    >
+        className={`flex items-start gap-3 cursor-pointer p-1 rounded
+      ${isSelected ? "bg-blue-800" : "hover:bg-gray-600"}`}>
       <img src="user.png" alt="avatar" className="w-10 h-10 rounded-full object-cover"/>
-      <div className="flex items-center justify-between gap-2">
-        <div className="font-semibold text-gray-300 text-sm truncate max-w-[70%]">{conv.name}</div>
-        <div className="text-gray-400 text-xs whitespace-nowrap">{conv.time}</div>
-      </div>
+      <div className="flex flex-col flex-grow overflow-hidden">
+        <div className="flex items-center justify-between gap-2">
+          <div className="font-semibold text-gray-300 text-sm truncate max-w-[70%]">{conv.name}</div>
+          <div className="text-gray-400 text-xs whitespace-nowrap">{conv.time}</div>
+        </div>
       <div className="text-gray-400 text-sm line-clamp-2 max-h-10 overflow-hidden">
         {conv.message}
+        </div>
       </div>
     </div>
 ));
