@@ -31,3 +31,9 @@ model Cursor {
   eventSeq String
   txDigest String
 }
+
+model Contact {
+  id String @id
+  suins String?
+  name String?
+}

@@ -1,11 +1,17 @@
 import { decryptMessage, deriveKeyFromSignature, generateSharedSecret } from './cryptoService';
 import { WalletContextState } from '@suiet/wallet-kit'
+import { prisma } from '../../../../api/db'
 interface Message {
     sender: "sent" | "received";
     text: string|null;
     timestamp?: number;
     txDigest?: string;
   }
+interface Contact {
+    id: string;
+    suins: string;
+    name: string;
+}
 
 export async function getAllMessages(): Promise<Message[]> {
     try {
@@ -149,6 +155,69 @@ export async function getAllContactedAddresses(): Promise<string[]> {
     } catch (error) {
         console.error('Error fetching contacted addresses:', error);
         return [];
+    }
+}
+
+export async function addContact(addr: string, suiname?: string, contactName?: string): Promise<void> {
+    if(suiname && contactName){
+        const contact = await prisma.contact.create({
+            data: {
+              id: addr,
+              suins: suiname,
+              name: contactName,
+            },
+          })
+    }
+    else if(suiname){
+        const contact = await prisma.contact.create({
+            data: {
+              id: addr,
+              suins: suiname,
+            },
+          })
+    }
+    else if(contactName){
+        const contact = await prisma.contact.create({
+            data: {
+              id: addr,
+              name: contactName,
+            },
+          })
+    }
+    else{
+        const contact = await prisma.contact.create({
+            data: {
+            id: addr,
+            },
+        })
+    }
+}
+
+export async function getSuiNSByAddress(addr: string): Promise<string|null>{
+    const contact = await prisma.contact.findUnique({
+        where: {
+          id: addr,
+        },
+      })
+    if(contact){
+        return contact.suins;
+    }
+    else{ //null case
+        return contact
+    }
+}
+
+export async function getNameByAddress(addr: string): Promise<string|null>{
+    const contact = await prisma.contact.findUnique({
+        where: {
+          id: addr,
+        },
+      })
+    if(contact){
+        return contact.name;
+    }
+    else{ //null case
+        return contact
     }
 }
 
