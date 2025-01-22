@@ -21,7 +21,7 @@ const ConversationItem = React.memo(({
     onClick={onSelect}
     className={`flex items-center gap-3 cursor-pointer p-1 rounded
       ${isSelected 
-        ? "bg-gray-600" 
+        ? "bg-blue-800" 
         : "hover:bg-gray-600"
       }`}
   >
