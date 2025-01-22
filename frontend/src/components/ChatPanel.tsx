@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import MessageInputField from "./MessageInputField";
+import { MessageInputField } from "./MessageInputField";
 import { getMessagesWithAddress, getDecryptedMessage } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
 

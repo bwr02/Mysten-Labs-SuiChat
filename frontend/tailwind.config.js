@@ -8,7 +8,8 @@ export default {
       colors: {
         'dark-blue': '#1f2937',
         'medium-blue': '#2e3845',
-        'light-blue': '#374454',
+        'light-blue': '#303a47',
+        'lighter-blue': '#374454'
       }
     },
   },

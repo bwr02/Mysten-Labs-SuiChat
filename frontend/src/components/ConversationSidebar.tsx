@@ -116,7 +116,7 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
       <div className="mb-4">
         <input
           type="text"
-          className="border border-gray-800 rounded px-3 py-1 w-full bg-dark-blue text-gray-300 text-base focus:ring-0"
+          className="border-none rounded-xl px-3 py-1 w-full bg-dark-blue text-gray-300 text-base focus:ring-0"
           placeholder="Find a conversation"
           value={searchText}
           onChange={handleSearchInputChange}
