@@ -1,57 +1,98 @@
-import { useEffect, useState } from "react";
-import {SidebarConversationParams} from "@/types/SidebarType";
-import {getAllContactedAddresses, getDecryptedMessage} from "../api/services/dbService";
+import React, { useCallback, useEffect, useState } from "react";
+import { SidebarConversationParams } from "@/types/SidebarType";
+import { getAllContactedAddresses, getDecryptedMessage } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
-
-// component to display all the chat previews on the left hand-side
+import { getSuiNInfo } from "@/api/services/nameServices";
 
 interface ChatSidebarProps {
   setRecipientAddress: (address: string) => void;
 }
+
+const ConversationItem = React.memo(({ 
+  conv, 
+  isSelected, 
+  onSelect 
+}: { 
+  conv: SidebarConversationParams;
+  isSelected: boolean;
+  onSelect: () => void;
+}) => (
+  <div
+    onClick={onSelect}
+    className={`flex items-center gap-3 cursor-pointer p-1 rounded
+      ${isSelected 
+        ? "bg-blue-800" 
+        : "hover:bg-gray-600"
+      }`}
+  >
+    <img src="user.png" alt="avatar" className="w-10 h-10 rounded-full object-cover" />
+    <div className="flex-grow">
+      <span className="font-semibold text-gray-300 block">{conv.name}</span>
+      <span className="text-gray-400">{conv.message}</span>
+    </div>
+    <span className="text-gray-400 text-sm">{conv.time}</span>
+  </div>
+));
+
+ConversationItem.displayName = 'ConversationItem';
+
 export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) => {
-  // const [isSearchOpen, setIsSearchOpen] = useState(false);
-  // const [searchText, setSearchText] = useState("");
-
-  // This is now controlled by fetched data
   const [conversations, setConversations] = useState<SidebarConversationParams[]>([]);
-  // Track which conversation is selected (for highlighting)
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
-
-
-// Pull in your wallet context (used for key derivation)
+  const [searchText, setSearchText] = useState("");
   const { wallet } = useSuiWallet();
 
+  const handleSearchInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+  }, []);
 
-  // Fetch initial "contacts" and decrypt their most recent messages
+  const handleSearchForUser = useCallback(async () => {
+    if (!searchText.trim()) return;
+
+    try {
+      const targetAddress = await getSuiNInfo("@" + searchText);
+      if (targetAddress) {
+        setRecipientAddress(targetAddress);
+        setSearchText("");
+      } else {
+        console.log("No target address found for the given name.");
+      }
+    } catch (error) {
+      console.error("Error fetching target address:", error);
+    }
+  }, [searchText, setRecipientAddress]);
+
+  const handleSearchKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSearchForUser();
+      event.stopPropagation();
+    }
+  }, [handleSearchForUser]);
+
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        // 1) Get the array of contacts with encrypted messages
         const initialContacts = await getAllContactedAddresses();
-        // console.log("Contacts from server (encrypted):", initialContacts);
-
-        // 2) Decrypt each contact's message
+        
         const decryptedContacts = await Promise.all(
-            initialContacts.map(async (contact) => {
-              try {
-                if (!contact.message) {
-                  // If message is null or empty, show "No Messages"
-                  return { ...contact, message: "No Messages" };
-                } else {
-                  // Otherwise, decrypt the message
-                  const decryptedMessage = await getDecryptedMessage(
-                      contact.address, // otherAddr
-                      wallet,
-                      contact.message  // encrypted text
-                  );
-                  return { ...contact, message: decryptedMessage || "No Messages" };
-                }
-              } catch (error) {
-                console.error(`Failed to decrypt message for ${contact.address}`, error);
-                // Fall back to showing an error or "No Messages"
-                return { ...contact, message: "(decryption error)" };
+          initialContacts.map(async (contact) => {
+            try {
+              if (!contact.message) {
+                return { ...contact, message: "No Messages" };
               }
-            })
+              
+              const decryptedMessage = await getDecryptedMessage(
+                contact.address,
+                wallet,
+                contact.message
+              );
+              return { ...contact, message: decryptedMessage || "No Messages" };
+            } catch (error) {
+              console.error(`Failed to decrypt message for ${contact.address}`, error);
+              return { ...contact, message: "(decryption error)" };
+            }
+          })
         );
 
         setConversations(decryptedContacts);
@@ -60,45 +101,40 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
       }
     };
 
-    // Only fetch/decrypt if wallet is ready (optional check)
     if (wallet) {
       fetchContacts();
     }
   }, [wallet]);
 
-  // Handler for selecting a conversation
-  const handleSelectConversation = (address: string) => {
+  const handleSelectConversation = useCallback((address: string) => {
     setSelectedAddress(address);
     setRecipientAddress(address);
-  };
-
+  }, [setRecipientAddress]);
 
   return (
-    <div className="w-1/4 p-4 bg-purple-100 flex flex-col overflow-auto">
-      <h1 className="text-xl font-bold mb-4 flex items-center gap-2 text-black">SuiChat</h1>
-      <h2 className="text-base font-semibold text-gray-500 mb-2">Conversations</h2>
+    <div className="w-1/4 p-4 bg-medium-blue flex flex-col overflow-auto">      
+      <div className="mb-4">
+        <input
+          type="text"
+          className="border border-gray-800 rounded px-3 py-1 w-full bg-dark-blue text-gray-300 text-base focus:ring-0"
+          placeholder="Find a conversation"
+          value={searchText}
+          onChange={handleSearchInputChange}
+          onKeyDown={handleSearchKeyDown}
+        />
+      </div>
+
+      <h2 className="text-sm font-semibold text-gray-300 mb-2">DIRECT MESSAGES</h2>
       <div className="flex flex-col gap-3">
-        {conversations.map((conv, index) => (
-          <div
-              key={index}
-              onClick={() => handleSelectConversation(conv.address)}
-              className={`flex items-center gap-3 cursor-pointer p-1 rounded
-              ${
-                  selectedAddress === conv.address
-                      ? "bg-blue-200" // Highlight selected
-                      : "hover:bg-gray-200" // Hover style
-              }`}
-          >
-            {/* Conversation Avatar, Currently not populated */}
-            <div className="w-10 h-10 bg-gray-300 rounded-full" />
-            <div className="flex-grow">
-              <span className="font-semibold text-black block">{conv.name}</span>
-              <span className="text-gray-500">{conv.message}</span>
-            </div>
-            <span className="text-gray-500 text-sm">{conv.time}</span>
-          </div>
+        {conversations.map((conv) => (
+          <ConversationItem 
+            key={conv.address}
+            conv={conv}
+            isSelected={selectedAddress === conv.address}
+            onSelect={() => handleSelectConversation(conv.address)}
+          />
         ))}
       </div>
     </div>
   );
-}
+};
