@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Message {
-  id Int @id @default(autoincrement())
+  txDigest   String @id
   sender     String?
   recipient  String?
   //message_id String   @unique // Ensures unique message_id for upserts
