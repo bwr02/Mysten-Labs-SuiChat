@@ -23,7 +23,7 @@ export default function ContactsPage() {
                         htmlFor="name"
                         className="block mb-2 text-sm font-medium text-gray-900"
                     >
-                        Name
+                        Name (optional)
                     </label>
                     <input
                         type="text"
@@ -40,7 +40,7 @@ export default function ContactsPage() {
                         htmlFor="suins-name"
                         className="block mb-2 text-sm font-medium text-gray-900"
                     >
-                        SuiNS Name
+                        SuiNS Name (optional)
                     </label>
                     <input
                         type="text"
@@ -77,6 +77,18 @@ export default function ContactsPage() {
                 >
                     Save Contact
                 </button>
+                <div className="mt-4 text-center">
+                    <p className="text-sm text-gray-600">
+                        Don't have a SuiNS name?{" "}
+                        <a
+                            href="https://suins.io/"
+                            target="_blank"
+                            className="text-purple-600 hover:text-purple-700 font-medium"
+                        >
+                            Register here
+                        </a>
+                    </p>
+                </div>
             </form>
         </div>
     );
