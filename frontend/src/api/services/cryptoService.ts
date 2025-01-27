@@ -20,26 +20,20 @@ export function deriveKeyFromSignature(signature: string): Uint8Array {
 
 export function generateSharedSecret(privateKey: Uint8Array, publicAddr: string): Uint8Array {
     try {
-        console.log("Private key input:", Array.from(privateKey));
-        console.log("Public address input:", publicAddr);
-        
         const addrBytes = Buffer.from(publicAddr.replace('0x', ''), 'hex');
-        console.log("Address bytes:", Array.from(addrBytes));
         
-        const derivedPubKey = blake2b(addrBytes, { dkLen: 32 });
-        console.log("Derived public key:", Array.from(derivedPubKey));
+        // Derive a deterministic value from concatenated keys to ensure consistent order
+        const combinedKeys = Buffer.concat([
+            Buffer.from(privateKey),
+            addrBytes
+        ]);
         
-        const pubKey = new Uint8Array(derivedPubKey);
-        pubKey[31] &= 127;
-        console.log("Formatted public key:", Array.from(pubKey));
+        // Sort the bytes to ensure consistent ordering regardless of input order
+        const sortedKeys = Array.from(combinedKeys);
+        sortedKeys.sort();
         
-        const sharedSecret = nacl.scalarMult(privateKey, pubKey);
-        console.log("Raw shared secret:", Array.from(sharedSecret));
-        
-        const finalSecret = new Uint8Array(blake2b(sharedSecret, { dkLen: 32 }));
-        console.log("Final shared secret:", Array.from(finalSecret));
-        
-        return finalSecret;
+        const finalSecret = blake2b(Buffer.from(sortedKeys), { dkLen: 32 });
+        return new Uint8Array(finalSecret);
     } catch (error) {
         console.error('Error in generateSharedSecret:', error);
         throw error;
