@@ -116,7 +116,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen w-3/4 bg-light-blue">
+    <div className="flex flex-col h-screen w-3/4 bg-light-blue overflow-auto">
       <RecipientBar recipientAddress={recipientAddress} />
       <div className="flex-grow flex flex-col gap-2 px-4 py-2 justify-end mb-4">
         {messages.map((message, index) => (
@@ -125,7 +125,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
           {/* Ref element to keep the scroll at the bottom */}
           <div ref={messagesEndRef} />
       </div>
-      <div className="w-full px-4 py-3 bg-light-blue border-t border-gray-700">
+      <div className="w-full px-4 py-3 bg-light-blue border-t border-gray-700 sticky bottom-0">
         <MessageInputField
           recipientAddress={recipientAddress}
           onMessageSent={handleMessageSent}
