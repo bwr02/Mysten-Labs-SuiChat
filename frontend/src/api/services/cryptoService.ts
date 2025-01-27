@@ -1,15 +1,22 @@
 import { fromBase64 } from '@mysten/bcs';
 import nacl from 'tweetnacl';
 import * as forge from 'node-forge';
+import { blake2b } from '@noble/hashes/blake2b';
 
 
 
 export function deriveKeyFromSignature(signature: string) {
   try {
     const signatureBytes = fromBase64(signature);
-    const tempPrivateKey = signatureBytes.slice(0, 32);  // taking first 32 bytes of signature as the private key
-    console.log('Temp private key:', tempPrivateKey);
-    return tempPrivateKey;
+    // Hash the signature to get a proper scalar
+    const hash = blake2b(signatureBytes, { dkLen: 32 });
+    // Clamp the scalar for Ed25519
+    const scalar = new Uint8Array(hash);
+    scalar[0] &= 248;
+    scalar[31] &= 127;
+    scalar[31] |= 64;
+    
+    return scalar;
   } catch (error) {
     console.error('Error in deriveKeyFromSignature:', error);
     throw error;
@@ -19,12 +26,15 @@ export function deriveKeyFromSignature(signature: string) {
 
 export function generateSharedSecret(privateKey: Uint8Array, publicKeyHex: string) {
   try {
-    // Convert public key from hex to bytes
-    const publicKey = Buffer.from(publicKeyHex.replace('0x', ''), 'hex');
+    // Convert public key from hex and get its Y coordinate
+    const publicKeyBytes = Buffer.from(publicKeyHex.replace('0x', ''), 'hex');
+    const publicKey = nacl.scalarMult.base(publicKeyBytes);
     
-    // Ensure privateKey is converted to the scalar for ed25519
+    // Perform X25519 key exchange
     const sharedSecret = nacl.scalarMult(privateKey, publicKey);
-    return sharedSecret;
+
+    // Hash the result to get final shared secret
+    return blake2b(sharedSecret, { dkLen: 32 });
   } catch (error) {
     console.error('Error in generateSharedSecret:', error);
     throw error;
@@ -36,9 +46,9 @@ export function encryptMessage(message: string | null, sharedSecret: Uint8Array)
   if(!message){
     return ""
   }
-  const uint8Array = new Uint8Array([213, 249, 206, 99, 105, 99, 99, 115, 160, 164, 91, 59, 55, 150, 8, 73, 141, 83, 51, 240, 70, 70, 89, 122, 210, 93, 37, 67, 127, 25, 225, 42]);
-  const key = forge.util.createBuffer(uint8Array).bytes(); // TODO: remove hardcoded shared secret
-  //const key = forge.util.createBuffer(sharedSecret).bytes(); // Ensure the key is in the correct format
+  // const uint8Array = new Uint8Array([213, 249, 206, 99, 105, 99, 99, 115, 160, 164, 91, 59, 55, 150, 8, 73, 141, 83, 51, 240, 70, 70, 89, 122, 210, 93, 37, 67, 127, 25, 225, 42]);
+  // const key = forge.util.createBuffer(uint8Array).bytes(); // TODO: remove hardcoded shared secret
+  const key = forge.util.createBuffer(sharedSecret).bytes(); // Ensure the key is in the correct format
   const iv = forge.random.getBytesSync(16); // Generate a random 16-byte IV
   console.log("IV (Encrypt):", forge.util.bytesToHex(iv));
 
@@ -70,10 +80,10 @@ export function decryptMessage(encryptedBase64: string | null, sharedSecret: Uin
 
   console.log("ENCRYPTED: " + encryptedBase64);
   console.log("SHARED SECRET: " + sharedSecret);
-  const uint8Array = new Uint8Array([213, 249, 206, 99, 105, 99, 99, 115, 160, 164, 91, 59, 55, 150, 8, 73, 141, 83, 51, 240, 70, 70, 89, 122, 210, 93, 37, 67, 127, 25, 225, 42]);
+  // const uint8Array = new Uint8Array([213, 249, 206, 99, 105, 99, 99, 115, 160, 164, 91, 59, 55, 150, 8, 73, 141, 83, 51, 240, 70, 70, 89, 122, 210, 93, 37, 67, 127, 25, 225, 42]);
   console.log("Hard coded SHARED SECRET: " + sharedSecret); // TODO: remove hardcoded shared secret
-  const key = forge.util.createBuffer(uint8Array).bytes();
-  //const key = forge.util.createBuffer(sharedSecret).bytes(); // Ensure the key is in the correct format
+  // const key = forge.util.createBuffer(uint8Array).bytes();
+  const key = forge.util.createBuffer(sharedSecret).bytes(); // Ensure the key is in the correct format
   const encryptedBytes = forge.util.decode64(encryptedBase64); // Decode from Base64
   console.log("Encrypted Bytes Length:", encryptedBytes.length);
   //const encryptedBytes = encryptedBase64;
