@@ -133,4 +133,5 @@ npm-debug.log*
 # Yarn debug files
 yarn-debug.log*
 yarn-error.log*
-api/prisma/dev.db
+*.db
+*.db-journal

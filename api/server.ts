@@ -29,6 +29,9 @@ app.get('/messages', async (req, res) => {
                     { recipient: myAddress },
                 ],
             },
+            orderBy: {
+                timestamp: 'desc',
+            },
         });
 
         const formattedMessages = messages.map((message) => ({
@@ -53,6 +56,9 @@ app.get('/messages/by-sender/:sender', async (req, res) => {
             where: {
                 sender,
             },
+            orderBy: {
+                timestamp: 'desc',
+            },
         });
 
         const formattedMessages = messages.map((message) => ({
@@ -76,6 +82,9 @@ app.get('/messages/by-recipient/:recipient', async (req, res) => {
         const messages = await prisma.message.findMany({
             where: {
                 recipient,
+            },
+            orderBy: {
+                timestamp: 'desc',
             },
         });
 
