@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { MessageInputField } from "./MessageInputField";
 import { getMessagesWithAddress, getDecryptedMessage } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
+import { toBase64 } from '@mysten/bcs';
+
 
 interface Message {
   sender: "sent" | "received";
@@ -55,8 +57,15 @@ const MessageBubble = React.memo(({message}: {message: Message}) => (
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const { wallet } = useSuiWallet();
+  const { wallet, publicKey } = useSuiWallet();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // hardcode
+  const hexKey = "4076f134f5d62737d12f6b3efb3b4c8f95abe17ca0bb039c44b6d98fdd2f568f";
+  const hexBytes = Uint8Array.from(Buffer.from(hexKey, "hex"));
+  const recipientPubKey = toBase64(hexBytes);
+  console.log("Sophia's Base64 Key:", recipientPubKey);
+
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth"});
   }, []);
@@ -70,17 +79,26 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
 
       const handleNewMessage = async (messageData: any) => {
           try {
+              const { messageType, text, timestamp } = messageData;
+
+              // const publicKeyForDecryption =
+              // messageType === "sent" ? publicKey : recipientPubKey;
+
+              // if (!publicKeyForDecryption) {
+              //   console.error("Public key for decryption is missing.");
+              //   return;
+              // }
+              
               const decryptedMessage = await getDecryptedMessage(
-                  recipientAddress,
+                  recipientPubKey,
                   wallet,
                   messageData.text
               );
-        
-            setMessages((prev) => [...prev, {
-                sender: messageData.messageType,
-                text: decryptedMessage,
-                timestamp: messageData.timestamp
-              }]);
+              setMessages((prev) => [...prev, {
+                  sender: messageType,
+                  text: decryptedMessage,
+                  timestamp: timestamp
+                }]);
           } catch (error) {
             console.error('Error decrypting message:', error);
         }
@@ -109,7 +127,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
       if (recipientAddress) {
         fetchMessages();
       }
-  }, [recipientAddress, wallet]);
+  }, [recipientAddress, wallet, recipientPubKey]);
 
   const handleMessageSent = useCallback((newMessage: string, timestamp: number, txDigest: string) => {
     setMessages(prev => [...prev]);
@@ -128,6 +146,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
       <div className="w-full px-4 py-3 bg-light-blue border-t border-gray-700 sticky bottom-0">
         <MessageInputField
           recipientAddress={recipientAddress}
+          recipientPubKey={recipientPubKey}
           onMessageSent={handleMessageSent}
         />
       </div>

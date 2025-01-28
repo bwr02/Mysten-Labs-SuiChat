@@ -9,6 +9,7 @@ import { WalletContextState } from '@suiet/wallet-kit';
 export interface SendMessageParams {
     senderAddress: string;
     recipientAddress: string;
+    recipientPubKey: string;
     content: string;
     signature: string;
 }
@@ -16,6 +17,7 @@ export interface SendMessageParams {
 export const sendMessage = async ({
     senderAddress,
     recipientAddress,
+    recipientPubKey,
     content,
     signature,
     wallet
@@ -27,8 +29,8 @@ export const sendMessage = async ({
             throw new Error('Insufficient balance. Please request tokens from the faucet.');
         }
 
-        const tempPrivKey = deriveKeyFromSignature(signature);
-        const sharedSecret = generateSharedSecret(tempPrivKey, recipientAddress);
+        const senderPrivKey = deriveKeyFromSignature(signature);
+        const sharedSecret = generateSharedSecret(senderPrivKey, recipientPubKey);
         console.log("SENDER SHARED SECRET: " + sharedSecret);
         const encryptedContent = encryptMessage(content, sharedSecret);
         const tx = new Transaction();

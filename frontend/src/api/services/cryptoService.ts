@@ -1,4 +1,4 @@
-import { fromBase64 } from '@mysten/bcs';
+import { fromBase64, toBase64 } from '@mysten/bcs';
 import nacl from 'tweetnacl';
 import * as forge from 'node-forge';
 import { blake2b } from '@noble/hashes/blake2b';

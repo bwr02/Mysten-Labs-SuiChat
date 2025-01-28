@@ -61,8 +61,8 @@ export async function getAllByRecipient(recipient: string): Promise<Message[]> {
     }
 }
 
-export async function getDecryptedMessage(otherAddr: string|null, wallet: WalletContextState|null, message: string): Promise<string> {
-    if (!wallet) {
+export async function getDecryptedMessage(publicKey: string, wallet: WalletContextState|null, encryptedMessage: string): Promise<string> {
+    if (!wallet?.connected) {
         console.log("Wallet is not connected.");
         return "";
     }
@@ -81,14 +81,9 @@ export async function getDecryptedMessage(otherAddr: string|null, wallet: Wallet
         localStorage.setItem('walletSignature', signature);
     }
 
-    const tempPrivKey = deriveKeyFromSignature(signature);
-    if (!otherAddr) {
-        console.log("Other address is not specified.");
-        return "";
-    }
-    const sharedSecret = generateSharedSecret(tempPrivKey, otherAddr);
-    const decryptedText = decryptMessage(message, sharedSecret);
-    return decryptedText;
+    const otherPrivKey = deriveKeyFromSignature(signature);
+    const sharedSecret = generateSharedSecret(otherPrivKey, publicKey);
+    return decryptMessage(encryptedMessage, sharedSecret);
 }
 
  

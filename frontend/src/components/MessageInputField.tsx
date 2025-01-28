@@ -4,6 +4,7 @@ import { sendMessage } from '../api/services/messageService';
 
 interface MessageInputFieldProps {
   recipientAddress: string | null;
+  recipientPubKey: string | null;
   onMessageSent: (message: string, timestamp: number, txDigest: string) => void;
 }
 
@@ -38,7 +39,7 @@ const SendButton = memo(({ sending, disabled, onClick }: {
 
 SendButton.displayName = 'SendButton';
 
-export const MessageInputField = memo(({ recipientAddress, onMessageSent }: MessageInputFieldProps) => {
+export const MessageInputField = memo(({ recipientAddress, recipientPubKey, onMessageSent }: MessageInputFieldProps) => {
   const { address, loading, error, refreshBalance, wallet } = useSuiWallet();
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
@@ -51,7 +52,7 @@ export const MessageInputField = memo(({ recipientAddress, onMessageSent }: Mess
   const handleSendMessage = useCallback(async (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
     
-    if (!address || !recipientAddress || !message.trim() || !wallet) {
+    if (!address || !recipientAddress || !recipientPubKey || !message.trim() || !wallet) {
       setStatus(
         !address ? "Sender address is missing." :
         !recipientAddress ? "Recipient address is missing." :
@@ -83,6 +84,7 @@ export const MessageInputField = memo(({ recipientAddress, onMessageSent }: Mess
       const result = await sendMessage({
         senderAddress: address,
         recipientAddress,
+        recipientPubKey,
         content: message,
         signature,
         wallet,
