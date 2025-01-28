@@ -10,7 +10,7 @@ interface Message {
     txDigest?: string;
   }
 interface Contact {
-    id: string;
+    address: string;
     suins: string;
     name: string;
 }
@@ -167,7 +167,7 @@ export async function addContact(addr: string, suiname?: string, contactName?: s
     if(suiname && contactName){
         const contact = await prisma.contact.create({
             data: {
-              id: addr,
+              address: addr,
               suins: suiname,
               name: contactName,
             },
@@ -176,7 +176,7 @@ export async function addContact(addr: string, suiname?: string, contactName?: s
     else if(suiname){
         const contact = await prisma.contact.create({
             data: {
-              id: addr,
+              address: addr,
               suins: suiname,
             },
           })
@@ -184,7 +184,7 @@ export async function addContact(addr: string, suiname?: string, contactName?: s
     else if(contactName){
         const contact = await prisma.contact.create({
             data: {
-              id: addr,
+              address: addr,
               name: contactName,
             },
           })
@@ -192,7 +192,7 @@ export async function addContact(addr: string, suiname?: string, contactName?: s
     else{
         const contact = await prisma.contact.create({
             data: {
-            id: addr,
+            address: addr,
             },
         })
     }
@@ -201,7 +201,7 @@ export async function addContact(addr: string, suiname?: string, contactName?: s
 export async function getSuiNSByAddress(addr: string): Promise<string|null>{
     const contact = await prisma.contact.findUnique({
         where: {
-          id: addr,
+          address: addr,
         },
       })
     if(contact){
@@ -215,7 +215,7 @@ export async function getSuiNSByAddress(addr: string): Promise<string|null>{
 export async function getNameByAddress(addr: string): Promise<string|null>{
     const contact = await prisma.contact.findUnique({
         where: {
-          id: addr,
+          address: addr,
         },
       })
     if(contact){
