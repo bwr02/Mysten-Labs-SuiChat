@@ -68,15 +68,16 @@ const handleMessageCreated = async (events: SuiEvent[], type: string) => {
         }
     }
 
-    const promises = updates.map(async (update) => {
+    const promises = updates.map(async (update, index) => {
+        const suiEvent = events[index];
         const result = await prisma.message.upsert({
             where: {
-                id: id_cur,
-                sender: update.sender,
-                recipient: update.recipient,
-                timestamp: update.timestamp,
+                txDigest: suiEvent.id.txDigest,  // Use the event's txDigest as the primary key
             },
-            create: update,
+            create: {
+                txDigest: suiEvent.id.txDigest,  // Add txDigest to the create
+                ...update,
+            },
             update,
         });
 
@@ -91,7 +92,6 @@ const handleMessageCreated = async (events: SuiEvent[], type: string) => {
                 timestamp: result.timestamp,
             },
         });
-
         return result;
     });
 

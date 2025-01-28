@@ -1,6 +1,8 @@
 import { decryptMessage, deriveKeyFromSignature, generateSharedSecret } from './cryptoService';
 import { WalletContextState } from '@suiet/wallet-kit'
 import { prisma } from '../../../../api/db'
+import { SidebarConversationParams } from "@/types/SidebarType";
+
 interface Message {
     sender: "sent" | "received";
     text: string|null;
@@ -142,15 +144,18 @@ export async function getMessagesWithAddress(otherAddr: string|null, wallet: Wal
     }
 }
 
-export async function getAllContactedAddresses(): Promise<string[]> {
+export async function getAllContactedAddresses(): Promise<SidebarConversationParams[]> {
     try {
-        const response = await fetch('http://localhost:3000/contacts');
+        const response = await fetch('http://localhost:3000/contacts/metadata');
         if (!response.ok) {
             console.error('Failed to fetch contacted addresses. Status:', response.status);
             throw new Error('Failed to fetch contacted addresses');
         }
-        const data: string[] = await response.json();
-        console.log('Fetched contacted addresses:', data);
+
+        // Now we expect an array of SidebarConversationParams from the server
+        // Note as of now the server is passing in encrypted messages and the name is address
+        const data: SidebarConversationParams[] = await response.json();
+        // console.log('Fetched contacted addresses:', data);
         return data;
     } catch (error) {
         console.error('Error fetching contacted addresses:', error);

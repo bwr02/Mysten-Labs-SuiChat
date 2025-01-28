@@ -9,9 +9,9 @@ import { useState } from "react";
 export default function HomePage() {
     const [recipientAddress, setRecipientAddress] = useState<string | null>(null);
     return (
-        <div className="flex flex-col h-screen bg-purple-100">
+        <div className="flex flex-col h-screen bg-dark-blue">
             {/* flex with Sidebar and Chat Panel */}
-            <Flex className="h-full flex-row" style={{ background: "#F3E8FF" }}>
+            <Flex className="h-full flex-row bg-dark-blue">
                 <ConversationSidebar setRecipientAddress={setRecipientAddress} />
                 <ChatPanel recipientAddress={recipientAddress} />
             </Flex>

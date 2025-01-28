@@ -29,6 +29,9 @@ app.get('/messages', async (req, res) => {
                     { recipient: myAddress },
                 ],
             },
+            orderBy: {
+                timestamp: 'desc',
+            },
         });
 
         const formattedMessages = messages.map((message) => ({
@@ -53,6 +56,9 @@ app.get('/messages/by-sender/:sender', async (req, res) => {
             where: {
                 sender,
             },
+            orderBy: {
+                timestamp: 'desc',
+            },
         });
 
         const formattedMessages = messages.map((message) => ({
@@ -76,6 +82,9 @@ app.get('/messages/by-recipient/:recipient', async (req, res) => {
         const messages = await prisma.message.findMany({
             where: {
                 recipient,
+            },
+            orderBy: {
+                timestamp: 'desc',
             },
         });
 
@@ -148,6 +157,68 @@ app.get('/contacts', async (req, res) => {
     } catch (error) {
         console.error('Error fetching contacts:', error);
         res.status(500).json({ error: 'Failed to fetch contacted addresses' });
+    }
+});
+
+app.get('/contacts/metadata', async (req, res) => {
+    try {
+        const myAddress = getActiveAddress();
+
+        // Fetch all messages involving the current SuiChat user
+        const messages = await prisma.message.findMany({
+            where: {
+                OR: [
+                    { sender: myAddress },
+                    { recipient: myAddress },
+                ],
+            },
+            orderBy: {
+                timestamp: 'desc', // Order by timestamp descending for easy aggregation
+            },
+        });
+
+        // contactMap will store info about each contact
+        // key = contactAddress, value = { mostRecentMessage, timestamp }
+        const contactMap: Record<string, { mostRecentMessage: string | null; timestamp: string | null }> = {};
+
+        // Build our map with the first (i.e. most recent) message
+        messages.forEach((message) => {
+            const otherAddress = message.sender === myAddress ? message.recipient : message.sender;
+            if (!otherAddress) return;
+
+            // If we haven't seen this address yet, store the most recent message
+            if (!contactMap[otherAddress]) {
+                contactMap[otherAddress] = {
+                    mostRecentMessage: message.content,
+                    timestamp: message.timestamp,
+                };
+            }
+        });
+
+        // Now convert the map to the shape of SidebarConversationParams
+        // For now, "name" will be set to the same address string
+        const contacts = Object.entries(contactMap).map(([address, { mostRecentMessage, timestamp }]) => {
+            let timeString = "";
+            if (timestamp) {
+                const numericTimestamp = parseInt(timestamp, 10);
+                // If it’s valid, convert to local time
+                if (!isNaN(numericTimestamp)) {
+                    timeString = new Date(numericTimestamp).toLocaleTimeString();
+                }
+            }
+
+            return {
+                address,
+                name: address,        // Fill 'name' with 'address' for now
+                message: mostRecentMessage || "",
+                time: timeString,     // This will be something like '1:30:15 PM'
+            };
+        });
+
+        res.json(contacts);
+    } catch (error) {
+        console.error('Error fetching contacts:', error);
+        res.status(500).json({ error: 'Failed to fetch contacts' });
     }
 });
 
