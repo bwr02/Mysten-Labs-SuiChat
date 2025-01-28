@@ -28,7 +28,7 @@ const RecipientBar: React.FC<{ recipientAddress: string | null }> = ({ recipient
 
 const MessageBubble = React.memo(({message}: {message: Message}) => (
   <div
-    className={`p-3 rounded-2xl max-w-[70%] text-sm ${
+    className={`p-3 rounded-2xl max-w-[50%] text-sm ${
       message.sender === "sent"
         ? "bg-blue-700 text-white self-end"
         : "bg-gray-200 text-black self-start"
