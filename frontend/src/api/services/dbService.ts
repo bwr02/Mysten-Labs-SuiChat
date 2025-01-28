@@ -13,6 +13,7 @@ interface Contact {
     address: string;
     suins: string;
     name: string;
+    public_key: string;
 }
 
 export async function getAllMessages(): Promise<Message[]> {
@@ -220,6 +221,20 @@ export async function getNameByAddress(addr: string): Promise<string|null>{
       })
     if(contact){
         return contact.name;
+    }
+    else{ //null case
+        return contact
+    }
+}
+
+export async function getPublicKeyByAddress(addr: string): Promise<string|null>{
+    const contact = await prisma.contact.findUnique({
+        where: {
+          address: addr,
+        },
+      })
+    if(contact){
+        return contact.public_key;
     }
     else{ //null case
         return contact
