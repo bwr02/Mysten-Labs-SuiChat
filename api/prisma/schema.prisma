@@ -33,7 +33,8 @@ model Cursor {
 }
 
 model Contact {
-  id String @id
+  address String @id
   suins String?
   name String?
+  public_key String?
 }
