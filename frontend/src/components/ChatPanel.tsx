@@ -28,7 +28,7 @@ const RecipientBar: React.FC<{ recipientAddress: string | null }> = ({ recipient
 
 const MessageBubble = React.memo(({message}: {message: Message}) => (
   <div
-    className={`p-3 rounded-2xl max-w-[70%] text-sm ${
+    className={`p-3 rounded-2xl max-w-[50%] text-sm ${
       message.sender === "sent"
         ? "bg-blue-700 text-white self-end"
         : "bg-gray-200 text-black self-start"
@@ -116,7 +116,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen w-3/4 bg-light-blue overflow-auto">
+    <div className="flex flex-col h-screen flex-1 bg-light-blue overflow-auto">
       <RecipientBar recipientAddress={recipientAddress} />
       <div className="flex-grow flex flex-col gap-2 px-4 py-2 justify-end mb-4">
         {messages.map((message, index) => (

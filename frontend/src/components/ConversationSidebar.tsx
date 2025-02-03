@@ -112,7 +112,7 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
   }, [setRecipientAddress]);
 
   return (
-    <div className="w-1/4 p-4 bg-medium-blue flex flex-col overflow-y-auto overflow-x-hidden">
+    <div className="w-80 shrink-0 p-4 bg-medium-blue flex flex-col overflow-y-auto overflow-x-hidden">
       <div className="mb-4">
         <input
           type="text"
