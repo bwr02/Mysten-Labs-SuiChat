@@ -1,20 +1,24 @@
 import { fromBase64 } from '@mysten/bcs';
 import nacl from 'tweetnacl';
 import * as forge from 'node-forge';
-import * as bip39 from 'bip39';
-import { createHash } from 'crypto';
+import { entropyToMnemonic } from '@it-tools/bip39';
+import { sha256 } from 'js-sha256';
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+import * as secp from "noble-secp256k1";
 
 function deterministicMnemonic(input: string): string {
     // Hash the input to produce a deterministic 256-bit entropy
-    const hash = createHash('sha256').update(input).digest();
+    const hash = sha256(input);
     // Convert the entropy into a mnemonic
-    return bip39.entropyToMnemonic(hash.toString('hex'));
+    const mnem = entropyToMnemonic(hash.slice(0,32));
+    console.log(mnem);
+    return mnem;
 }
 
-const input = "your-deterministic-input";
-const mnemonic = deterministicMnemonic(input);
-console.log(mnemonic);
+const keyPair = Ed25519Keypair.deriveKeypair(deterministicMnemonic(string));
+keyPair.getSecretKey();
 
+//tortoise problem practice emerge ivory betray give glimpse creek begin cruise miss
 
 export function deriveKeyFromSignature(signature: string) {
   try {
