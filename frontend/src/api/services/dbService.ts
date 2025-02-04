@@ -1,4 +1,4 @@
-import { decryptMessage, deriveKeyFromSignature, generateSharedSecret } from './cryptoService';
+import { decryptMessage, generateSharedSecret } from './cryptoService';
 import { WalletContextState } from '@suiet/wallet-kit'
 import { prisma } from '../../../../api/db'
 import { SidebarConversationParams } from "@/types/SidebarType";
@@ -88,12 +88,14 @@ export async function getDecryptedMessage(otherAddr: string|null, wallet: Wallet
         localStorage.setItem('walletSignature', signature);
     }
 
-    const tempPrivKey = deriveKeyFromSignature(signature);
+    //const tempPrivKey = deriveKeyFromSignature(signature);
     if (!otherAddr) {
         console.log("Other address is not specified.");
         return "";
     }
-    const sharedSecret = generateSharedSecret(tempPrivKey, otherAddr);
+
+    const publicKeyRecipient = "1111";
+    const sharedSecret = await generateSharedSecret(publicKeyRecipient, signature);
     const decryptedText = decryptMessage(message, sharedSecret);
     return decryptedText;
 }
@@ -126,12 +128,14 @@ export async function getMessagesWithAddress(otherAddr: string|null, wallet: Wal
             localStorage.setItem('walletSignature', signature);
         }
 
-        const tempPrivKey = deriveKeyFromSignature(signature);
+        //const tempPrivKey = deriveKeyFromSignature(signature);
+        const publicKeyRecipient = "1111";
+        const sharedSecret = await generateSharedSecret(publicKeyRecipient, signature);
         if (!otherAddr) {
             console.log("Other address is not specified.");
             return [];
         }
-        const sharedSecret = generateSharedSecret(tempPrivKey, otherAddr);
+        //const sharedSecret = generateSharedSecret(tempPrivKey, otherAddr);
 
         const messages: Message[] = await response.json();
         return messages.map((message) =>
