@@ -94,7 +94,7 @@ export async function getDecryptedMessage(otherAddr: string|null, wallet: Wallet
         return "";
     }
 
-    const publicKeyRecipient = "1111";
+    const publicKeyRecipient = new Uint8Array([56, 247, 185, 182, 151, 92, 228, 128, 74, 42, 5, 115, 70, 10, 122, 232, 88, 72, 237, 29, 85, 42, 129, 4, 174, 69, 44, 126, 186, 219, 10, 81]);
     const sharedSecret = await generateSharedSecret(publicKeyRecipient, signature);
     const decryptedText = decryptMessage(message, sharedSecret);
     return decryptedText;
@@ -129,7 +129,7 @@ export async function getMessagesWithAddress(otherAddr: string|null, wallet: Wal
         }
 
         //const tempPrivKey = deriveKeyFromSignature(signature);
-        const publicKeyRecipient = "1111";
+        const publicKeyRecipient = new Uint8Array([56, 247, 185, 182, 151, 92, 228, 128, 74, 42, 5, 115, 70, 10, 122, 232, 88, 72, 237, 29, 85, 42, 129, 4, 174, 69, 44, 126, 186, 219, 10, 81]);
         const sharedSecret = await generateSharedSecret(publicKeyRecipient, signature);
         if (!otherAddr) {
             console.log("Other address is not specified.");

@@ -1,8 +1,10 @@
 import * as forge from 'node-forge';
 import { entropyToMnemonic } from '@it-tools/bip39';
 import { sha256 } from 'js-sha256';
-import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+import { Ed25519Keypair, Ed25519PublicKey } from '@mysten/sui/keypairs/ed25519';
 import * as secp from "noble-secp256k1";
+
+type PubKey = Uint8Array;
 
 function deterministicMnemonic(input: string): string {
     // Hash the input to produce a deterministic 256-bit entropy
@@ -26,13 +28,16 @@ function hexToUint8Array(hex: string): Uint8Array {
 // ASHTON'S PUBLIC KEY: [56, 247, 185, 182, 151, 92, 228, 128, 74, 42, 5, 115, 70, 10, 122, 232, 88, 72, 237, 29, 85, 42, 129, 4, 174, 69, 44, 126, 186, 219, 10, 81]
 
 
-
 export async function generateSharedSecret(publicKey: string, signature: string): Promise<Uint8Array> {
   const keyPair = Ed25519Keypair.deriveKeypair(deterministicMnemonic(signature));
-  console.log("PUBLIC KEY: ", keyPair.getPublicKey());
+  console.log("PUBLIC KEY: ", keyPair.getPublicKey().toBase64());
 
+  //const pubKey = Buffer.from(publicKey);
+  //const pubKey = secp.utils.bytesToHex(publicKey);
   const sharedSecretHex = secp.getSharedSecret(keyPair.getSecretKey(), publicKey);
-  return hexToUint8Array(sharedSecretHex.toString()); // Convert hex string to Uint8Array
+  const finalSharedSecret = hexToUint8Array(sharedSecretHex.toString()); // Convert hex string to Uint8Array
+  console.log("SHARED SECRET: " + finalSharedSecret);
+  return finalSharedSecret;
 }
 
 //tortoise problem practice emerge ivory betray give glimpse creek begin cruise miss
