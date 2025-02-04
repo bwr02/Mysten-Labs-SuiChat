@@ -1,22 +1,69 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getSuiNInfo } from "../api/services/nameServices.ts";
+import { addContact, getSuiNSByAddress, getNameByAddress } from "@/api/services/dbService.ts";
+
+
+interface Contact {
+    address: string;
+    suins: string;
+    name: string;
+    public_key: string;
+}
 
 export default function ContactsPage() {
     const [name, setName] = useState("");
     const [suinsName, setSuinsName] = useState("");
     const [suiAddress, setSuiAddress] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [message, setMessage] = useState("");
+
+    useEffect(() => {
+        if (suiAddress.trim()) {
+            (async () => {
+                const fetchedSuins = await getSuiNSByAddress(suiAddress);
+                const fetchedName = await getNameByAddress(suiAddress);
+                setSuinsName(fetchedSuins || "");  // Avoid null in state
+                setName(fetchedName || "");
+            })();
+        }
+    }, [suiAddress]);
 
     // Handler to populate Sui Address based on SuiNS name
     const handleSuiNSBlur = async () => {
         if (suinsName.trim()) {
             const address = await getSuiNInfo("@" + suinsName);
-            setSuiAddress(address || "");
+            if (address) setSuiAddress(address);
+        }
+    };    
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setMessage("");
+
+        if (!suiAddress.trim()) {
+            setMessage("Sui Address is required.");
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
+            await addContact(suiAddress, suinsName || undefined, name || undefined);
+            setMessage("Contact saved successfully!");
+            setName("");
+            setSuinsName("");
+            setSuiAddress("");
+        } catch (error) {
+            console.error("Error saving contact:", error);
+            setMessage("Failed to save contact.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
-
+    
     return (
         <div className="h-screen bg-light-blue flex flex-col justify-center items-center">
-            <form className="bg-gray-800 shadow-md rounded-lg p-6 w-full max-w-md">
+            <form onSubmit={handleSubmit} className="bg-gray-800 shadow-md rounded-lg p-6 w-full max-w-md">
                 <h1 className="text-2xl font-bold text-center text-gray-200 mb-6">New Contact</h1>
                 <div className="mb-5">
                     <label
@@ -73,9 +120,12 @@ export default function ContactsPage() {
 
                 <button
                     type="submit"
-                    className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                    className={`w-full text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center ${
+                        isSubmitting ? "bg-gray-600 cursor-not-allowed" : "bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-500"
+                    }`}
+                    disabled={isSubmitting}
                 >
-                    Save Contact
+                    {isSubmitting ? "Saving..." : "Save Contact"}
                 </button>
                 <div className="mt-4 text-center">
                     <p className="text-sm text-gray-400">
