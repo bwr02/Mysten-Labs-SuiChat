@@ -3,13 +3,6 @@ import { getSuiNInfo } from "../api/services/nameServices.ts";
 import { addContact, getSuiNSByAddress, getNameByAddress } from "@/api/services/dbService.ts";
 
 
-interface Contact {
-    address: string;
-    suins: string;
-    name: string;
-    public_key: string;
-}
-
 export default function ContactsPage() {
     const [name, setName] = useState("");
     const [suinsName, setSuinsName] = useState("");
@@ -22,7 +15,7 @@ export default function ContactsPage() {
             (async () => {
                 const fetchedSuins = await getSuiNSByAddress(suiAddress);
                 const fetchedName = await getNameByAddress(suiAddress);
-                setSuinsName(fetchedSuins || "");  // Avoid null in state
+                setSuinsName(fetchedSuins || "");
                 setName(fetchedName || "");
             })();
         }
