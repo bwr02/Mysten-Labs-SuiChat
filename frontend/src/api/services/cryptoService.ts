@@ -1,7 +1,19 @@
 import { fromBase64 } from '@mysten/bcs';
 import nacl from 'tweetnacl';
 import * as forge from 'node-forge';
+import * as bip39 from 'bip39';
+import { createHash } from 'crypto';
 
+function deterministicMnemonic(input: string): string {
+    // Hash the input to produce a deterministic 256-bit entropy
+    const hash = createHash('sha256').update(input).digest();
+    // Convert the entropy into a mnemonic
+    return bip39.entropyToMnemonic(hash.toString('hex'));
+}
+
+const input = "your-deterministic-input";
+const mnemonic = deterministicMnemonic(input);
+console.log(mnemonic);
 
 
 export function deriveKeyFromSignature(signature: string) {
