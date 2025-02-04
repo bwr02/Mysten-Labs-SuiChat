@@ -13,12 +13,26 @@ function deterministicMnemonic(input: string): string {
     return mnem;
 }
 
+function hexToUint8Array(hex: string): Uint8Array {
+  if (hex.startsWith('0x')) hex = hex.slice(2); // Remove "0x" prefix if present
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+  }
+  return bytes;
+}
+
+ 
+// ASHTON'S PUBLIC KEY: [56, 247, 185, 182, 151, 92, 228, 128, 74, 42, 5, 115, 70, 10, 122, 232, 88, 72, 237, 29, 85, 42, 129, 4, 174, 69, 44, 126, 186, 219, 10, 81]
+
+
 
 export async function generateSharedSecret(publicKey: string, signature: string): Promise<Uint8Array> {
   const keyPair = Ed25519Keypair.deriveKeypair(deterministicMnemonic(signature));
-  console.log("PUBLIC KEY: " + keyPair.getPublicKey());
-  const sharedSecret = await secp.getSharedSecret(keyPair.getSecretKey(), publicKey).toUint8Array();
-  return sharedSecret;
+  console.log("PUBLIC KEY: ", keyPair.getPublicKey());
+
+  const sharedSecretHex = secp.getSharedSecret(keyPair.getSecretKey(), publicKey);
+  return hexToUint8Array(sharedSecretHex.toString()); // Convert hex string to Uint8Array
 }
 
 //tortoise problem practice emerge ivory betray give glimpse creek begin cruise miss
