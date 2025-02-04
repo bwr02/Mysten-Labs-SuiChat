@@ -222,5 +222,27 @@ app.get('/contacts/metadata', async (req, res) => {
     }
 });
 
+app.post('/add-contact', async (req, res) => {
+    const { addr, suiname, contactName } = req.body;
+
+    if (!addr) {
+        return res.status(400).json({ error: 'Address is required' });
+    }
+
+    try {
+        const contact = await prisma.contact.create({
+            data: {
+                address: addr,
+                ...(suiname && { suins: suiname }),
+                ...(contactName && { name: contactName }),
+            },
+        });
+
+        res.status(201).json(contact);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to add contact' });
+    }
+});
 
 app.listen(3000, () => console.log(`🚀 Server ready at: http://localhost:3000`));
