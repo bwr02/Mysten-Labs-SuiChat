@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { getSuiNInfo } from "../api/services/nameServices.ts";
 import { addContact, getSuiNSByAddress, getNameByAddress } from "@/api/services/dbService.ts";
+import { useNavigate } from "react-router-dom";
 
 
 export default function ContactsPage() {
@@ -9,6 +10,8 @@ export default function ContactsPage() {
     const [suiAddress, setSuiAddress] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState("");
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (suiAddress.trim()) {
@@ -46,6 +49,7 @@ export default function ContactsPage() {
             setName("");
             setSuinsName("");
             setSuiAddress("");
+            navigate("/messages", { state: { recipientAddress: suiAddress } });
         } catch (error) {
             console.error("Error saving contact:", error);
             setMessage("Failed to save contact.");
