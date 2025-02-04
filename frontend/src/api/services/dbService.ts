@@ -1,5 +1,6 @@
 import { decryptMessage, deriveKeyFromSignature, generateSharedSecret } from './cryptoService';
 import { WalletContextState } from '@suiet/wallet-kit'
+import { prisma } from '../../../../api/db'
 import { SidebarConversationParams } from "@/types/SidebarType";
 
 interface Message {
@@ -8,6 +9,12 @@ interface Message {
     timestamp?: number;
     txDigest?: string;
   }
+interface Contact {
+    address: string;
+    suins: string;
+    name: string;
+    public_key: string;
+}
 
 export async function getAllMessages(): Promise<Message[]> {
     try {
@@ -149,6 +156,83 @@ export async function getAllContactedAddresses(): Promise<SidebarConversationPar
     } catch (error) {
         console.error('Error fetching contacted addresses:', error);
         return [];
+    }
+}
+
+export async function addContact(addr: string, suiname?: string, contactName?: string): Promise<void> {
+    if(suiname && contactName){
+        const contact = await prisma.contact.create({
+            data: {
+              address: addr,
+              suins: suiname,
+              name: contactName,
+            },
+          })
+    }
+    else if(suiname){
+        const contact = await prisma.contact.create({
+            data: {
+              address: addr,
+              suins: suiname,
+            },
+          })
+    }
+    else if(contactName){
+        const contact = await prisma.contact.create({
+            data: {
+              address: addr,
+              name: contactName,
+            },
+          })
+    }
+    else{
+        const contact = await prisma.contact.create({
+            data: {
+            address: addr,
+            },
+        })
+    }
+}
+
+export async function getSuiNSByAddress(addr: string): Promise<string|null>{
+    const contact = await prisma.contact.findUnique({
+        where: {
+          address: addr,
+        },
+      })
+    if(contact){
+        return contact.suins;
+    }
+    else{ //null case
+        return contact
+    }
+}
+
+export async function getNameByAddress(addr: string): Promise<string|null>{
+    const contact = await prisma.contact.findUnique({
+        where: {
+          address: addr,
+        },
+      })
+    if(contact){
+        return contact.name;
+    }
+    else{ //null case
+        return contact
+    }
+}
+
+export async function getPublicKeyByAddress(addr: string): Promise<string|null>{
+    const contact = await prisma.contact.findUnique({
+        where: {
+          address: addr,
+        },
+      })
+    if(contact){
+        return contact.public_key;
+    }
+    else{ //null case
+        return contact
     }
 }
 

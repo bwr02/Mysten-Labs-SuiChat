@@ -1,20 +1,20 @@
-import { fromBase64, toBase64 } from '@mysten/bcs';
+import { fromB64 } from '@mysten/bcs'
 import nacl from 'tweetnacl';
 import * as forge from 'node-forge';
 import { blake2b } from '@noble/hashes/blake2b';
 
 
 
-export function deriveKeyFromSignature(signature: string): Uint8Array {
-    const signatureBytes = fromBase64(signature);
-    // Use Blake2b to derive a deterministic private key
-    const hash = blake2b(signatureBytes, { dkLen: 32 });
-    // Convert to X25519 private key format
-    const scalar = new Uint8Array(hash);
-    scalar[0] &= 248;
-    scalar[31] &= 127;
-    scalar[31] |= 64;
-    return scalar;
+export function deriveKeyFromSignature(signature: string) {
+  try {
+    const signatureBytes = fromB64(signature);
+    const tempPrivateKey = signatureBytes.slice(0, 32);  // taking first 32 bytes of signature as the private key
+    console.log('Temp private key:', tempPrivateKey);
+    return tempPrivateKey;
+  } catch (error) {
+    console.error('Error in deriveKeyFromSignature:', error);
+    throw error;
+  }
 }
 
 
