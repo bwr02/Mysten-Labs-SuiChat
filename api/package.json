@@ -1,5 +1,6 @@
 {
   "name": "backend",
+  "type": "module",
   "version": "1.0.0",
   "main": "server.ts",
   "scripts": {
@@ -14,9 +15,10 @@
     "@types/cors": "^2.8.17",
     "@types/dotenv": "^8.2.3",
     "@types/express": "^4.17.21",
-    "@types/node": "^22.8.7",
+    "@types/node": "^22.13.1",
     "@types/ws": "^8.5.13",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "@prisma/client": "5.21.1",

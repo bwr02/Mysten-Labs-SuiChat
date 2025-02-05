@@ -1,47 +1,18 @@
-// Copyright (c) Mysten Labs, Inc.
-// SPDX-License-Identifier: Apache-2.0
-
-import { execSync } from 'child_process';
-import { readFileSync, writeFileSync } from 'fs';
-import { homedir } from 'os';
-import path from 'path';
-import { getFullnodeUrl, SuiClient } from '@mysten/sui/client'; 
-import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
-import { fromB64 } from '@mysten/sui/utils';
-import { bcs } from '@mysten/sui/bcs';
 
 export type Network = 'mainnet' | 'testnet' | 'devnet' | 'localnet';
 
-export const ACTIVE_NETWORK = (process.env.NETWORK as Network) || 'testnet';
+// Use environment variable if available, default to testnet
+export const ACTIVE_NETWORK: Network = 
+  (import.meta.env.VITE_NETWORK as Network) || 'testnet';
 
-export const SUI_BIN = `sui`;
-
-export const getActiveAddress = () => {
-    return execSync(`${SUI_BIN} client active-address`, { encoding: 'utf8' }).trim();
-};
-
-/** Returns a signer based on the active address of system's sui. */
-export const getSigner = () => {
-    const sender = getActiveAddress();
-
-    const keystore = JSON.parse(
-        readFileSync(path.join(homedir(), '.sui', 'sui_config', 'sui.keystore'), 'utf8'),
-    );
-
-    for (const priv of keystore) {
-        const raw = fromB64(priv);
-        if (raw[0] !== 0) {
-            continue;
-        }
-
-        const pair = Ed25519Keypair.fromSecretKey(raw.slice(1));
-        if (pair.getPublicKey().toSuiAddress() === sender) {
-            return pair;
-        }
+export const getActiveAddress = (): string => {
+    const address = localStorage.getItem('active_wallet_address');
+    if (!address) {
+        throw new Error('No active wallet address found');
     }
-
-    throw new Error(`keypair not found for sender: ${sender}`);
+    return address;
 };
 
 /** Get the client for the specified network. */
@@ -49,14 +20,17 @@ export const getClient = (network: Network) => {
     return new SuiClient({ url: getFullnodeUrl(network) });
 };
 
-/** A helper to sign & execute a transaction. */
-export const signAndExecute = async (tx: Transaction, network: Network) => {
+/** A helper to sign & execute a transaction using wallet. */
+export const signAndExecute = async (
+    tx: Transaction, 
+    network: Network,
+    wallet: any  // Replace 'any' with your wallet type
+) => {
     const client = getClient(network);
-    const signer = getSigner();
 
     return client.signAndExecuteTransaction({
         transaction: tx,
-        signer,
+        signer: wallet,
         options: {
             showEffects: true,
             showObjectChanges: true,
@@ -64,53 +38,6 @@ export const signAndExecute = async (tx: Transaction, network: Network) => {
     });
 };
 
-/** Publishes a package and saves the package id to a specified json file. */
-export const publishPackage = async ({
-    packagePath,
-    network,
-    exportFileName = 'contract',
-}: {
-    packagePath: string;
-    network: Network;
-    exportFileName: string;
-}) => {
-    const tx = new Transaction();
-
-    const { modules, dependencies } = JSON.parse(
-        execSync(`${SUI_BIN} move build --dump-bytecode-as-base64 --path ${packagePath}`, {
-            encoding: 'utf-8',
-        }),
-    );
-
-    const [upgradeCap] = tx.publish({
-        modules,
-        dependencies,
-    });
-
-    // Transfer the upgrade capability to the sender so they can upgrade the package later if they want.
-    tx.transferObjects([upgradeCap], tx.pure(bcs.Address.serialize(getActiveAddress())));
-
-    const results = await signAndExecute(tx, network);
-
-    const packageId = results.objectChanges?.find((x) => x.type === 'published')?.packageId;
-
-    if (!packageId) {
-        throw new Error('Failed to get package ID from transaction results');
-    }
-
-    // save to an env file
-    writeFileSync(
-        `${exportFileName}.json`,
-        JSON.stringify({
-            packageId,
-        }),
-        { encoding: 'utf8', flag: 'w' },
-    );
-
-    return packageId;
-};
-
-// Add some utility functions for error handling and validation
 export const validateNetwork = (network: Network) => {
     const validNetworks: Network[] = ['mainnet', 'testnet', 'devnet', 'localnet'];
     if (!validNetworks.includes(network)) {
@@ -125,14 +52,26 @@ export const getNetworkConfig = (network: Network) => {
     };
 };
 
-// Add a function to check connection
 export const checkConnection = async (network: Network) => {
     try {
         const client = getClient(network);
-        await client.getAllBalances({ owner: getActiveAddress() });
+        const address = getActiveAddress();
+        await client.getAllBalances({ owner: address });
         return true;
     } catch (error) {
         console.error(`Failed to connect to ${network}:`, error);
         return false;
     }
+};
+
+export const setActiveAddress = (address: string) => {
+    localStorage.setItem('active_wallet_address', address);
+};
+
+export const clearWalletData = () => {
+    localStorage.removeItem('active_wallet_address');
+};
+
+export const getNetworkFromEnv = (): Network => {
+    return (import.meta.env.VITE_NETWORK as Network) || 'testnet';
 };
