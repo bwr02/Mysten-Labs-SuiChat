@@ -1,4 +1,4 @@
-import { Message } from "@/types/chat";
+import { Message } from "@/types/types";
 import { deriveKeysFromSignature, getOrCreateSignature } from "./cryptoService";
 import { WalletContextState } from "@suiet/wallet-kit";
 import { generateSharedSecret } from "./cryptoService";
