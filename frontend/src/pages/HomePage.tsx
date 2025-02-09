@@ -10,6 +10,7 @@ import { useLocation } from "react-router-dom";
 export default function HomePage() {
     const location = useLocation();
     const [recipientAddress, setRecipientAddress] = useState<string | null>(null);
+    const [isMinimized, setIsMinimized] = useState(false);
 
     useEffect(() => {
         // Check if the navigation state contains a recipientAddress from the ContactsPage
@@ -18,6 +19,16 @@ export default function HomePage() {
         }
     }, [location]);
 
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMinimized(window.innerWidth < 875);
+        };
+
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     return (
         <div className="flex flex-col h-screen bg-dark-blue">
             {/* flex with Sidebar and Chat Panel */}
@@ -25,15 +36,18 @@ export default function HomePage() {
                 <ConversationSidebar setRecipientAddress={setRecipientAddress} />
                 <ChatPanel recipientAddress={recipientAddress} />
             </Flex>
-            <Box
-                style={{
-                    position: "absolute",
-                    top: "8px",
-                    right: "16px",
-                }}
-            >
-            <ConnectButton/>
-            </Box>
+            {!isMinimized && (
+                <Box
+                    style={{
+                        position: "absolute",
+                        top: "8px",
+                        right: "16px",
+                        transition: "opacity 0.3s ease-in-out",
+                    }}
+                >
+                    <ConnectButton />
+                </Box>
+            )}
         </div>
     );
 }
