@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getSuiNInfo } from "../api/services/nameServices.ts";
-import { addContact, getSuiNSByAddress, getNameByAddress } from "@/api/services/dbService.ts";
+import { addContact, editContact, getSuiNSByAddress, getNameByAddress } from "@/api/services/dbService.ts";
 import { useNavigate } from "react-router-dom";
 
 
@@ -10,6 +10,7 @@ export default function ContactsPage() {
     const [suiAddress, setSuiAddress] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState("");
+    const [isEditing, setIsEditing] = useState(false);
 
     const navigate = useNavigate();
 
@@ -20,6 +21,9 @@ export default function ContactsPage() {
                 const fetchedName = await getNameByAddress(suiAddress);
                 setSuinsName(fetchedSuins || "");
                 setName(fetchedName || "");
+                if (fetchedSuins || fetchedName) {
+                    setIsEditing(true);
+                }
             })();
         }
     }, [suiAddress]);
@@ -44,8 +48,13 @@ export default function ContactsPage() {
         }
 
         try {
-            await addContact(suiAddress, suinsName || undefined, name || undefined);
-            setMessage("Contact saved successfully!");
+            if (isEditing) {
+                await editContact(suiAddress, suinsName || undefined, name || undefined);
+                setMessage("Contact updated successfully!");
+            } else {
+                await addContact(suiAddress, suinsName || undefined, name || undefined);
+                setMessage("Contact saved successfully!");
+            }
             setName("");
             setSuinsName("");
             setSuiAddress("");
@@ -61,7 +70,17 @@ export default function ContactsPage() {
     return (
         <div className="h-screen bg-light-blue flex flex-col justify-center items-center">
             <form onSubmit={handleSubmit} className="bg-gray-800 shadow-md rounded-lg p-6 w-full max-w-md">
-                <h1 className="text-2xl font-bold text-center text-gray-200 mb-6">New Contact</h1>
+                <h1 className="text-2xl font-bold text-center text-gray-200 mb-6">{isEditing ? "Edit Contact" : "New Contact"}</h1>
+                <button
+                    type="button"
+                    className="mb-4 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
+                    onClick={() => {
+                        setIsEditing(!isEditing);
+                        setMessage("");
+                    }}
+                >
+                    {isEditing ? "New" : "Edit"}
+                </button>
                 <div className="mb-5">
                     <label
                         htmlFor="name"
@@ -122,7 +141,7 @@ export default function ContactsPage() {
                     }`}
                     disabled={isSubmitting}
                 >
-                    {isSubmitting ? "Saving..." : "Save Contact"}
+                    {isSubmitting ? "Saving..." : isEditing ? "Update Contact" : "Save Contact"}
                 </button>
                 <div className="mt-4 text-center">
                     <p className="text-sm text-gray-400">
