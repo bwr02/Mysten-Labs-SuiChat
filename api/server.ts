@@ -9,6 +9,7 @@ import {
 	WhereParamTypes,
 } from './utils/api-queries';
 import { getActiveAddress } from './sui-utils';
+import { execSync } from 'child_process';
 
 const app = express();
 app.use(cors());
@@ -19,7 +20,7 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/messages', async (req, res) => {
-	const myAddress = getActiveAddress();
+	const myAddress = await getActiveAddress();
 
     try {
         const messages = await prisma.message.findMany({
@@ -102,7 +103,7 @@ app.get('/messages/by-recipient/:recipient', async (req, res) => {
 });
 
 app.get('/messages/with-given-address/:otherAddr', async (req, res) => {
-	const myAddress = getActiveAddress();
+	const myAddress = await getActiveAddress();
     const { otherAddr } = req.params
 
     try {
@@ -133,7 +134,7 @@ app.get('/messages/with-given-address/:otherAddr', async (req, res) => {
 
 app.get('/contacts', async (req, res) => {
     try {
-        const myAddress = getActiveAddress()
+        const myAddress = await getActiveAddress()
         const messages = await prisma.message.findMany({
             where: {
                 OR: [
@@ -162,7 +163,7 @@ app.get('/contacts', async (req, res) => {
 
 app.get('/contacts/metadata', async (req, res) => {
     try {
-        const myAddress = getActiveAddress();
+        const myAddress = await getActiveAddress();
 
         // Fetch all messages involving the current SuiChat user
         const messages = await prisma.message.findMany({
@@ -219,6 +220,15 @@ app.get('/contacts/metadata', async (req, res) => {
     } catch (error) {
         console.error('Error fetching contacts:', error);
         res.status(500).json({ error: 'Failed to fetch contacts' });
+    }
+});
+
+app.get('/active-address', (req, res) => {
+    try {
+        const address = execSync('sui client active-address', { encoding: 'utf8' }).trim();
+        res.json({ address });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to get active address' });
     }
 });
 

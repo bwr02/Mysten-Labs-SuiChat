@@ -51,13 +51,13 @@ const broadcastMessage = (data: object) => {
 
 const handleMessageCreated = async (events: SuiEvent[], type: string) => {
   const updates: MessageCreatedInput[] = []; // Use an array instead of an object keyed by message_id
-
+  const address = await getActiveAddress();
   for (const event of events) {
     // console.log("event");
     const creationData = event.parsedJson as MessageCreatedEvent;
     if (
-      creationData.sender == getActiveAddress() ||
-      creationData.recipient == getActiveAddress()
+      creationData.sender == address ||
+      creationData.recipient == address
     ) {
       updates.push({
         sender: creationData.sender,
@@ -87,7 +87,7 @@ const handleMessageCreated = async (events: SuiEvent[], type: string) => {
     broadcastMessage({
       type: "new-message",
       message: {
-        messageType: result.sender === getActiveAddress() ? "sent" : "received",
+        messageType: result.sender === address ? "sent" : "received",
         sender: result.sender,
         recipient: result.recipient,
         text: result.content,
