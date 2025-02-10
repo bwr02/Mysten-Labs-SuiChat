@@ -1,5 +1,8 @@
 import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
+import { useCurrentAccount } from '@mysten/dapp-kit';
+
+
 
 export type Network = 'mainnet' | 'testnet' | 'devnet' | 'localnet';
 
@@ -7,11 +10,21 @@ export type Network = 'mainnet' | 'testnet' | 'devnet' | 'localnet';
 export const ACTIVE_NETWORK: Network = 'testnet'
 //   (import.meta.env.VITE_NETWORK as Network) || 'testnet';
 
-export const getActiveAddress = (): string => {
+/*export const getActiveAddress = (): string => {
     const address = localStorage.getItem('active_wallet_address');
     if (!address) {
         throw new Error('No active wallet address found');
     }
+    return address;
+};
+*/
+
+export const getActiveAddress = () => {
+    const address = useCurrentAccount()?.address;
+    if (!address) {
+        throw new Error('No active wallet address found');
+    }
+    console.log(address);
     return address;
 };
 
