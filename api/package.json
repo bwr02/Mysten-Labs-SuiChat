@@ -8,8 +8,8 @@
     "db:setup:dev": "npx prisma migrate dev --name init",
     "db:reset:dev": "npx prisma db push --force-reset",
     "db:studio": "npx prisma studio",
-    "api:dev": "npx ts-node server.ts",
-    "indexer": "npx ts-node indexer.ts"
+    "api:dev": "npx tsx server.ts",
+    "indexer": "npx tsx indexer.ts"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -21,6 +21,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
+    "@mysten/sui": "^1.21.2",
     "@prisma/client": "5.21.1",
     "concurrently": "^9.1.0",
     "cors": "^2.8.5",

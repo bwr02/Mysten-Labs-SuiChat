@@ -1,22 +1,33 @@
 {
+  "ts-node": {
+    "transpileOnly": true,
+    "files": false
+  },
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "lib": ["ESNext", "DOM"],
-    "types": ["vite/client"],
-    "jsx": "react-jsx"
+    "incremental": true,
+    "composite": true,
+    "declaration": true,
+    "skipDefaultLibCheck": true,
+    "outDir": "build",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "sourceMap": true,
+    "lib": [
+      "esnext",
+    ],
+    "resolveJsonModule": true,
+    "types": [
+      "node",
+      "express"
+    ],
+    "baseUrl": "./",
   },
   "include": [
-    "./**/*",
-    "./**/*.d.ts",
-    "./**/*.ts",
-    "./**/*.tsx"
-  ],
-  "exclude": ["node_modules"]
+    "src/**/*",
+    "tsoa/public/*.json",
+    "scripts/**/*",
+    "src/db/seed/**/*.json",
+    "package.json"
+  ]
 }

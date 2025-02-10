@@ -4,8 +4,8 @@ import { Transaction } from '@mysten/sui/transactions';
 export type Network = 'mainnet' | 'testnet' | 'devnet' | 'localnet';
 
 // Use environment variable if available, default to testnet
-export const ACTIVE_NETWORK: Network = 
-  (import.meta.env.VITE_NETWORK as Network) || 'testnet';
+export const ACTIVE_NETWORK: Network = 'testnet'
+//   (import.meta.env.VITE_NETWORK as Network) || 'testnet';
 
 export const getActiveAddress = (): string => {
     const address = localStorage.getItem('active_wallet_address');
@@ -22,7 +22,7 @@ export const getClient = (network: Network) => {
 
 /** A helper to sign & execute a transaction using wallet. */
 export const signAndExecute = async (
-    tx: Transaction, 
+    tx: Transaction,
     network: Network,
     wallet: any  // Replace 'any' with your wallet type
 ) => {
@@ -73,5 +73,6 @@ export const clearWalletData = () => {
 };
 
 export const getNetworkFromEnv = (): Network => {
-    return (import.meta.env.VITE_NETWORK as Network) || 'testnet';
+    return 'testnet';
+    // return (import.meta.env.VITE_NETWORK as Network) || 'testnet';
 };
