@@ -2,7 +2,9 @@ import { Transaction } from '@mysten/sui/transactions';
 import { SuiClient } from '@mysten/sui/client';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { CONFIG } from '../config';
-import { ACTIVE_NETWORK, getActiveAddress, signAndExecute } from '../sui-utils';
+import { ACTIVE_NETWORK, signAndExecute } from '../sui-utils';
+import  { getActiveAddress } from '../utils/activeAddressManager';
+
 import { bcs } from '@mysten/sui/bcs';
 
 

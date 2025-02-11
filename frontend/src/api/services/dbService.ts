@@ -195,9 +195,11 @@ export async function editContact(addr: string, suiname?: string, contactName?: 
             },
             body: JSON.stringify({ suiname, contactName }),
         });
+
         if (!response.ok) {
             throw new Error(`Failed to edit contact: ${response.statusText}`);
         }
+
         const data = await response.json();
         console.log('Contact updated:', data);
         return data;
@@ -205,6 +207,7 @@ export async function editContact(addr: string, suiname?: string, contactName?: 
         console.error(error);
     }
 }
+
 
 
 export async function getSuiNSByAddress(addr: string): Promise<string|null>{

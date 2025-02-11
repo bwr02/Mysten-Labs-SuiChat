@@ -10,6 +10,7 @@ import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { Transaction } from '@mysten/sui/transactions';
 import { fromB64 } from '@mysten/sui/utils';
 import { bcs } from '@mysten/sui/bcs';
+import  { getActiveAddress } from './utils/activeAddressManager';
 
 export type Network = 'mainnet' | 'testnet' | 'devnet' | 'localnet';
 
@@ -17,9 +18,6 @@ export const ACTIVE_NETWORK = (process.env.NETWORK as Network) || 'testnet';
 
 export const SUI_BIN = `sui`;
 
-export const getActiveAddress = () => {
-    return execSync(`${SUI_BIN} client active-address`, { encoding: 'utf8' }).trim();
-};
 
 /** Returns a signer based on the active address of system's sui. */
 export const getSigner = () => {

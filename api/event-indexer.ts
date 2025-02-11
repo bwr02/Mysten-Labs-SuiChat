@@ -3,7 +3,8 @@ import { SuiClient } from '@mysten/sui/client';
 import { CONFIG } from './config';
 import { Prisma } from '@prisma/client';
 import { prisma } from './db';
-import { getActiveAddress, getClient } from './sui-utils';
+import { getClient } from './sui-utils';
+import  { getActiveAddress } from './utils/activeAddressManager';
 import { WebSocketServer } from "ws"
 
 var id_cur = Number(1);
