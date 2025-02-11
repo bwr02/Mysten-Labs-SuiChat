@@ -8,15 +8,28 @@ import {
 	WhereParam,
 	WhereParamTypes,
 } from './utils/api-queries';
-import { getActiveAddress } from './sui-utils';
+import { setActiveAddress, getActiveAddress } from './utils/activeAddressManager';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+
 app.get('/', async (req, res) => {
 	return res.send({ message: '🚀 API is functional 🚀' });
 });
+
+// New endpoint to set the active address from the frontend
+app.post('/api/setActiveAddress', (req: Request, res: Response) => {
+    const { activeAddress: newAddress } = req.body;
+    if (!newAddress) {
+        return res.status(400).json({ error: 'No activeAddress provided' });
+    }
+    setActiveAddress(newAddress);
+    console.log('Active address updated to:', getActiveAddress());
+    return res.json({ success: true, getActiveAddress });
+});
+
 
 app.get('/messages', async (req, res) => {
 	const myAddress = getActiveAddress();
