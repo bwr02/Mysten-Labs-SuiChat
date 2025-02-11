@@ -80,40 +80,51 @@ export async function getAllContactedAddresses(): Promise<SidebarConversationPar
     }
 }
 
-export async function addContact(addr: string, suiname?: string, contactName?: string): Promise<void> {
-    if(suiname && contactName){
-        const contact = await prisma.contact.create({
-            data: {
-              address: addr,
-              suins: suiname,
-              name: contactName,
+export async function addContact(addr: string, suiname?: string, contactName?: string) {
+    try {
+        const response = await fetch('http://localhost:3000/add-contact', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             },
-          })
-    }
-    else if(suiname){
-        const contact = await prisma.contact.create({
-            data: {
-              address: addr,
-              suins: suiname,
-            },
-          })
-    }
-    else if(contactName){
-        const contact = await prisma.contact.create({
-            data: {
-              address: addr,
-              name: contactName,
-            },
-          })
-    }
-    else{
-        const contact = await prisma.contact.create({
-            data: {
-            address: addr,
-            },
-        })
+            body: JSON.stringify({ addr, suiname, contactName }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to add contact: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log('Contact added:', data);
+        return data;
+    } catch (error) {
+        console.error(error);
     }
 }
+
+export async function editContact(addr: string, suiname?: string, contactName?: string) {
+    try {
+        const response = await fetch(`http://localhost:3000/edit-contact/${addr}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ suiname, contactName }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to edit contact: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log('Contact updated:', data);
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
 
 export async function getSuiNSByAddress(addr: string): Promise<string|null>{
     const contact = await prisma.contact.findUnique({

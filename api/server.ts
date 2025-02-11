@@ -8,15 +8,28 @@ import {
 	WhereParam,
 	WhereParamTypes,
 } from './utils/api-queries';
-import { getActiveAddress } from './sui-utils';
+import { setActiveAddress, getActiveAddress } from './utils/activeAddressManager';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+
 app.get('/', async (req, res) => {
 	return res.send({ message: '🚀 API is functional 🚀' });
 });
+
+// New endpoint to set the active address from the frontend
+app.post('/api/setActiveAddress', (req: Request, res: Response) => {
+    const { activeAddress: newAddress } = req.body;
+    if (!newAddress) {
+        return res.status(400).json({ error: 'No activeAddress provided' });
+    }
+    setActiveAddress(newAddress);
+    console.log('Active address updated to:', getActiveAddress());
+    return res.json({ success: true, getActiveAddress });
+});
+
 
 app.get('/messages', async (req, res) => {
 	const myAddress = getActiveAddress();
@@ -222,5 +235,57 @@ app.get('/contacts/metadata', async (req, res) => {
     }
 });
 
+app.post('/add-contact', async (req, res) => {
+    const { addr, suiname, contactName } = req.body;
+
+    if (!addr) {
+        return res.status(400).json({ error: 'Address is required' });
+    }
+
+    try {
+        const contact = await prisma.contact.create({
+            data: {
+                address: addr,
+                ...(suiname && { suins: suiname }),
+                ...(contactName && { name: contactName }),
+            },
+        });
+
+        res.status(201).json(contact);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to add contact' });
+    }
+});
+
+app.put('/edit-contact/:addr', async (req, res) => {
+    const { addr } = req.params;
+    const { suiname, contactName } = req.body;
+
+    try {
+        // Check if the contact exists
+        const existingContact = await prisma.contact.findUnique({
+            where: { address: addr },
+        });
+
+        if (!existingContact) {
+            return res.status(404).json({ error: 'Contact not found' });
+        }
+
+        // Update the contact with provided fields
+        const updatedContact = await prisma.contact.update({
+            where: { address: addr },
+            data: {
+                ...(suiname && { suins: suiname }),
+                ...(contactName && { name: contactName }),
+            },
+        });
+
+        res.status(200).json(updatedContact);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to update contact' });
+    }
+});
 
 app.listen(3000, () => console.log(`🚀 Server ready at: http://localhost:3000`));

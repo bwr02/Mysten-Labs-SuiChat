@@ -1,10 +1,11 @@
-import { EventId, SuiEvent, SuiEventFilter } from "@mysten/sui/client";
-import { SuiClient } from "@mysten/sui/client";
-import { CONFIG } from "./config";
-import { Prisma } from "@prisma/client";
-import { prisma } from "./db";
-import { getActiveAddress, getClient } from "./sui-utils";
-import { WebSocketServer } from "ws";
+import { EventId, SuiEvent, SuiEventFilter } from '@mysten/sui/client';
+import { SuiClient } from '@mysten/sui/client';
+import { CONFIG } from './config';
+import { Prisma } from '@prisma/client';
+import { prisma } from './db';
+import { getClient } from './sui-utils';
+import  { getActiveAddress } from './utils/activeAddressManager';
+import { WebSocketServer } from "ws"
 
 var id_cur = Number(1);
 
