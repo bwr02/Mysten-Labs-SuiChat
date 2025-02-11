@@ -5,7 +5,6 @@ import Contacts from "./pages/Contacts";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
 import { useEffect, useState } from 'react';
 import {ConnectButton} from "@suiet/wallet-kit";
-import {Box} from "@radix-ui/themes";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -38,18 +37,22 @@ function App() {
     }, [address]);
 
     // Do not load full SuiChat until active address is set and show welcome screen
-    if (!activeAddressLoaded) {
+    // If wallet is not connected, show a welcome screen in the center of the screen.
+    if (!address) {
         return (
-            <div className="flex flex-col h-screen bg-dark-blue">
-                <Box
-                    style={{
-                        position: "absolute",
-                        top: "8px",
-                        right: "16px",
-                    }}
-                >
-                    <ConnectButton/>
-                </Box>
+            <div className="flex flex-col items-center justify-center h-screen bg-dark-blue">
+                <h1 className="text-white text-3xl font-bold mb-4">Welcome to SuiChat</h1>
+                <p className="text-white text-lg mb-8">Press Connect to start</p>
+                <ConnectButton />
+            </div>
+        );
+    }
+
+    // If wallet is connected but the backend hasn't confirmed the active address, show a loading state.
+    if (address && !activeAddressLoaded) {
+        return (
+            <div className="flex flex-col items-center justify-center h-screen bg-dark-blue">
+                <p className="text-white text-xl">Loading SuiChat...</p>
             </div>
         );
     }
