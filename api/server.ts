@@ -245,4 +245,30 @@ app.post('/add-contact', async (req, res) => {
     }
 });
 
+app.put('/edit-contact/:addr', async (req, res) => {
+    const { addr } = req.params;
+    const { suiname, contactName } = req.body;
+    try {
+        // Check if the contact exists
+        const existingContact = await prisma.contact.findUnique({
+            where: { address: addr },
+        });
+        if (!existingContact) {
+            return res.status(404).json({ error: 'Contact not found' });
+        }
+        // Update the contact with provided fields
+        const updatedContact = await prisma.contact.update({
+            where: { address: addr },
+            data: {
+                ...(suiname && { suins: suiname }),
+                ...(contactName && { name: contactName }),
+            },
+        });
+        res.status(200).json(updatedContact);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to update contact' });
+    }
+});
+
 app.listen(3000, () => console.log(`🚀 Server ready at: http://localhost:3000`));

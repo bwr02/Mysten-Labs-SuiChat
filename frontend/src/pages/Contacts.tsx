@@ -70,17 +70,15 @@ export default function ContactsPage() {
     return (
         <div className="h-screen bg-light-blue flex flex-col justify-center items-center">
             <form onSubmit={handleSubmit} className="bg-gray-800 shadow-md rounded-lg p-6 w-full max-w-md">
-                <h1 className="text-2xl font-bold text-center text-gray-200 mb-6">{isEditing ? "Edit Contact" : "New Contact"}</h1>
-                <button
-                    type="button"
-                    className="mb-4 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
-                    onClick={() => {
-                        setIsEditing(!isEditing);
-                        setMessage("");
-                    }}
-                >
-                    {isEditing ? "New" : "Edit"}
-                </button>
+                <div className="flex items-center justify-between w-full mb-6">
+                    <h1 className="text-2xl font-bold text-gray-200">{isEditing ? "Edit Contact" : "New Contact"}</h1>
+                    <button
+                        onClick={() => setIsEditing(!isEditing)}
+                        className="bg-blue-700 hover:bg-blue-800 text-white font-medium rounded-lg text-sm px-4 py-2 focus:ring-4 focus:ring-blue-500"
+                    >
+                        {isEditing ? "New" : "Edit"}
+                    </button>
+                </div>
                 <div className="mb-5">
                     <label
                         htmlFor="name"
