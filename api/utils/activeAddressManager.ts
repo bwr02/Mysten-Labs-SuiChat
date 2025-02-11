@@ -1,12 +1,17 @@
 // activeAddressStore.ts
 
-// This variable holds the active address in memory.
-let activeAddress: string = '';
+import { writeFileSync, readFileSync, existsSync } from 'fs';
+import path from 'path';
 
-// Setter: Update the active address.
+const ACTIVE_ADDRESS_FILE = path.join(__dirname, 'activeAddress.json');
+
 export const setActiveAddress = (address: string): void => {
-    activeAddress = address;
+    const trimmed = address.trim();
+    writeFileSync(ACTIVE_ADDRESS_FILE, JSON.stringify({ activeAddress: trimmed }), { encoding: 'utf8' });
 };
 
-// Getter: Retrieve the active address.
-export const getActiveAddress = (): string => activeAddress;
+export const getActiveAddress = (): string => {
+    if (!existsSync(ACTIVE_ADDRESS_FILE)) return '';
+    const data = JSON.parse(readFileSync(ACTIVE_ADDRESS_FILE, { encoding: 'utf8' }));
+    return data.activeAddress || '';
+};
