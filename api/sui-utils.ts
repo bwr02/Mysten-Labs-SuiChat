@@ -1,35 +1,12 @@
 import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
-import { useCurrentAccount } from '@mysten/dapp-kit';
-
-
-import { fromB64 } from '@mysten/sui/utils';
-import { bcs } from '@mysten/sui/bcs';
-import  { getActiveAddress } from './utils/activeAddressManager';
+import { getActiveAddress } from './utils/activeAddressManager';
 
 export type Network = 'mainnet' | 'testnet' | 'devnet' | 'localnet';
 
 // Use environment variable if available, default to testnet
 export const ACTIVE_NETWORK: Network = 'testnet'
-//   (import.meta.env.VITE_NETWORK as Network) || 'testnet';
-
-/*export const getActiveAddress = (): string => {
-    const address = localStorage.getItem('active_wallet_address');
-    if (!address) {
-        throw new Error('No active wallet address found');
-    }
-    return address;
-};
-*/
-
-export const getActiveAddress = () => {
-    const address = useCurrentAccount()?.address;
-    if (!address) {
-        throw new Error('No active wallet address found');
-    }
-    console.log(address);
-    return address;
-};
+//  TODO: remove hardcoded active network (import.meta.env.VITE_NETWORK as Network) || 'testnet';
 
 /** Get the client for the specified network. */
 export const getClient = (network: Network) => {
@@ -78,17 +55,4 @@ export const checkConnection = async (network: Network) => {
         console.error(`Failed to connect to ${network}:`, error);
         return false;
     }
-};
-
-export const setActiveAddress = (address: string) => {
-    localStorage.setItem('active_wallet_address', address);
-};
-
-export const clearWalletData = () => {
-    localStorage.removeItem('active_wallet_address');
-};
-
-export const getNetworkFromEnv = (): Network => {
-    return 'testnet';
-    // return (import.meta.env.VITE_NETWORK as Network) || 'testnet';
 };

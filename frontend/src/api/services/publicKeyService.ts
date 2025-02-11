@@ -2,12 +2,13 @@ import { SuiClient } from "@mysten/sui/client";
 import { bcs } from "@mysten/sui/bcs";
 import {
   getClient,
-  getActiveAddress,
   ACTIVE_NETWORK,
 } from "../../../../api/sui-utils";
 import { Transaction } from "@mysten/sui/transactions";
 import { WalletContextState } from "@suiet/wallet-kit";
 import { CONFIG } from "../config";
+import { useSuiWallet } from "../../hooks/useSuiWallet";
+import { normalizeSuiAddress } from "@mysten/sui/utils";
 
 /**
  * Returns the published public key (as a Uint8Array) for the given address.
@@ -54,7 +55,11 @@ export async function registerPublicKey(
 ): Promise<string> {
   try {
     const tx = new Transaction();
-    const ownerAddress = getActiveAddress();
+    const { address } = useSuiWallet();
+    if (!address) {
+        throw new Error('Wallet address not found.');
+    }
+    const normalizedSenderAddress = normalizeSuiAddress(address);
     const serializedPublicKey = bcs
       .vector(bcs.u8())
       .serialize(publicKey)
@@ -63,7 +68,7 @@ export async function registerPublicKey(
     tx.moveCall({
       target: `${CONFIG.MESSAGE_CONTRACT.packageId}::chat::public_keys::publish_key`,
       arguments: [
-        tx.pure(bcs.Address.serialize(ownerAddress)),
+        tx.pure(bcs.Address.serialize(normalizedSenderAddress)),
         tx.pure(serializedPublicKey),
       ],
       typeArguments: [],

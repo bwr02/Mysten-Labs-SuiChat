@@ -1,12 +1,9 @@
 import { prisma } from '../../../../api/db'
+// FE should not directly import a backend constant (prisma). 
+// TODO: Create an API endpoint in the backend to handle database interactions 
+// and fetch data via HTTP requests instead of importing backend logic directly.
 import { Message, SidebarConversationParams } from "@/types/types";
 
-interface Contact {
-    address: string;
-    suins: string;
-    name: string;
-    public_key: string;
-}
 
 export async function getAllMessages(): Promise<Message[]> {
     try {
