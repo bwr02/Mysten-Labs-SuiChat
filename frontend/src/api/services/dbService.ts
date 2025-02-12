@@ -186,6 +186,29 @@ export async function addContact(addr: string, suiname?: string, contactName?: s
     }
 }
 
+export async function editContact(addr: string, suiname?: string, contactName?: string) {
+    try {
+        const response = await fetch(`http://localhost:3000/edit-contact/${addr}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ suiname, contactName }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to edit contact: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log('Contact updated:', data);
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
 
 export async function getSuiNSByAddress(addr: string): Promise<string|null>{
     const contact = await prisma.contact.findUnique({

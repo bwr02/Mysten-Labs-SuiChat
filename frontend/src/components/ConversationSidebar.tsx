@@ -53,6 +53,7 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
       const targetAddress = await getSuiNInfo("@" + searchText);
       if (targetAddress) {
         setRecipientAddress(targetAddress);
+        setSelectedAddress(targetAddress);
         setSearchText("");
       } else {
         console.log("No target address found for the given name.");
