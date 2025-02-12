@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { MessageInputField } from "./MessageInputField";
-import { getMessagesWithAddress, getDecryptedMessage } from "../api/services/dbService";
+import { getMessagesWithAddress, getDecryptedMessage, getNameByAddress, getSuiNSByAddress } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
 
 interface Message {
@@ -14,6 +14,7 @@ interface ChatPanelProps {
   recipientAddress: string | null;
 }
 
+
 const RecipientBar: React.FC<{ recipientAddress: string | null }> = ({ recipientAddress }) => {
   return (
     <div className="w-full bg-light-blue text-gray-200 py-4 px-6 flex items-center justify-between shadow-md sticky top-0">
@@ -26,31 +27,30 @@ const RecipientBar: React.FC<{ recipientAddress: string | null }> = ({ recipient
   );
 };
 
+
 const MessageBubble = React.memo(({message}: {message: Message}) => (
   <div
-    className={`p-3 rounded-2xl max-w-[50%] text-sm ${
-      message.sender === "sent"
-        ? "bg-blue-700 text-white self-end"
-        : "bg-gray-200 text-black self-start"
-    }`}
+  className={`p-3 rounded-2xl max-w-[50%] text-sm ${
+    message.sender === "sent"
+      ? "bg-blue-700 text-white self-end"
+      : "bg-gray-200 text-black self-start"
+  }`}
   >
-    <span>
-      {message.text}
-      {message.txDigest && (
-        <>
-          <br />
-          <a
-            href={`https://suiscan.xyz/testnet/tx/${message.txDigest}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 underline"
-          >
-            View on Chain
-          </a>
-        </>
-      )}
-    </span>
-  </div>
+  <span>{message.text}</span>
+  {message.txDigest && (
+    <div className="mt-2">
+      <a
+        href={`https://suiscan.xyz/testnet/tx/${message.txDigest}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-500 hover:underline"
+      >
+        View on Sui Scanner
+      </a>
+    </div>
+  )}
+  <div>{message.timestamp}</div>
+</div>
 ));
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
@@ -76,10 +76,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
                   messageData.text
               );
         
+            console.log("messageData", messageData);
             setMessages((prev) => [...prev, {
                 sender: messageData.messageType,
                 text: decryptedMessage,
-                timestamp: messageData.timestamp
+                timestamp: messageData.timestamp,
+                txdigest: messageData.txDigest
               }]);
           } catch (error) {
             console.error('Error decrypting message:', error);
@@ -92,6 +94,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
         if (data.type === 'new-message') {
           const { sender, recipient } = data.message;
           if ((sender === recipientAddress || recipient === recipientAddress)) {
+            console.log("New message received:", data);
             handleNewMessage(data.message);
           }
         };
@@ -111,9 +114,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
       }
   }, [recipientAddress, wallet]);
 
-  const handleMessageSent = useCallback((newMessage: string, timestamp: number, txDigest: string) => {
+  const handleMessageSent = useCallback(() => {
     setMessages(prev => [...prev]);
   }, []);
+
+  console.log(messages);
 
   return (
     <div className="flex flex-col h-screen flex-1 bg-light-blue overflow-auto">
