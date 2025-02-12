@@ -30,13 +30,13 @@ const RecipientBar: React.FC<{ recipientAddress: string | null }> = ({ recipient
 };
 
 
-const MessageBubble = React.memo(({ message, isLast }: { message: Message, isLast: boolean }) => {
+const MessageBubble = React.memo(({ message, isLast }) => {
   const [showTimestamp, setShowTimestamp] = useState(false);
 
   const handleClick = () => {
     setShowTimestamp(true);
 
-    // Hide the timestamp after 10 seconds for non-last messages
+    // Hide the timestamp after 5 seconds for non-last messages
     if (!isLast) {
       const timer = setTimeout(() => {
         setShowTimestamp(false);
@@ -48,10 +48,10 @@ const MessageBubble = React.memo(({ message, isLast }: { message: Message, isLas
   };
 
   return (
-    <div>
-      <div className={`flex items-center ${message.sender === 'sent' ? 'flex-row-reverse' : 'flex-row'}`}>
-        {/* Icon Link for Sent Messages (on the left) */}
-        {message.txDigest && message.sender === 'sent' && (
+    <div className="mb-2">
+      <div className={`flex items-center ${message.sender === 'sent' ? 'justify-end' : 'justify-start'}`}>
+        {/* Icon Link for Received Messages (on the left) */}
+        {message.txDigest && message.sender === 'received' && (
           <a
             href={`https://suiscan.xyz/testnet/tx/${message.txDigest}`}
             target="_blank"
@@ -61,7 +61,7 @@ const MessageBubble = React.memo(({ message, isLast }: { message: Message, isLas
             <FaLink />
           </a>
         )}
-        
+
         {/* Message Bubble */}
         <div
           className={`p-3 rounded-2xl max-w-[50%] text-sm cursor-pointer ${
@@ -74,8 +74,8 @@ const MessageBubble = React.memo(({ message, isLast }: { message: Message, isLas
           <span>{message.text}</span>
         </div>
 
-        {/* Icon Link for Received Messages (on the right) */}
-        {message.txDigest && message.sender === 'received' && (
+        {/* Icon Link for Sent Messages (on the right) */}
+        {message.txDigest && message.sender === 'sent' && (
           <a
             href={`https://suiscan.xyz/testnet/tx/${message.txDigest}`}
             target="_blank"
@@ -87,17 +87,25 @@ const MessageBubble = React.memo(({ message, isLast }: { message: Message, isLas
         )}
       </div>
 
-      {/* Timestamp underneath the message bubble */}
-      <div className={`flex items-center ${message.sender === 'sent' ? 'flex-row-reverse' : 'flex-row'} mt-1`}>
-        {(isLast || showTimestamp) && (
-          <div className="text-xs text-gray-500">
-            {message.timestamp}
-          </div>
-        )}
-      </div>
+      {/* Timestamp aligned with the message bubble */}
+      {(isLast || showTimestamp) && (
+        <div className="flex mt-1">
+          {message.sender === 'received' ? (
+            <div className="text-xs text-gray-500 ml-[calc(2rem+8px)]"> {/* Aligned to start of the bubble */}
+              {message.timestamp}
+            </div>
+          ) : (
+            <div className="text-xs text-gray-500 ml-auto mr-[calc(2rem+8px)]"> {/* Aligned to end of the bubble */}
+              {message.timestamp}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 });
+
+
 
 
 
