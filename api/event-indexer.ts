@@ -201,7 +201,14 @@ const saveLatestCursor = async (tracker: EventTracker, cursor: EventId) => {
 // };
 
 export const setupListeners = async () => {
-	for (const event of EVENTS_TO_TRACK) {
+    // Wait until getActiveAddress() returns a non-empty value.
+    while (!getActiveAddress()) {
+        // console.log("Waiting for active address to be set...");
+        // console.log(getActiveAddress());
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // wait 1 second before retrying
+    }
+
+    for (const event of EVENTS_TO_TRACK) {
 		runEventJob(getClient(CONFIG.NETWORK), event, await getLatestCursor(event));
 	}
 };
