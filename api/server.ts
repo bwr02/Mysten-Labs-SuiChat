@@ -75,12 +75,45 @@ app.get('/messages/by-sender/:sender', async (req, res) => {
             },
         });
 
-        const formattedMessages = messages.map((message) => ({
-            sender: "sent",
-            text: message.content,
-            timestamp: message.timestamp,
-            txDigest: message.txDigest,
-        }));
+        const formattedMessages = messages.map((message) => {
+            let timeString = "";
+            if(message.timestamp) {
+                const numericTimestamp = parseInt(message.timestamp, 10);
+
+                if (!isNaN(numericTimestamp)) {
+                    const messageDate = new Date(numericTimestamp);
+                    const currentDate = new Date();
+
+                    // Calculate the difference in milliseconds
+                    const msDifference = currentDate.getTime() - messageDate.getTime();
+                    const hoursDifference = msDifference / (1000 * 60 * 60);
+                    const daysDifference = msDifference / (1000 * 60 * 60 * 24);
+
+                    if (hoursDifference < 24) {
+                        // Within 24 hours, show time
+                        timeString = messageDate.toLocaleTimeString();
+                    } else if (daysDifference < 7) {
+                        // Within a week, show day of the week (e.g., "Mon")
+                        timeString = messageDate.toLocaleDateString(undefined, {
+                            weekday: 'short',
+                        });
+                    } else {
+                        // More than a week ago, show date (e.g., "Feb 10")
+                        timeString = messageDate.toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                        });
+                    }
+                }
+            }
+
+            return {
+                sender: "sent",
+                text: message.content,
+                timestamp: timeString,
+                txDigest: message.txDigest,
+            };
+        });
 
         res.json(formattedMessages);
     } catch (error) {
@@ -103,12 +136,45 @@ app.get('/messages/by-recipient/:recipient', async (req, res) => {
             },
         });
 
-        const formattedMessages = messages.map((message) => ({
-            sender: "received",
-            text: message.content,
-            timestamp: message.timestamp,
-            txDigest: message.txDigest,
-        }));
+        const formattedMessages = messages.map((message) => {
+            let timeString = "";
+            if(message.timestamp) {
+                const numericTimestamp = parseInt(message.timestamp, 10);
+
+                if (!isNaN(numericTimestamp)) {
+                    const messageDate = new Date(numericTimestamp);
+                    const currentDate = new Date();
+
+                    // Calculate the difference in milliseconds
+                    const msDifference = currentDate.getTime() - messageDate.getTime();
+                    const hoursDifference = msDifference / (1000 * 60 * 60);
+                    const daysDifference = msDifference / (1000 * 60 * 60 * 24);
+
+                    if (hoursDifference < 24) {
+                        // Within 24 hours, show time
+                        timeString = messageDate.toLocaleTimeString();
+                    } else if (daysDifference < 7) {
+                        // Within a week, show day of the week (e.g., "Mon")
+                        timeString = messageDate.toLocaleDateString(undefined, {
+                            weekday: 'short',
+                        });
+                    } else {
+                        // More than a week ago, show date (e.g., "Feb 10")
+                        timeString = messageDate.toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                        });
+                    }
+                }
+            }
+
+            return {
+                sender: "received",
+                text: message.content,
+                timestamp: timeString,
+                txDigest: message.txDigest,
+            };
+        });
 
         res.json(formattedMessages);
     } catch (error) {
