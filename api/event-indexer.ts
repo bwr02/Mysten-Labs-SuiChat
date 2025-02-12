@@ -3,7 +3,8 @@ import { SuiClient } from '@mysten/sui/client';
 import { CONFIG } from './config';
 import { Prisma } from '@prisma/client';
 import { prisma } from './db';
-import { getActiveAddress, getClient } from './sui-utils';
+import { getClient } from './sui-utils';
+import  { getActiveAddress } from './utils/activeAddressManager';
 import { WebSocketServer } from "ws"
 
 var id_cur = Number(1);
@@ -55,7 +56,7 @@ const handleMessageCreated = async (events: SuiEvent[], type: string) => {
     for (const event of events) {
         // console.log("event");
         const creationData = event.parsedJson as MessageCreatedEvent;
-        if(creationData.sender == getActiveAddress() || creationData.recipient == getActiveAddress()){
+        if((creationData.sender == getActiveAddress() || creationData.recipient == getActiveAddress())&& Number(creationData.timestamp) > 1739317580112){
             updates.push({
                 sender: creationData.sender,
                 recipient: creationData.recipient,
@@ -200,7 +201,14 @@ const saveLatestCursor = async (tracker: EventTracker, cursor: EventId) => {
 // };
 
 export const setupListeners = async () => {
-	for (const event of EVENTS_TO_TRACK) {
+    // Wait until getActiveAddress() returns a non-empty value.
+    while (!getActiveAddress()) {
+        // console.log("Waiting for active address to be set...");
+        // console.log(getActiveAddress());
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // wait 1 second before retrying
+    }
+
+    for (const event of EVENTS_TO_TRACK) {
 		runEventJob(getClient(CONFIG.NETWORK), event, await getLatestCursor(event));
 	}
 };
