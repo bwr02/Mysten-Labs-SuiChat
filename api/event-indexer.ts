@@ -56,7 +56,7 @@ const handleMessageCreated = async (events: SuiEvent[], type: string) => {
     for (const event of events) {
         // console.log("event");
         const creationData = event.parsedJson as MessageCreatedEvent;
-        if(creationData.sender == getActiveAddress() || creationData.recipient == getActiveAddress()){
+        if((creationData.sender == getActiveAddress() || creationData.recipient == getActiveAddress())&& Number(creationData.timestamp) > 1739317580112){
             updates.push({
                 sender: creationData.sender,
                 recipient: creationData.recipient,
