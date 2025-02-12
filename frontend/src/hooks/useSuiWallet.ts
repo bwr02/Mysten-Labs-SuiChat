@@ -5,6 +5,17 @@ export const useSuiWallet = () => {
     const wallet = useWallet();
 
     /**
+     * Get the wallet's public key as a hex string.
+     * @returns The public key or null if not available.
+     */
+    const getPublicKeyB64 = () => {
+        if (!wallet.account?.publicKey) return null;
+        return wallet.account?.publicKey 
+        ? Buffer.from(wallet.account.publicKey).toString('base64')
+        : null;
+    };
+
+    /**
      * Refresh the user's wallet balance.
      * @returns The formatted balance or null if an error occurs.
      */
@@ -44,6 +55,7 @@ export const useSuiWallet = () => {
 
     return { 
         address: wallet.account?.address ?? null,
+        publicKey: getPublicKeyB64(),
         connected: wallet.connected,
         loading: wallet.connecting,
         error: wallet.status === 'disconnected' ? 'Wallet disconnected' : null,

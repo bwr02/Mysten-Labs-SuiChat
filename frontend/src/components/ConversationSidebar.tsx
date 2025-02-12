@@ -1,12 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { SidebarConversationParams } from "@/types/SidebarType";
-import { getAllContactedAddresses, getDecryptedMessage } from "../api/services/dbService";
+import { SidebarConversationParams, ChatSidebarProps } from "@/types/types";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
 import { getSuiNInfo } from "@/api/services/nameServices";
+import { fetchAndDecryptChatHistory } from "../api/services/decryptService";
+import { useListenMessages } from "../hooks/useListenMessages";
 
-interface ChatSidebarProps {
-  setRecipientAddress: (address: string) => void;
-}
 
 const ConversationItem = React.memo(({ 
   conv, 
@@ -42,6 +40,36 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
   const [searchText, setSearchText] = useState("");
   const { wallet } = useSuiWallet();
 
+  // For the selected conversation
+  const [selectedRecipientPub, setSelectedRecipientPub] = useState<Uint8Array | null>(null);
+
+  // Use the hook for the selected conversation
+  const { messages: selectedMessages } = useListenMessages({
+    recipientAddress: selectedAddress,
+    recipientPub: selectedRecipientPub,
+    wallet: wallet || null,
+  });
+
+  useEffect(() => {
+    if (selectedAddress && selectedMessages.length > 0) {
+      const latestMessage = selectedMessages[selectedMessages.length - 1];
+      setConversations(prevConvs => 
+        prevConvs.map(conv => 
+          conv.address === selectedAddress 
+            ? { 
+                ...conv, 
+                message: latestMessage.text || "No message content",
+                time: latestMessage.timestamp 
+                ? new Date(latestMessage.timestamp).toLocaleTimeString()
+                : new Date().toLocaleTimeString()
+              }
+            : conv
+        )
+      );
+    }
+  }, [selectedMessages, selectedAddress]);
+
+
   const handleSearchInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
   }, []);
@@ -73,39 +101,33 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
 
   useEffect(() => {
     const fetchContacts = async () => {
-      try {
-        const initialContacts = await getAllContactedAddresses();
-        
-        const decryptedContacts = await Promise.all(
-          initialContacts.map(async (contact) => {
-            try {
-              if (!contact.message) {
-                return { ...contact, message: "No Messages" };
-              }
-              
-              const decryptedMessage = await getDecryptedMessage(
-                contact.address,
-                wallet,
-                contact.message
-              );
-              return { ...contact, message: decryptedMessage || "No Messages" };
-            } catch (error) {
-              console.error(`Failed to decrypt message for ${contact.address}`, error);
-              return { ...contact, message: "(decryption error)" };
-            }
-          })
-        );
+      if (!wallet || !selectedAddress || !selectedRecipientPub) return;
 
-        setConversations(decryptedContacts);
+      try {
+        const history = await fetchAndDecryptChatHistory(
+          selectedAddress,
+          selectedRecipientPub,
+          wallet
+        );
+        
+        // Convert Message[] to SidebarConversationParams[]
+        const conversationPreviews: SidebarConversationParams[] = history.map(msg => ({
+          address: selectedAddress,
+          name: selectedAddress, // You might want to get a display name from somewhere
+          message: msg.text || "No message content",
+          time: msg.timestamp 
+    ? new Date(msg.timestamp).toLocaleTimeString()
+    : new Date().toLocaleTimeString()
+        }));
+
+        setConversations(conversationPreviews);
       } catch (error) {
         console.error("Error fetching contacts:", error);
       }
     };
 
-    if (wallet) {
-      fetchContacts();
-    }
-  }, [wallet]);
+    fetchContacts();
+  }, [wallet, selectedAddress, selectedRecipientPub]);
 
   const handleSelectConversation = useCallback((address: string) => {
     setSelectedAddress(address);
