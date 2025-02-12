@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { MessageInputField } from "./MessageInputField";
 import { getMessagesWithAddress, getDecryptedMessage, getNameByAddress, getSuiNSByAddress } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
+import { FaLink } from 'react-icons/fa'; 
+
 
 interface Message {
   sender: "sent" | "received";
@@ -28,30 +30,35 @@ const RecipientBar: React.FC<{ recipientAddress: string | null }> = ({ recipient
 };
 
 
+
 const MessageBubble = React.memo(({message}: {message: Message}) => (
   <div
-  className={`p-3 rounded-2xl max-w-[50%] text-sm ${
-    message.sender === "sent"
-      ? "bg-blue-700 text-white self-end"
-      : "bg-gray-200 text-black self-start"
-  }`}
+    className={`p-3 rounded-2xl max-w-[50%] text-sm ${
+      message.sender === "sent"
+        ? "bg-blue-700 text-white self-end"
+        : "bg-gray-200 text-black self-start"
+    }`}
   >
-  <span>{message.text}</span>
-  {message.txDigest && (
-    <div className="mt-2">
-      <a
-        href={`https://suiscan.xyz/testnet/tx/${message.txDigest}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-blue-500 hover:underline"
-      >
-        View on Sui Scanner
-      </a>
+    <span>{message.text}</span>
+
+    <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+
+      {message.txDigest && (
+        <a
+          href={`https://suiscan.xyz/testnet/tx/${message.txDigest}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 hover:underline flex items-center"
+        >
+          <FaLink className="mr-1" />
+        </a>
+      )}
+      <span>{message.timestamp}</span>
     </div>
-  )}
-  <div>{message.timestamp}</div>
-</div>
+  </div>
 ));
+
+
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);
