@@ -30,33 +30,75 @@ const RecipientBar: React.FC<{ recipientAddress: string | null }> = ({ recipient
 };
 
 
+const MessageBubble = React.memo(({ message, isLast }: { message: Message, isLast: boolean }) => {
+  const [showTimestamp, setShowTimestamp] = useState(false);
 
-const MessageBubble = React.memo(({message}: {message: Message}) => (
-  <div
-    className={`p-3 rounded-2xl max-w-[50%] text-sm ${
-      message.sender === "sent"
-        ? "bg-blue-700 text-white self-end"
-        : "bg-gray-200 text-black self-start"
-    }`}
-  >
-    <span>{message.text}</span>
+  const handleClick = () => {
+    setShowTimestamp(true);
 
-    <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+    // Hide the timestamp after 10 seconds for non-last messages
+    if (!isLast) {
+      const timer = setTimeout(() => {
+        setShowTimestamp(false);
+      }, 5000);
 
-      {message.txDigest && (
-        <a
-          href={`https://suiscan.xyz/testnet/tx/${message.txDigest}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-500 hover:underline flex items-center"
+      // Clear timeout if clicked again or component unmounts
+      return () => clearTimeout(timer);
+    }
+  };
+
+  return (
+    <div>
+      <div className={`flex items-center ${message.sender === 'sent' ? 'flex-row-reverse' : 'flex-row'}`}>
+        {/* Icon Link for Sent Messages (on the left) */}
+        {message.txDigest && message.sender === 'sent' && (
+          <a
+            href={`https://suiscan.xyz/testnet/tx/${message.txDigest}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline flex items-center mx-2"
+          >
+            <FaLink />
+          </a>
+        )}
+        
+        {/* Message Bubble */}
+        <div
+          className={`p-3 rounded-2xl max-w-[50%] text-sm cursor-pointer ${
+            message.sender === 'sent'
+              ? 'bg-blue-700 text-white self-end'
+              : 'bg-gray-200 text-black self-start'
+          }`}
+          onClick={handleClick}
         >
-          <FaLink className="mr-1" />
-        </a>
-      )}
-      <span>{message.timestamp}</span>
+          <span>{message.text}</span>
+        </div>
+
+        {/* Icon Link for Received Messages (on the right) */}
+        {message.txDigest && message.sender === 'received' && (
+          <a
+            href={`https://suiscan.xyz/testnet/tx/${message.txDigest}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline flex items-center mx-2"
+          >
+            <FaLink />
+          </a>
+        )}
+      </div>
+
+      {/* Timestamp underneath the message bubble */}
+      <div className={`flex items-center ${message.sender === 'sent' ? 'flex-row-reverse' : 'flex-row'} mt-1`}>
+        {(isLast || showTimestamp) && (
+          <div className="text-xs text-gray-500">
+            {message.timestamp}
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-));
+  );
+});
+
 
 
 
@@ -76,24 +118,57 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
       const ws = new WebSocket('ws://localhost:8080');
 
       const handleNewMessage = async (messageData: any) => {
-          try {
-              const decryptedMessage = await getDecryptedMessage(
-                  recipientAddress,
-                  wallet,
-                  messageData.text
-              );
-        
-            console.log("messageData", messageData);
-            setMessages((prev) => [...prev, {
-                sender: messageData.messageType,
-                text: decryptedMessage,
-                timestamp: messageData.timestamp,
-                txdigest: messageData.txDigest
-              }]);
-          } catch (error) {
+        try {
+            const decryptedMessage = await getDecryptedMessage(
+                recipientAddress,
+                wallet,
+                messageData.text
+            );
+      
+          let timeString = "";
+          if (messageData.timestamp) {
+            const numericTimestamp = parseInt(messageData.timestamp, 10);
+
+            if (!isNaN(numericTimestamp)) {
+              const messageDate = new Date(numericTimestamp);
+              const currentDate = new Date();
+
+              // Calculate the difference in milliseconds
+              const msDifference = currentDate.getTime() - messageDate.getTime();
+              const hoursDifference = msDifference / (1000 * 60 * 60);
+              const daysDifference = msDifference / (1000 * 60 * 60 * 24);
+
+              if (hoursDifference < 24) {
+                // Within 24 hours, show time
+                timeString = messageDate.toLocaleTimeString();
+              } else if (daysDifference < 7) {
+                // Within a week, show day of the week (e.g., "Mon")
+                timeString = messageDate.toLocaleDateString(undefined, {
+                  weekday: 'short',
+                });
+              } else {
+                // More than a week ago, show date (e.g., "Feb 10")
+                timeString = messageDate.toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                });
+              }
+            }
+          }
+
+          setMessages((prev) => [
+            ...prev,
+            {
+              sender: messageData.messageType,
+              text: decryptedMessage,
+              timestamp: timeString,
+              txdigest: messageData.txDigest,
+            },
+          ]);
+        } catch (error) {
             console.error('Error decrypting message:', error);
         }
-      }
+    }
 
 
       ws.onmessage = (event) => {
@@ -132,7 +207,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
       <RecipientBar recipientAddress={recipientAddress} />
       <div className="flex-grow flex flex-col gap-2 px-4 py-2 justify-end mb-4">
         {messages.map((message, index) => (
-          <MessageBubble key={`${index}-${message.timestamp}`} message={message}/>
+          <MessageBubble key={`${index}-${message.timestamp}`} message={message} isLast={index === messages.length - 1}/>
         ))}
           {/* Ref element to keep the scroll at the bottom */}
           <div ref={messagesEndRef} />
