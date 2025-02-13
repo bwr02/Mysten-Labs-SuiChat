@@ -164,6 +164,26 @@ export async function getAllContactedAddresses(): Promise<SidebarConversationPar
     }
 }
 
+
+export async function getAllContacts(): Promise<Contact[]> {
+    try {
+        const response = await fetch('http://localhost:3000/contacts/all-contacts');
+        if (!response.ok) {
+            console.error('Failed to fetch contacted addresses. Status:', response.status);
+            throw new Error('Failed to fetch contacted addresses');
+        }
+
+        // Now we expect an array of Contact from the server
+        // Note as of now the server is passing in encrypted messages and the name is address
+        const data: Contact[] = await response.json();
+        // console.log('Fetched contacted addresses:', data);
+        return data;
+    } catch (error) {
+        console.error('Error fetching contacted addresses:', error);
+        return [];
+    }
+}
+
 export async function addContact(addr: string, suiname?: string, contactName?: string) {
     try {
         const response = await fetch('http://localhost:3000/add-contact', {

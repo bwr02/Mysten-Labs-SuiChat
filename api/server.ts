@@ -257,6 +257,27 @@ app.get('/contacts/metadata', async (req, res) => {
     }
 });
 
+app.get('/contacts/all-contacts', async (req, res) => {
+    try {
+        const contacts = await prisma.contact.findMany({
+            distinct: ['address'],
+            orderBy: {
+                address: 'asc',
+            },
+            select: {
+                address: true,
+                name: true,
+                suins: true,
+            },
+        });
+
+        res.json(contacts);
+    } catch (error) {
+        console.error('Error fetching contacts:', error);
+        res.status(500).json({ error: 'Failed to fetch contacts' });
+    }
+});
+
 app.post('/add-contact', async (req, res) => {
     const { addr, suiname, contactName } = req.body;
 
