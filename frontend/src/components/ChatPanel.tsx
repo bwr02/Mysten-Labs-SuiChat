@@ -170,7 +170,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
               sender: messageData.messageType,
               text: decryptedMessage,
               timestamp: timeString,
-              txdigest: messageData.txDigest,
+              txDigest: messageData.txDigest,
             },
           ]);
         } catch (error) {
