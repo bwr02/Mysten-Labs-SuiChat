@@ -132,6 +132,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
                 wallet,
                 messageData.text
             );
+
+          
       
           let timeString = "";
           if (messageData.timestamp) {
@@ -148,7 +150,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
 
               if (hoursDifference < 24) {
                 // Within 24 hours, show time
-                timeString = messageDate.toLocaleTimeString();
+                timeString = messageDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
               } else if (daysDifference < 7) {
                 // Within a week, show day of the week (e.g., "Mon")
                 timeString = messageDate.toLocaleDateString(undefined, {
