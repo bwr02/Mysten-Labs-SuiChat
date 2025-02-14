@@ -69,7 +69,6 @@ const handleMessageCreated = async (events: SuiEvent[], type: string) => {
             continue;
         }
     }
-  }
 
   const promises = updates.map(async (update, index) => {
     const suiEvent = events[index];

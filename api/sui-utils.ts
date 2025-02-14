@@ -11,12 +11,12 @@ export const ACTIVE_NETWORK = (process.env.NETWORK as Network) || 'testnet';
 
 
 
-
-export type Network = 'mainnet' | 'testnet' | 'devnet' | 'localnet';
-
-// Use environment variable if available, default to testnet
-export const ACTIVE_NETWORK: Network = 'testnet'
-//   (import.meta.env.VITE_NETWORK as Network) || 'testnet';
+// DUBLICATED IN MERGE TODO DELETE
+// export type Network = 'mainnet' | 'testnet' | 'devnet' | 'localnet';
+//
+// // Use environment variable if available, default to testnet
+// export const ACTIVE_NETWORK: Network = 'testnet'
+// //   (import.meta.env.VITE_NETWORK as Network) || 'testnet';
 
 /*export const getActiveAddress = (): string => {
     const address = localStorage.getItem('active_wallet_address');
@@ -27,14 +27,14 @@ export const ACTIVE_NETWORK: Network = 'testnet'
 };
 */
 
-export const getActiveAddress = () => {
-    const address = useCurrentAccount()?.address;
-    if (!address) {
-        throw new Error('No active wallet address found');
-    }
-    console.log(address);
-    return address;
-};
+// export const getActiveAddress = () => {
+//     const address = useCurrentAccount()?.address;
+//     if (!address) {
+//         throw new Error('No active wallet address found');
+//     }
+//     console.log(address);
+//     return address;
+// };
 
 /** Get the client for the specified network. */
 export const getClient = (network: Network) => {

@@ -2,7 +2,6 @@ import { SuiClient } from "@mysten/sui/client";
 import { bcs } from "@mysten/sui/bcs";
 import {
   getClient,
-  getActiveAddress,
   ACTIVE_NETWORK,
 } from "../../../../api/sui-utils";
 import { Transaction } from "@mysten/sui/transactions";
@@ -54,7 +53,7 @@ export async function registerPublicKey(
 ): Promise<string> {
   try {
     const tx = new Transaction();
-    const ownerAddress = getActiveAddress();
+    const ownerAddress = wallet.address;
     const serializedPublicKey = bcs
       .vector(bcs.u8())
       .serialize(publicKey)

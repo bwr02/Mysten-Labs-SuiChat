@@ -1,4 +1,12 @@
 // activeAddressStore.ts
+import { writeFileSync, readFileSync, existsSync } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Compute __dirname in an ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 import { writeFileSync, readFileSync, existsSync } from 'fs';
 import path from 'path';
