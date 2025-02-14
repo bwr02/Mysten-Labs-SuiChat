@@ -285,6 +285,36 @@ app.get('/contacts/all-contacts', async (req, res) => {
     }
 });
 
+app.get('/contacts/get-name/:addr', async (req, res) => {
+    const { addr } = req.params;
+    const contact = await prisma.contact.findUnique({
+        where: {
+          address: addr,
+        },
+      })
+    if(contact){
+        return contact.name;
+    }
+    else{ //null case
+        return contact
+    }
+});
+
+app.get('/contacts/get-suins/:addr', async (req, res) => {
+    const { addr } = req.params;
+    const contact = await prisma.contact.findUnique({
+        where: {
+          address: addr,
+        },
+      })
+    if(contact){
+        return contact.suins;
+    }
+    else{ //null case
+        return contact
+    }
+});
+
 app.post('/add-contact', async (req, res) => {
     const { addr, suiname, contactName } = req.body;
 
