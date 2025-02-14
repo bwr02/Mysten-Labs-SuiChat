@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { SidebarConversationParams } from "@/types/SidebarType";
-import { getAllContactedAddresses, getDecryptedMessage } from "../api/services/dbService";
+import { getAllContactedAddresses, getDecryptedMessage, getAllContacts } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
 import { getSuiNInfo } from "@/api/services/nameServices";
 
@@ -75,7 +75,12 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
     const fetchContacts = async () => {
       try {
         const initialContacts = await getAllContactedAddresses();
-        
+        if (initialContacts.length > 0) {
+          const mostRecentContact = initialContacts[0];
+          setRecipientAddress(mostRecentContact.address);
+          setSelectedAddress(mostRecentContact.address);
+        }
+
         const decryptedContacts = await Promise.all(
           initialContacts.map(async (contact) => {
             try {
