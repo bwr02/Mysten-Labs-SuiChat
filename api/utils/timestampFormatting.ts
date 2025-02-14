@@ -11,9 +11,12 @@ export function formatTimestamp(timestamp: string): string {
                 const hoursDifference = msDifference / (1000 * 60 * 60);
                 const daysDifference = msDifference / (1000 * 60 * 60 * 24);
 
-                if (hoursDifference < 24) {
-                    // Within 24 hours, show time
+                if (messageDate.toDateString() === currentDate.toDateString()) {
+                    // Same day, show time
                     timeString = messageDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+                } else if (daysDifference < 2 && messageDate.getDate() === currentDate.getDate() - 1) {
+                    // Yesterday, show "Yesterday"
+                    timeString = "Yesterday";
                 } else if (daysDifference < 7) {
                     // Within a week, show day of the week (e.g., "Mon")
                     timeString = messageDate.toLocaleDateString(undefined, {

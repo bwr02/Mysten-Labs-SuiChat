@@ -243,19 +243,24 @@ app.get('/contacts/metadata', async (req, res) => {
 
         // Now convert the map to the shape of SidebarConversationParams
         // For now, "name" will be set to the same address string
-        const contacts = Object.entries(contactMap).map(([address, { mostRecentMessage, timestamp }]) => {
+        const contacts = await Promise.all(Object.entries(contactMap).map(async ([address, { mostRecentMessage, timestamp }]) => {
             let timeString = "";
-            if(timestamp) { 
+            if (timestamp) {
                 timeString = formatTimestamp(timestamp);
             }
 
+            const contact = await prisma.contact.findUnique({
+                where: { address },
+                select: { name: true, suins: true },
+            });
+
             return {
                 address,
-                name: address,        // Fill 'name' with 'address' for now
+                name: contact?.name || contact?.suins || address, // Use name if available, otherwise suins, otherwise address
                 message: mostRecentMessage || "",
-                time: timeString,     // This will be something like '1:30:15 PM'
+                time: timeString, // This will be something like '1:30 PM'
             };
-        });
+        }));
 
         res.json(contacts);
     } catch (error) {
@@ -289,14 +294,14 @@ app.get('/contacts/get-name/:addr', async (req, res) => {
     const { addr } = req.params;
     const contact = await prisma.contact.findUnique({
         where: {
-          address: addr,
+            address: addr,
         },
-      })
-    if(contact){
-        return contact.name;
-    }
-    else{ //null case
-        return contact
+    });
+
+    if (contact && contact.name) {
+        res.json(contact.name); // Send the name as JSON
+    } else {
+        res.json(null); // Send null if no contact is found
     }
 });
 
@@ -304,16 +309,18 @@ app.get('/contacts/get-suins/:addr', async (req, res) => {
     const { addr } = req.params;
     const contact = await prisma.contact.findUnique({
         where: {
-          address: addr,
+            address: addr,
         },
-      })
-    if(contact){
-        return contact.suins;
-    }
-    else{ //null case
-        return contact
+    });
+
+    if (contact && contact.suins) {
+        res.json(contact.suins); // Send the SuiNS as JSON
+    } else {
+        res.json(null); // Send null if no SuiNS is found
     }
 });
+
+
 
 app.post('/add-contact', async (req, res) => {
     const { addr, suiname, contactName } = req.body;

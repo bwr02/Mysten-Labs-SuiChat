@@ -155,17 +155,6 @@ export async function getAllContactedAddresses(): Promise<SidebarConversationPar
 
         const data: SidebarConversationParams[] = await response.json();
 
-        // Update the name field with getNameByAddress or getSuiNSByAddress
-        for (const contact of data) {
-            const name = await getNameByAddress(contact.address);
-            const suins = await getSuiNSByAddress(contact.address);
-            if (name) {
-                contact.name = name;
-            } else if (suins) {
-                contact.name = suins;
-            }
-        }
-
         return data;
     } catch (error) {
         console.error('Error fetching contacted addresses:', error);
@@ -270,6 +259,7 @@ export async function getNameByAddress(addr: string): Promise<string|null>{
         return "";
     }
 }
+
 
 export async function getPublicKeyByAddress(addr: string): Promise<string|null>{
     const contact = await prisma.contact.findUnique({
