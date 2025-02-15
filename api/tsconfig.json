@@ -13,15 +13,10 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "sourceMap": true,
-    "lib": [
-      "esnext",
-    ],
+    "lib": ["esnext"],
     "resolveJsonModule": true,
-    "types": [
-      "node",
-      "express"
-    ],
-    "baseUrl": "./",
+    "types": ["node", "express"],
+    "baseUrl": "./"
   },
   "include": [
     "src/**/*",
