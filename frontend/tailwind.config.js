@@ -17,5 +17,19 @@ export default {
   plugins: [
     flowbite.plugin(),
     lineClamp,
+    // Custom plugin to hide scrollbars
+    function({ addUtilities }) {
+      const newUtilities = {
+        // Utility to hide scrollbar for all browsers
+        '.no-scrollbar': {
+          '-ms-overflow-style': 'none', /* IE and Edge */
+          'scrollbar-width': 'none', /* Firefox */
+        },
+        '.no-scrollbar::-webkit-scrollbar': {
+          display: 'none', /* Chrome, Safari, Opera */
+        },
+      };
+      addUtilities(newUtilities);
+    },
   ],
 };
