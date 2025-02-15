@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { MessageInputField } from "./MessageInputField";
-import { getMessagesWithAddress, getDecryptedMessage, getNameByAddress, getSuiNSByAddress } from "../api/services/dbService";
+import { getMessagesWithAddress, getDecryptedMessage, getSuiNSByAddress, getNameByAddress } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
 import { FaLink } from 'react-icons/fa'; 
 
@@ -17,12 +17,12 @@ interface ChatPanelProps {
 }
 
 
-const RecipientBar: React.FC<{ recipientAddress: string | null }> = ({ recipientAddress }) => {
+const RecipientBar: React.FC<{ recipientName: string | null }> = ({ recipientName }) => {
   return (
     <div className="w-full bg-light-blue text-gray-200 py-4 px-6 flex items-center justify-between shadow-md sticky top-0">
       <h1 className="text-2xl font-bold">
-        {recipientAddress
-          ? `${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`
+        {recipientName && recipientName !== "null"
+          ? recipientName
           : "No Contact Selected"}
       </h1>
     </div>
@@ -112,6 +112,7 @@ const MessageBubble = React.memo(({ message, isLast }) => {
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [recipientName, setRecipientName] = useState<string | null>(null);
   const { wallet } = useSuiWallet();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollToBottom = useCallback(() => {
@@ -121,6 +122,43 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
+
+
+  useEffect(() => {
+    const fetchRecipientName = async () => {
+  
+      if (recipientAddress) {
+        try {
+          const name = await getNameByAddress(recipientAddress);
+  
+          if (name) {
+            setRecipientName(name);
+            return;
+          }
+  
+          const suiNS = await getSuiNSByAddress(recipientAddress);
+  
+          if (suiNS) {
+            setRecipientName(suiNS);
+            return;
+          }
+  
+          // If no name or SuiNS, use the shortened address
+          setRecipientName(`${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`);
+        } catch (error) {
+          console.error("Error fetching recipient name:", error);
+          setRecipientName(`${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`);
+        }
+      } else {
+        console.log("No recipient address provided");
+        setRecipientName(null);
+      }
+    };
+  
+    fetchRecipientName();
+  }, [recipientAddress]);
+  
+
 
   useEffect(() => {
       const ws = new WebSocket('ws://localhost:8080');
@@ -132,8 +170,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
                 wallet,
                 messageData.text
             );
-
-          
       
           let timeString = "";
           if (messageData.timestamp) {
@@ -148,20 +184,26 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
               const hoursDifference = msDifference / (1000 * 60 * 60);
               const daysDifference = msDifference / (1000 * 60 * 60 * 24);
 
-              if (hoursDifference < 24) {
-                // Within 24 hours, show time
+              if (messageDate.toDateString() === currentDate.toDateString()) {
+                // Same day, show time
                 timeString = messageDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+              } else if (daysDifference < 2 && messageDate.getDate() === currentDate.getDate() - 1) {
+                  // Yesterday, show "Yesterday"
+                  timeString = "Yesterday" +  messageDate.toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                  });
               } else if (daysDifference < 7) {
-                // Within a week, show day of the week (e.g., "Mon")
-                timeString = messageDate.toLocaleDateString(undefined, {
-                  weekday: 'short',
-                });
+                  // Within a week, show day of the week (e.g., "Mon")
+                  timeString = messageDate.toLocaleDateString(undefined, {
+                      weekday: 'short',
+                  });
               } else {
-                // More than a week ago, show date (e.g., "Feb 10")
-                timeString = messageDate.toLocaleDateString(undefined, {
-                  month: 'short',
-                  day: 'numeric',
-                });
+                  // More than a week ago, show date (e.g., "Feb 10")
+                  timeString = messageDate.toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                  });
               }
             }
           }
@@ -204,6 +246,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
       if (recipientAddress) {
         fetchMessages();
       }
+
   }, [recipientAddress, wallet]);
 
   const handleMessageSent = useCallback(() => {
@@ -214,7 +257,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
 
   return (
     <div className="flex flex-col h-screen flex-1 bg-light-blue overflow-auto">
-      <RecipientBar recipientAddress={recipientAddress} />
+      <RecipientBar recipientName={recipientName} />
       <div className="flex-grow flex flex-col gap-2 px-4 py-2 justify-end mb-4">
         {messages.map((message, index) => (
           <MessageBubble key={`${index}-${message.timestamp}`} message={message} isLast={index === messages.length - 1}/>
