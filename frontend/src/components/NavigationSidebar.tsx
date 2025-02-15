@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 
 export function NavigationSidebar() {
   return (
-    <div className="h-screen relative" style={{ width: "48px" }}>
+    <div className="top-0 left-0 h-screen w-12 bg-gray-900 border-r border-gray-700">
       <Sidebar
         aria-label="Custom sidebar"
         className="h-full flex flex-col justify-between items-center absolute inset-0"
@@ -34,7 +34,7 @@ export function NavigationSidebar() {
               icon={FaAddressBook}
               className="flex justify-start items-center p-2 mt-4"
             >
-              <span className="hidden">Contacts</span>
+              <span className="sr-only">Contacts</span>
             </Sidebar.Item>
           </Sidebar.ItemGroup>
         </Sidebar.Items>
