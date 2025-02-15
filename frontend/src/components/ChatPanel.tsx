@@ -2,7 +2,8 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { MessageInputField } from "./MessageInputField";
 import { getMessagesWithAddress, getDecryptedMessage, getSuiNSByAddress, getNameByAddress } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
-import { FaLink } from 'react-icons/fa'; 
+import { FaLink, FaInfoCircle } from 'react-icons/fa'; 
+import Modal from 'react-modal';
 
 
 interface Message {
@@ -16,18 +17,71 @@ interface ChatPanelProps {
   recipientAddress: string | null;
 }
 
+interface RecipientBarProps {
+  recipientName: string | null;
+  suins: string | null;
+  address: string | null;
+}
 
-const RecipientBar: React.FC<{ recipientName: string | null }> = ({ recipientName }) => {
+const RecipientBar: React.FC<RecipientBarProps> = ({
+  recipientName,
+  suins,
+  address,
+}) => {
+  const [popupIsOpen, setPopupIsOpen] = useState(false);
+  const popupRef = useRef<HTMLDivElement>(null);
+  const iconRef = useRef<HTMLDivElement>(null);
+
+  const togglePopup = () => setPopupIsOpen(!popupIsOpen);
+  console.log("SuiNS: ", suins);
+  // Close popup when clicking outside or on the info icon again
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        popupRef.current &&
+        !popupRef.current.contains(event.target as Node) &&
+        iconRef.current &&
+        !iconRef.current.contains(event.target as Node)
+      ) {
+        setPopupIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="w-full bg-light-blue text-gray-200 py-4 px-6 flex items-center justify-between shadow-md sticky top-0">
-      <h1 className="text-2xl font-bold">
+      <h1 className="text-2xl font-bold flex items-center relative">
         {recipientName && recipientName !== "null"
           ? recipientName
           : "No Contact Selected"}
+        {recipientName && recipientName !== "null" && (
+            <div ref={iconRef} className="relative inline-block">
+            <FaInfoCircle
+              className="ml-2 cursor-pointer text-sm" // Added text-sm class to make the icon smaller
+              onClick={togglePopup}
+            />
+            {popupIsOpen && (
+              <div
+              ref={popupRef}
+              className="absolute left-0 mt-2 bg-white text-black rounded-lg shadow-lg w-64 p-4 z-10"
+              >
+              <div className="absolute -top-2 left-4 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-white"></div>
+              <h2 className="text-lg font-bold mb-2">{recipientName}</h2>
+              {suins && <p className="text-sm">SUINS: {suins}</p>}
+              {address && <p className="text-sm">Address: {address}</p>}
+              </div>
+            )}
+            </div>
+        )}
       </h1>
     </div>
   );
 };
+
 
 
 const MessageBubble = React.memo(({ message, isLast }) => {
@@ -113,6 +167,7 @@ const MessageBubble = React.memo(({ message, isLast }) => {
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [recipientName, setRecipientName] = useState<string | null>(null);
+  const [suiNS, setSuiNS] = useState<string | null>(null);
   const { wallet } = useSuiWallet();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollToBottom = useCallback(() => {
@@ -133,6 +188,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   
           if (name) {
             setRecipientName(name);
+            const suiNS = await getSuiNSByAddress(recipientAddress);
+  
+            if (suiNS) {
+              setSuiNS(suiNS);
+            }
             return;
           }
   
@@ -140,11 +200,13 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   
           if (suiNS) {
             setRecipientName(suiNS);
+            setSuiNS(suiNS);
             return;
           }
   
           // If no name or SuiNS, use the shortened address
           setRecipientName(`${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`);
+          setSuiNS(null);
         } catch (error) {
           console.error("Error fetching recipient name:", error);
           setRecipientName(`${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`);
@@ -257,7 +319,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
 
   return (
     <div className="flex flex-col h-screen flex-1 bg-light-blue overflow-auto">
-      <RecipientBar recipientName={recipientName} />
+      <RecipientBar recipientName={recipientName} address={recipientAddress} suins={suiNS}/>
       <div className="flex-grow flex flex-col gap-2 px-4 py-2 justify-end mb-4">
         {messages.map((message, index) => (
           <MessageBubble key={`${index}-${message.timestamp}`} message={message} isLast={index === messages.length - 1}/>
