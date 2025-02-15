@@ -1,20 +1,7 @@
-import { decryptMessage, deriveKeyFromSignature, generateSharedSecret } from './cryptoService';
-import { WalletContextState } from '@suiet/wallet-kit'
-import { prisma } from '../../../../api/db'
-import { SidebarConversationParams } from "@/types/types.ts";
-
-interface Message {
-    sender: "sent" | "received";
-    text: string|null;
-    timestamp?: number;
-    txDigest?: string;
-  }
-interface Contact {
-    address: string;
-    suins: string;
-    name: string;
-    public_key: string;
-}
+import {decryptMessage, deriveKeyFromSignature, generateSharedSecret} from './cryptoService';
+import {WalletContextState} from '@suiet/wallet-kit'
+import {prisma} from '../../../../api/db'
+import {Contact, Message, SidebarConversationParams} from "@/types/types.ts";
 
 export async function getAllMessages(): Promise<Message[]> {
     try {

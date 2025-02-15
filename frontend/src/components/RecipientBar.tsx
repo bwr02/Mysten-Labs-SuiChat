@@ -1,12 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import {editContact} from "@/api/services/dbService.ts";
 import {FaInfoCircle} from "react-icons/fa";
-
-interface RecipientBarProps {
-    recipientName: string | null;
-    suins: string | null;
-    address: string | null;
-}
+import {RecipientBarProps} from "@/types/types.ts";
 
 export const RecipientBar: React.FC<RecipientBarProps> = ({
                                                               recipientName,

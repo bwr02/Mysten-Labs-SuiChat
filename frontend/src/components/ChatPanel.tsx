@@ -9,19 +9,7 @@ import {
 import {useSuiWallet} from "@/hooks/useSuiWallet";
 import {RecipientBar} from "@/components/RecipientBar.tsx";
 import {MessageBubble} from "@/components/MessageBubble.tsx";
-
-
-interface Message {
-  sender: "sent" | "received";
-  text: string | null;
-  timestamp?: number;
-  txDigest?: string;
-}
-
-interface ChatPanelProps {
-  recipientAddress: string | null;
-}
-
+import {ChatPanelProps, Message} from "@/types/types.ts";
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);
