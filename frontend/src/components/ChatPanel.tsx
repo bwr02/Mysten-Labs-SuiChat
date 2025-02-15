@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { MessageInputField } from "./MessageInputField";
-import { getMessagesWithAddress, getDecryptedMessage, getSuiNSByAddress, getNameByAddress } from "../api/services/dbService";
+import { getMessagesWithAddress, getDecryptedMessage, getSuiNSByAddress, getNameByAddress, editContact } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
 import { FaLink, FaInfoCircle } from 'react-icons/fa'; 
 import Modal from 'react-modal';
@@ -23,18 +23,28 @@ interface RecipientBarProps {
   address: string | null;
 }
 
+
 const RecipientBar: React.FC<RecipientBarProps> = ({
   recipientName,
   suins,
   address,
 }) => {
   const [popupIsOpen, setPopupIsOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState(recipientName);
+
   const popupRef = useRef<HTMLDivElement>(null);
   const iconRef = useRef<HTMLDivElement>(null);
 
-  const togglePopup = () => setPopupIsOpen(!popupIsOpen);
-  console.log("SuiNS: ", suins);
-  // Close popup when clicking outside or on the info icon again
+  const togglePopup = () => {
+    // If closing the popup, also abort editing and reset input
+    if (popupIsOpen) {
+      setIsEditing(false);
+      setEditedName(null); // Reset the name if editing was in progress
+    }
+    setPopupIsOpen(!popupIsOpen);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -44,13 +54,31 @@ const RecipientBar: React.FC<RecipientBarProps> = ({
         !iconRef.current.contains(event.target as Node)
       ) {
         setPopupIsOpen(false);
+        setIsEditing(false); // Abort editing if clicked outside
+        setEditedName(null); // Reset to original name when closing
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [recipientName]);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveClick = async () => {
+    await editContact(address, suins, editedName);
+    setIsEditing(false);
+  };
+
+  const handleKeyPress = async (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      await editContact(address, suins, editedName);
+      setIsEditing(false);
+    }
+  };
 
   return (
     <div className="w-full bg-light-blue text-gray-200 py-4 px-6 flex items-center justify-between shadow-md sticky top-0">
@@ -59,28 +87,59 @@ const RecipientBar: React.FC<RecipientBarProps> = ({
           ? recipientName
           : "No Contact Selected"}
         {recipientName && recipientName !== "null" && (
-            <div ref={iconRef} className="relative inline-block">
+          <div ref={iconRef} className="relative inline-block">
             <FaInfoCircle
-              className="ml-2 cursor-pointer text-sm" // Added text-sm class to make the icon smaller
+              className="ml-2 cursor-pointer text-sm"
               onClick={togglePopup}
             />
             {popupIsOpen && (
               <div
-              ref={popupRef}
-              className="absolute left-0 mt-2 bg-white text-black rounded-lg shadow-lg w-64 p-4 z-10"
+                ref={popupRef}
+                className="absolute left-0 mt-2 bg-gray-600 text-white rounded-lg shadow-lg w-64 p-4 z-10"
               >
-              <div className="absolute -top-2 left-4 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-white"></div>
-              <h2 className="text-lg font-bold mb-2">{recipientName}</h2>
-              {suins && <p className="text-sm">SUINS: {suins}</p>}
-              {address && <p className="text-sm">Address: {address}</p>}
+                <div className="absolute -top-2 left-4 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-gray-600"></div>
+
+                {isEditing ? (
+                  <>
+                    <input
+                      className="bg-gray-700 text-white rounded-lg p-1 mb-2 w-[80%] text-xs" 
+                      value={editedName}
+                      onChange={(e) => setEditedName(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Enter New Contact Name"
+                    />
+                    <button
+                      className="absolute top-2 right-2 text-xs text-gray-300 hover:text-white"
+                      onClick={handleSaveClick}
+                    >
+                      Save
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="text-lg font-bold mb-2">{recipientName}</h2>
+                    <button
+                      className="absolute top-2 right-2 text-xs text-gray-300 hover:text-white"
+                      onClick={handleEditClick}
+                    >
+                      Edit
+                    </button>
+                  </>
+                )}
+
+                {suins && <p className="text-sm">SUINS: {suins}</p>}
+                {address && <p className="text-sm">Address: {address}</p>}
               </div>
             )}
-            </div>
+          </div>
         )}
       </h1>
     </div>
   );
 };
+
+
+
 
 
 
