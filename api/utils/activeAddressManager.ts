@@ -2,6 +2,12 @@
 
 import { writeFileSync, readFileSync, existsSync } from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+
+// Compute __dirname in ES module scope
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const ACTIVE_ADDRESS_FILE = path.join(__dirname, 'activeAddress.json');
 

@@ -1,15 +1,20 @@
 // Copyright (c) Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 import { readFileSync } from 'fs';
-import { Network } from './sui-utils';
 import path from 'path';
+import { Network } from './sui-utils';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 /// We assume our config files are in the format: { "packageId": "0x..." }
 const parseConfigurationFile = (fileName: string) => {
     try {
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = dirname(__filename);
         const filePath = path.join(__dirname, `${fileName}.json`);
         return JSON.parse(readFileSync(filePath, 'utf8'));
     } catch (e) {
+        console.log({ e });
         throw new Error(`Missing config file ${fileName}.json`);
     }
 };
