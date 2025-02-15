@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { SidebarConversationParams } from "@/types/SidebarType";
+import { SidebarConversationParams } from "@/types/types.ts";
 import { getAllContactedAddresses, getDecryptedMessage, getAllContacts } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
 import { getSuiNInfo } from "@/api/services/nameServices";

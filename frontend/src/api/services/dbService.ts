@@ -1,7 +1,7 @@
 import { decryptMessage, deriveKeyFromSignature, generateSharedSecret } from './cryptoService';
 import { WalletContextState } from '@suiet/wallet-kit'
 import { prisma } from '../../../../api/db'
-import { SidebarConversationParams } from "@/types/SidebarType";
+import { SidebarConversationParams } from "@/types/types.ts";
 
 interface Message {
     sender: "sent" | "received";
