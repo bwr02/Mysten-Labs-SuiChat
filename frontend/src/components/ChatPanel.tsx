@@ -89,15 +89,15 @@ const RecipientBar: React.FC<RecipientBarProps> = ({
         {recipientName && recipientName !== "null" && (
           <div ref={iconRef} className="relative inline-block">
             <FaInfoCircle
-              className="ml-2 cursor-pointer text-sm"
+              className="ml-4 cursor-pointer text-lg"
               onClick={togglePopup}
             />
             {popupIsOpen && (
               <div
                 ref={popupRef}
-                className="absolute left-0 mt-2 bg-gray-600 text-white rounded-lg shadow-lg w-64 p-4 z-10"
+                className="absolute left-0 mt-5 bg-gray-600/90 text-white rounded-2xl shadow-lg w-64 p-4 z-10"
               >
-                <div className="absolute -top-2 left-4 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-gray-600"></div>
+                <div className="absolute -top-4 left-4 w-2 h-0 border-l-[10px] border-r-[10px] border-b-[16px] border-transparent border-b-gray-600/90"></div>
 
                 {isEditing ? (
                   <>

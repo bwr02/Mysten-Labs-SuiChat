@@ -19,7 +19,7 @@ const ConversationItem = React.memo(({
 }) => (
     <div
         onClick={onSelect}
-        className={`flex items-start gap-2 cursor-pointer p-2 rounded
+        className={`flex items-start gap-2 cursor-pointer p-2 rounded-2xl
       ${isSelected ? "bg-blue-800" : "hover:bg-gray-600"}`}>
       <img src="user.png" alt="avatar" className="w-10 h-10 rounded-full object-cover"/>
       <div className="flex flex-col flex-grow overflow-hidden">
