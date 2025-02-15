@@ -35,7 +35,6 @@ const ConversationItem = React.memo(({
 ));
 
 ConversationItem.displayName = 'ConversationItem';
-
 export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) => {
   const [conversations, setConversations] = useState<SidebarConversationParams[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
@@ -71,46 +70,106 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
     }
   }, [handleSearchForUser]);
 
-  useEffect(() => {
-    const fetchContacts = async () => {
-      try {
-        const initialContacts = await getAllContactedAddresses();
-        if (initialContacts.length > 0) {
-          const mostRecentContact = initialContacts[0];
-          setRecipientAddress(mostRecentContact.address);
-          setSelectedAddress(mostRecentContact.address);
-        }
+  const fetchContacts = useCallback(async () => {
+    try {
+      const initialContacts = await getAllContactedAddresses();
+      if (initialContacts.length > 0) {
+        const mostRecentContact = initialContacts[0];
+        setRecipientAddress(mostRecentContact.address);
+        setSelectedAddress(mostRecentContact.address);
+      }
 
-        const decryptedContacts = await Promise.all(
-          initialContacts.map(async (contact) => {
-            try {
-              if (!contact.message) {
-                return { ...contact, message: "No Messages" };
-              }
-              
-              const decryptedMessage = await getDecryptedMessage(
-                contact.address,
-                wallet,
-                contact.message
-              );
-              return { ...contact, message: decryptedMessage || "No Messages" };
-            } catch (error) {
-              console.error(`Failed to decrypt message for ${contact.address}`, error);
-              return { ...contact, message: "(decryption error)" };
+      const decryptedContacts = await Promise.all(
+        initialContacts.map(async (contact) => {
+          try {
+            if (!contact.message) {
+              return { ...contact, message: "No Messages", timestamp: new Date() };
             }
-          })
+
+            const decryptedMessage = await getDecryptedMessage(
+              contact.address,
+              wallet,
+              contact.message
+            );
+            return { ...contact, message: decryptedMessage || "No Messages", timestamp: contact.timestamp || new Date() };
+          } catch (error) {
+            console.error(`Failed to decrypt message for ${contact.address}`, error);
+            return { ...contact, message: "(decryption error)", timestamp: new Date() };
+          }
+        })
+      );
+
+      setConversations(decryptedContacts);
+    } catch (error) {
+      console.error("Error fetching contacts:", error);
+    }
+  }, [wallet, setRecipientAddress]);
+
+  // WebSocket to listen for new messages and update conversations
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8080');
+
+    const handleNewMessage = async (messageData: any) => {
+      try {
+        const { sender, recipient, text, timestamp } = messageData;
+        const decryptedMessage = await getDecryptedMessage(
+          recipient, // Assuming message is intended for recipient
+          wallet,
+          text
         );
 
-        setConversations(decryptedContacts);
+        const updatedConversations = [...conversations];
+        const messageTimestamp = new Date(timestamp); // Ensure we use the provided timestamp
+
+        // Find the conversation and update the message and timestamp
+        const conversationIndex = updatedConversations.findIndex(
+          (conv) => conv.address === sender || conv.address === recipient
+        );
+
+        if (conversationIndex > -1) {
+          // Update the existing conversation with the new message and timestamp
+          updatedConversations[conversationIndex] = {
+            ...updatedConversations[conversationIndex],
+            message: decryptedMessage || "No Messages",
+            timestamp: messageTimestamp,
+          };
+
+          // Move the conversation with the new message to the top
+          const [updatedConversation] = updatedConversations.splice(conversationIndex, 1);
+          updatedConversations.unshift(updatedConversation);
+        } else {
+          // New conversation, add it to the top
+          updatedConversations.unshift({
+            address: sender,
+            message: decryptedMessage || "No Messages",
+            timestamp: messageTimestamp,
+          });
+        }
+
+        setConversations(updatedConversations);
       } catch (error) {
-        console.error("Error fetching contacts:", error);
+        console.error('Error decrypting new message:', error);
       }
     };
 
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'new-message') {
+        const { sender, recipient } = data.message;
+        if (sender === selectedAddress || recipient === selectedAddress) {
+          handleNewMessage(data.message);
+        }
+      }
+    };
+
+    return () => ws.close(); // Cleanup on unmount
+  }, [conversations, selectedAddress, wallet]);
+
+  useEffect(() => {
     if (wallet) {
       fetchContacts();
     }
-  }, [wallet]);
+  }, [wallet, fetchContacts]);
 
   const handleSelectConversation = useCallback((address: string) => {
     setSelectedAddress(address);
