@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { SidebarConversationParams } from "@/types/SidebarType";
-import { getAllContactedAddresses, getDecryptedMessage } from "../api/services/dbService";
+import { getAllContactedAddresses, getDecryptedMessage, getAllContacts } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
 import { getSuiNInfo } from "@/api/services/nameServices";
 
@@ -19,7 +19,7 @@ const ConversationItem = React.memo(({
 }) => (
     <div
         onClick={onSelect}
-        className={`flex items-start gap-2 cursor-pointer p-2 rounded
+        className={`flex items-start gap-2 cursor-pointer p-2 rounded-2xl
       ${isSelected ? "bg-blue-800" : "hover:bg-gray-600"}`}>
       <img src="user.png" alt="avatar" className="w-10 h-10 rounded-full object-cover"/>
       <div className="flex flex-col flex-grow overflow-hidden">
@@ -75,7 +75,12 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
     const fetchContacts = async () => {
       try {
         const initialContacts = await getAllContactedAddresses();
-        
+        if (initialContacts.length > 0) {
+          const mostRecentContact = initialContacts[0];
+          setRecipientAddress(mostRecentContact.address);
+          setSelectedAddress(mostRecentContact.address);
+        }
+
         const decryptedContacts = await Promise.all(
           initialContacts.map(async (contact) => {
             try {

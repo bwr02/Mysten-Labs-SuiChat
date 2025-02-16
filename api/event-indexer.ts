@@ -91,6 +91,7 @@ const handleMessageCreated = async (events: SuiEvent[], type: string) => {
                 recipient: result.recipient,
                 text: result.content,
                 timestamp: result.timestamp,
+                txDigest: result.txDigest,
             },
         });
         return result;

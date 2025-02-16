@@ -9,6 +9,7 @@ import {
 	WhereParamTypes,
 } from './utils/api-queries';
 import { setActiveAddress, getActiveAddress } from './utils/activeAddressManager';
+import { formatTimestamp } from './utils/timestampFormatting';
 
 const app = express();
 app.use(cors());
@@ -47,11 +48,18 @@ app.get('/messages', async (req, res) => {
             },
         });
 
-        const formattedMessages = messages.map((message) => ({
-            sender: message.sender === myAddress ? "sent" : "received",
-            text: message.content,
-            timestamp: message.timestamp,
-        }));
+        const formattedMessages = messages.map((message) => {
+            let timeString = "";
+            if(message.timestamp) { 
+                timeString = formatTimestamp(message.timestamp);
+            }
+            return {
+                sender: "sent",
+                text: message.content,
+                timestamp: timeString,
+                txDigest: message.txDigest,
+            };
+        });
 
         res.json(formattedMessages);
     } catch (error) {
@@ -74,11 +82,19 @@ app.get('/messages/by-sender/:sender', async (req, res) => {
             },
         });
 
-        const formattedMessages = messages.map((message) => ({
-            sender: "sent",
-            text: message.content,
-            timestamp: message.timestamp,
-        }));
+        const formattedMessages = messages.map((message) => {
+            let timeString = "";
+            if(message.timestamp) { 
+                timeString = formatTimestamp(message.timestamp);
+            }
+
+            return {
+                sender: "sent",
+                text: message.content,
+                timestamp: timeString,
+                txDigest: message.txDigest,
+            };
+        });
 
         res.json(formattedMessages);
     } catch (error) {
@@ -101,11 +117,19 @@ app.get('/messages/by-recipient/:recipient', async (req, res) => {
             },
         });
 
-        const formattedMessages = messages.map((message) => ({
-            sender: "received",
-            text: message.content,
-            timestamp: message.timestamp,
-        }));
+        const formattedMessages = messages.map((message) => {
+            let timeString = "";
+            if(message.timestamp) { 
+                timeString = formatTimestamp(message.timestamp);
+            }
+
+            return {
+                sender: "received",
+                text: message.content,
+                timestamp: timeString,
+                txDigest: message.txDigest,
+            };
+        });
 
         res.json(formattedMessages);
     } catch (error) {
@@ -115,8 +139,8 @@ app.get('/messages/by-recipient/:recipient', async (req, res) => {
 });
 
 app.get('/messages/with-given-address/:otherAddr', async (req, res) => {
-	const myAddress = getActiveAddress();
-    const { otherAddr } = req.params
+    const myAddress = getActiveAddress();
+    const { otherAddr } = req.params;
 
     try {
         const messages = await prisma.message.findMany({
@@ -131,11 +155,19 @@ app.get('/messages/with-given-address/:otherAddr', async (req, res) => {
             },
         });
 
-        const formattedMessages = messages.map((message) => ({
-            sender: message.sender === myAddress ? "sent" : "received",
-            text: message.content,
-            timestamp: message.timestamp,
-        }));
+        const formattedMessages = messages.map((message) => {
+            let timeString = "";
+            if(message.timestamp) { 
+                timeString = formatTimestamp(message.timestamp);
+            }
+
+            return {
+                sender: message.sender === myAddress ? "sent" : "received",
+                text: message.content,
+                timestamp: timeString,
+                txDigest: message.txDigest,
+            };
+        });
 
         res.json(formattedMessages);
     } catch (error) {
@@ -143,6 +175,7 @@ app.get('/messages/with-given-address/:otherAddr', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch messages' });
     }
 });
+
 
 app.get('/contacts', async (req, res) => {
     try {
@@ -210,22 +243,44 @@ app.get('/contacts/metadata', async (req, res) => {
 
         // Now convert the map to the shape of SidebarConversationParams
         // For now, "name" will be set to the same address string
-        const contacts = Object.entries(contactMap).map(([address, { mostRecentMessage, timestamp }]) => {
+        const contacts = await Promise.all(Object.entries(contactMap).map(async ([address, { mostRecentMessage, timestamp }]) => {
             let timeString = "";
             if (timestamp) {
-                const numericTimestamp = parseInt(timestamp, 10);
-                // If it’s valid, convert to local time
-                if (!isNaN(numericTimestamp)) {
-                    timeString = new Date(numericTimestamp).toLocaleTimeString();
-                }
+                timeString = formatTimestamp(timestamp);
             }
+
+            const contact = await prisma.contact.findUnique({
+                where: { address },
+                select: { name: true, suins: true },
+            });
 
             return {
                 address,
-                name: address,        // Fill 'name' with 'address' for now
+                name: contact?.name || contact?.suins || address, // Use name if available, otherwise suins, otherwise address
                 message: mostRecentMessage || "",
-                time: timeString,     // This will be something like '1:30:15 PM'
+                time: timeString, // This will be something like '1:30 PM'
             };
+        }));
+
+        res.json(contacts);
+    } catch (error) {
+        console.error('Error fetching contacts:', error);
+        res.status(500).json({ error: 'Failed to fetch contacts' });
+    }
+});
+
+app.get('/contacts/all-contacts', async (req, res) => {
+    try {
+        const contacts = await prisma.contact.findMany({
+            distinct: ['address'],
+            orderBy: {
+                address: 'asc',
+            },
+            select: {
+                address: true,
+                name: true,
+                suins: true,
+            },
         });
 
         res.json(contacts);
@@ -234,6 +289,38 @@ app.get('/contacts/metadata', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch contacts' });
     }
 });
+
+app.get('/contacts/get-name/:addr', async (req, res) => {
+    const { addr } = req.params;
+    const contact = await prisma.contact.findUnique({
+        where: {
+            address: addr,
+        },
+    });
+
+    if (contact && contact.name) {
+        res.json(contact.name); // Send the name as JSON
+    } else {
+        res.json(null); // Send null if no contact is found
+    }
+});
+
+app.get('/contacts/get-suins/:addr', async (req, res) => {
+    const { addr } = req.params;
+    const contact = await prisma.contact.findUnique({
+        where: {
+            address: addr,
+        },
+    });
+
+    if (contact && contact.suins) {
+        res.json(contact.suins); // Send the SuiNS as JSON
+    } else {
+        res.json(null); // Send null if no SuiNS is found
+    }
+});
+
+
 
 app.post('/add-contact', async (req, res) => {
     const { addr, suiname, contactName } = req.body;
