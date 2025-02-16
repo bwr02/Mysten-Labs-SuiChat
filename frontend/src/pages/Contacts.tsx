@@ -18,7 +18,7 @@ export default function ContactsPage() {
             (async () => {
                 const fetchedSuins = await getSuiNSByAddress(suiAddress);
                 const fetchedName = await getNameByAddress(suiAddress);
-                setSuinsName(fetchedSuins || "");
+                // setSuinsName(fetchedSuins || "");
                 setName(fetchedName || "");
             })();
         }
