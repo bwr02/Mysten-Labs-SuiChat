@@ -5,14 +5,23 @@ import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 
 export default function ContactsPage() {
+    const [contacts, setContacts] = useState([]);
     const [name, setName] = useState("");
     const [suinsName, setSuinsName] = useState("");
     const [suiAddress, setSuiAddress] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState("");
-    const [isModalOpen, setIsModalOpen] = useState(false); 
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        async function fetchContacts() {
+            const data = await getAllContacts();
+            setContacts(data);
+        }
+        fetchContacts();
+    }, []);
 
     useEffect(() => {
         if (suiAddress.trim()) {
@@ -32,7 +41,7 @@ export default function ContactsPage() {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
         setMessage("");
@@ -49,8 +58,9 @@ export default function ContactsPage() {
             setName("");
             setSuinsName("");
             setSuiAddress("");
-            setIsModalOpen(false); 
+            setIsModalOpen(false);
             navigate("/messages", { state: { recipientAddress: suiAddress } });
+            setContacts(await getAllContacts());
         } catch (error) {
             console.error("Error saving contact:", error);
             setMessage("Failed to save contact.");
@@ -60,7 +70,11 @@ export default function ContactsPage() {
     };
 
     return (
-        <div className="relative h-screen bg-light-blue flex justify-center items-center">
+        <div className="relative bg-light-blue flex flex-col items-start p-4 flex-1 w-full h-full">
+            {/* Header aligned to the left */}
+            <h1 className="text-2xl font-bold mb-4 self-start">Contacts</h1>
+            
+            {/* Button to open the modal */}
             <button
                 onClick={() => setIsModalOpen(true)}
                 className="absolute top-4 right-4 p-3 rounded-full bg-blue-500 text-white shadow-lg hover:bg-blue-600 transition"
@@ -68,6 +82,24 @@ export default function ContactsPage() {
                 <Plus size={24} />
             </button>
 
+            {/* Contacts List */}
+            <div className="w-full overflow-y-auto rounded-lg bg-light-blue p-4 shadow-md">
+                {contacts.length > 0 ? (
+                    <ul>
+                        {contacts.map((contact, index) => (
+                            <li key={index} className="p-3 border-b last:border-b-0">
+                                <p className="font-semibold">{contact.name || "(No Name)"}</p>
+                                <p className="text-gray-600">{contact.suins || "(No SuiNS)"}</p>
+                                <p className="text-gray-500">{contact.address}</p>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="text-gray-500 text-center">No contacts found.</p>
+                )}
+            </div>
+            
+            {/* Modal for adding a new contact */}
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-gray-800 shadow-md rounded-lg p-6 w-full max-w-md">
@@ -75,54 +107,37 @@ export default function ContactsPage() {
                         
                         <form onSubmit={handleSubmit}>
                             <div className="mb-5">
-                                <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-300">
-                                    Name (optional)
-                                </label>
+                                <label className="block mb-2 text-sm font-medium text-gray-300">Name (optional)</label>
                                 <input
                                     type="text"
-                                    id="name"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    placeholder="Enter Name"
-                                    className="w-full p-2 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
+                                    className="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
                                 />
                             </div>
-
                             <div className="mb-5">
-                                <label htmlFor="suins-name" className="block mb-2 text-sm font-medium text-gray-300">
-                                    SuiNS Name (optional)
-                                </label>
+                                <label className="block mb-2 text-sm font-medium text-gray-300">SuiNS Name (optional)</label>
                                 <input
                                     type="text"
-                                    id="suins-name"
                                     value={suinsName}
                                     onChange={(e) => setSuinsName(e.target.value)}
                                     onBlur={handleSuiNSBlur}
-                                    placeholder="Enter SuiNS Name"
-                                    className="w-full p-2 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
+                                    className="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
                                 />
                             </div>
-
                             <div className="mb-5">
-                                <label htmlFor="sui-address" className="block mb-2 text-sm font-medium text-gray-300">
-                                    Sui Address
-                                </label>
+                                <label className="block mb-2 text-sm font-medium text-gray-300">Sui Address</label>
                                 <input
                                     type="text"
-                                    id="sui-address"
                                     value={suiAddress}
                                     onChange={(e) => setSuiAddress(e.target.value)}
-                                    placeholder="Enter Sui Address"
-                                    className="w-full p-2 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
+                                    className="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
                                     required
                                 />
                             </div>
-
                             <button
                                 type="submit"
-                                className={`w-full text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center ${
-                                    isSubmitting ? "bg-gray-600 cursor-not-allowed" : "bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-500"
-                                }`}
+                                className={`w-full text-white font-medium rounded-lg px-5 py-2.5 ${isSubmitting ? "bg-gray-600" : "bg-blue-700 hover:bg-blue-800"}`}
                                 disabled={isSubmitting}
                             >
                                 {isSubmitting ? "Saving..." : "Save Contact"}
