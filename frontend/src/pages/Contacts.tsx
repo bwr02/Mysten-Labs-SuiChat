@@ -31,17 +31,6 @@ export default function ContactsPage() {
         fetchContacts();
     }, []);
 
-    useEffect(() => {
-        if (suiAddress.trim()) {
-            (async () => {
-                const fetchedSuins = await getSuiNSByAddress(suiAddress);
-                const fetchedName = await getNameByAddress(suiAddress);
-                setSuinsName(fetchedSuins || "");
-                setName(fetchedName || "");
-            })();
-        }
-    }, [suiAddress]);
-
     const handleSuiNSBlur = async () => {
         if (suinsName.trim()) {
             const address = await getSuiNInfo("@" + suinsName);
@@ -144,14 +133,6 @@ export default function ContactsPage() {
                                     type="text"
                                     value={suiAddress}
                                     onChange={(e) => setSuiAddress(e.target.value)}
-                                    onFocus={(e) => {
-                                        if (!suiAddress && suinsName) {
-                                            (async () => {
-                                                const address = await getSuiNInfo("@" + suinsName);
-                                                setSuiAddress(address || "");
-                                            })();
-                                        }
-                                    }}
                                     className="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
                                     required
                                 />
