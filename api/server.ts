@@ -347,20 +347,8 @@ app.put("/edit-contact/:addr", async (req, res) => {
     });
 
     if (!existingContact) {
-      try {
-        const contact = await prisma.contact.create({
-          data: {
-            address: addr,
-            ...(suiname && { suins: suiname }),
-            ...(contactName && { name: contactName }),
-          },
-        });
-
-        res.status(201).json(contact);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to add contact" });
-      }    }
+      return res.status(404).json({ error: 'Contact not found' });
+    }
 
     // Update the contact with provided fields
     const updatedContact = await prisma.contact.update({
