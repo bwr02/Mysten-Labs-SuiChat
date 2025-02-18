@@ -66,6 +66,14 @@ export default function ContactsPage() {
         }
     };
 
+    const handleEditContact = (contact: Contact) => {
+        setEditingContact(contact);
+        setName(contact.name);
+        setSuinsName(contact.suins);
+        setSuiAddress(contact.address);
+        setIsModalOpen(true);
+    };
+
     return (
         <div className="bg-light-blue flex flex-col items-start p-4 flex-1 w-full h-full">
             <h1 className="text-2xl py-3 px-4 font-bold mb-1 self-start border-b border-gray-700 shadow-md w-full">Contacts</h1>
@@ -98,12 +106,14 @@ export default function ContactsPage() {
                                 </div>
                                 
                                 {/* Three-dot button */}
-                                <button
-                                    className="p-2 rounded-full hover:bg-gray-700 transition"
-                                    onClick={() => console.log("Show more options for", contact.address)}
-                                >
-                                    <MoreVertical size={20} className="text-gray-400" />
-                                </button>
+                                <div className="relative">
+                                    <button
+                                        className="p-2 rounded-full hover:bg-gray-700 transition"
+                                        onClick={() => handleEditContact(contact)}
+                                    >
+                                        <MoreVertical size={20} className="text-gray-400" />
+                                    </button>
+                                </div>
                             </li>
                         ))}
                     </ul>
@@ -115,7 +125,9 @@ export default function ContactsPage() {
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-gray-800 shadow-md rounded-lg p-6 w-full max-w-md">
-                        <h1 className="text-2xl font-bold text-center text-gray-200 mb-6">New Contact</h1>
+                        <h1 className="text-2xl font-bold text-center text-gray-200 mb-6">
+                            {editingContact ? "Edit Contact" : "New Contact"}
+                        </h1>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-5">
                                 <label className="block mb-2 text-sm font-medium text-gray-300">Name (optional)</label>
@@ -151,27 +163,12 @@ export default function ContactsPage() {
                                 className={`w-full text-white font-medium rounded-lg px-5 py-2.5 ${isSubmitting ? "bg-gray-600" : "bg-blue-700 hover:bg-blue-800"}`}
                                 disabled={isSubmitting}
                             >
-                                {isSubmitting ? "Saving..." : "Save Contact"}
+                                {isSubmitting ? "Saving..." : editingContact ? "Update Contact" : "Save Contact"}
                             </button>
-                            <div className="mt-4 text-center">
-                                <p className="text-sm text-gray-400">
-                                    Don't have a SuiNS name?{" "}
-                                    <a
-                                        href="https://suins.io/"
-                                        target="_blank"
-                                        className="text-blue-500 hover:text-blue-400 font-medium"
-                                    >
-                                        Register here
-                                    </a>
-                                </p>
-                            </div>
                         </form>
-
                         <button
                             onClick={() => {
-                                setName("");
-                                setSuinsName("");
-                                setSuiAddress("");
+                                setEditingContact(null);
                                 setIsModalOpen(false);
                             }}
                             className="mt-4 w-full text-center text-red-500 hover:underline"
