@@ -5,11 +5,7 @@ import { useSuiWallet } from "@/hooks/useSuiWallet";
 import { getSuiNInfo } from "@/api/services/nameServices";
 import { formatTimestamp } from "@/api/services/messageService";
 
-interface ChatSidebarProps {
-  setRecipientAddress: (address: string) => void;
-}
-
-const ConversationItem = React.memo(({ 
+const ConversationItem = React.memo(({
   conv, 
   isSelected, 
   onSelect 
