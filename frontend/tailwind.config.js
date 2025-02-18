@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-anonymous-default-export
 // const flowbite = require("flowbite-react/tailwind");
 import flowbite from "flowbite-react/tailwind";
-import lineClamp from '@tailwindcss/line-clamp';
+// import lineClamp from '@tailwindcss/line-clamp';
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}", flowbite.content(),],
   theme: {
@@ -16,6 +16,20 @@ export default {
   },
   plugins: [
     flowbite.plugin(),
-    lineClamp,
+    // lineClamp,
+    // Custom plugin to hide scrollbars
+    function({ addUtilities }) {
+      const newUtilities = {
+        // Utility to hide scrollbar for all browsers
+        '.no-scrollbar': {
+          '-ms-overflow-style': 'none', /* IE and Edge */
+          'scrollbar-width': 'none', /* Firefox */
+        },
+        '.no-scrollbar::-webkit-scrollbar': {
+          display: 'none', /* Chrome, Safari, Opera */
+        },
+      };
+      addUtilities(newUtilities);
+    },
   ],
 };

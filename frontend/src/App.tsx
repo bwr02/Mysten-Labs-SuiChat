@@ -11,6 +11,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 function App() {
     const { address } = useSuiWallet(); // Pull address from Suiet to give to backend
     const [activeAddressLoaded, setActiveAddressLoaded] = useState(false);
+
     // When the wallet address becomes available or changes, send it to the backend.
     useEffect(() => {
         if (address) {
@@ -36,6 +37,7 @@ function App() {
         }
     }, [address]);
 
+
     // Do not load full SuiChat until active address is set and show welcome screen
     // If wallet is not connected, show a welcome screen in the center of the screen.
     if (!address) {
@@ -48,20 +50,39 @@ function App() {
         );
     }
 
-    // If wallet is connected but the backend hasn't confirmed the active address, show a loading state.
-    if (address && !activeAddressLoaded) {
+    function LoadingScreen() {
+        const [timedOut, setTimedOut] = useState(false);
+
+        useEffect(() => {
+            const timeout = setTimeout(() => {
+                setTimedOut(true);
+            }, 5000);
+            return () => clearTimeout(timeout);
+        }, []);
+
         return (
             <div className="flex flex-col items-center justify-center h-screen bg-dark-blue">
-                <p className="text-white text-xl">Loading SuiChat...</p>
+                <p className="text-white text-xl mb-4">Loading SuiChat...</p>
+                {timedOut && (
+                    <p className="text-white text-xl mb-4">
+                        Please refresh or check backend if loading takes too long.
+                    </p>
+                )}
+                <ConnectButton/>
             </div>
         );
+    }
+
+    // If wallet is connected but the backend hasn't confirmed the active address, show a loading state.
+    if (address && !activeAddressLoaded) {
+        return  <LoadingScreen />;
     }
 
     return (
         <Router>
             <Routes>
                 {/* Main Layout with nested routes */}
-                <Route path="/" element={<Layout><Outlet /></Layout>}>
+                <Route path="/" element={<Layout><Outlet/></Layout>}>
                     <Route index element={<HomePage />} /> {/* Default route */}
                     <Route path="messages" element={<HomePage />} /> {/* Home route */}
                     <Route path="contacts" element={<Contacts />} /> {/* Contacts route */}

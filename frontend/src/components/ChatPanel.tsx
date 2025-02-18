@@ -165,7 +165,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   console.log(messages);
 
   return (
-    <div className="flex flex-col h-screen flex-1 bg-light-blue overflow-auto">
+    <div className="flex flex-col h-screen flex-1 bg-light-blue overflow-auto no-scrollbar">
       <RecipientBar recipientName={recipientName} address={recipientAddress} suins={suiNS}/>
       <div className="flex-grow flex flex-col gap-2 px-4 py-2 justify-end mb-4">
         {messages.map((message, index) => (
