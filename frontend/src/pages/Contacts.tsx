@@ -19,6 +19,7 @@ export default function ContactsPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState(""); 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [hoveredContact, setHoveredContact] = useState<string | null>(null);
 
     const navigate = useNavigate();
 
@@ -78,7 +79,7 @@ export default function ContactsPage() {
 
     return (
         <div className="relative bg-light-blue flex flex-col items-start p-4 flex-1 w-full h-full">
-            <h1 className="text-2xl font-bold mb-4 self-start">Contacts</h1>
+            <h1 className="text-2xl py-3 px-4 font-bold mb-4 self-start border-b border-gray-700 shadow-md w-full">Contacts</h1>
             
             <button
                 onClick={() => setIsModalOpen(true)}
@@ -91,10 +92,20 @@ export default function ContactsPage() {
                 {contacts.length > 0 ? (
                     <ul>
                         {contacts.map((contact, index) => (
-                            <li key={index} className="p-3 border-b last:border-b-0">
+                            <li
+                                key={index}
+                                className="p-3 border-b last:border-b-0 border-gray-600"
+                                onMouseEnter={() => setHoveredContact(contact.address)}
+                                onMouseLeave={() => setHoveredContact(null)}
+                            >
                                 <p className="font-semibold">{contact.name || "(No Name)"}</p>
-                                <p className="text-gray-600">{contact.suins || "(No SuiNS)"}</p>
-                                <p className="text-gray-500">{contact.address}</p>
+
+                                {hoveredContact === contact.address && (
+                                    <>
+                                        <p className="text-gray-400">{contact.suins || "(No SuiNS)"}</p>
+                                        <p className="text-gray-400">{contact.address}</p>
+                                    </>
+                                )}
                             </li>
                         ))}
                     </ul>
