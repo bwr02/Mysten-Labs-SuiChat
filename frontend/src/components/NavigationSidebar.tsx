@@ -14,7 +14,7 @@ export function NavigationSidebar() {
         <Sidebar.Logo
             href="#"
             img="Sui_Symbol_Sea.svg"
-            className=" my-4 mx-auto" />
+            className=" my-4 mx-auto pl-[--4px] " />
         <Sidebar.Items>
           <Sidebar.ItemGroup className="!border-0">
             <Sidebar.Item
