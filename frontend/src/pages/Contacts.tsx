@@ -4,13 +4,20 @@ import { addContact, getSuiNSByAddress, getNameByAddress, getAllContacts } from 
 import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 
+interface Contact {
+    address: string;
+    suins: string;
+    name: string;
+    public_key: string;
+}
+
 export default function ContactsPage() {
-    const [contacts, setContacts] = useState([]);
+    const [contacts, setContacts] = useState<Contact[]>([]);
     const [name, setName] = useState("");
     const [suinsName, setSuinsName] = useState("");
     const [suiAddress, setSuiAddress] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [message, setMessage] = useState("");
+    const [message, setMessage] = useState(""); 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const navigate = useNavigate();
@@ -41,7 +48,7 @@ export default function ContactsPage() {
         }
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
         setMessage("");
@@ -71,10 +78,8 @@ export default function ContactsPage() {
 
     return (
         <div className="relative bg-light-blue flex flex-col items-start p-4 flex-1 w-full h-full">
-            {/* Header aligned to the left */}
             <h1 className="text-2xl font-bold mb-4 self-start">Contacts</h1>
             
-            {/* Button to open the modal */}
             <button
                 onClick={() => setIsModalOpen(true)}
                 className="absolute top-4 right-4 p-3 rounded-full bg-blue-500 text-white shadow-lg hover:bg-blue-600 transition"
@@ -82,7 +87,6 @@ export default function ContactsPage() {
                 <Plus size={24} />
             </button>
 
-            {/* Contacts List */}
             <div className="w-full overflow-y-auto rounded-lg bg-light-blue p-4 shadow-md">
                 {contacts.length > 0 ? (
                     <ul>
@@ -99,7 +103,6 @@ export default function ContactsPage() {
                 )}
             </div>
             
-            {/* Modal for adding a new contact */}
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-gray-800 shadow-md rounded-lg p-6 w-full max-w-md">
