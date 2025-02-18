@@ -78,8 +78,8 @@ export default function ContactsPage() {
     };
 
     return (
-        <div className="relative bg-light-blue flex flex-col items-start p-4 flex-1 w-full h-full">
-            <h1 className="text-2xl py-3 px-4 font-bold mb-4 self-start border-b border-gray-700 shadow-md w-full">Contacts</h1>
+        <div className="bg-light-blue flex flex-col items-start p-4 flex-1 w-full h-full">
+            <h1 className="text-2xl py-3 px-4 font-bold mb-1 self-start border-b border-gray-700 shadow-md w-full">Contacts</h1>
             
             <button
                 onClick={() => setIsModalOpen(true)}
@@ -94,7 +94,7 @@ export default function ContactsPage() {
                         {contacts.map((contact, index) => (
                             <li
                                 key={index}
-                                className="p-3 border-b last:border-b-0 border-gray-600"
+                                className="p-3 py-8 border-b last:border-b-0 border-gray-600"
                                 onMouseEnter={() => setHoveredContact(contact.address)}
                                 onMouseLeave={() => setHoveredContact(null)}
                             >
@@ -118,7 +118,6 @@ export default function ContactsPage() {
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-gray-800 shadow-md rounded-lg p-6 w-full max-w-md">
                         <h1 className="text-2xl font-bold text-center text-gray-200 mb-6">New Contact</h1>
-                        
                         <form onSubmit={handleSubmit}>
                             <div className="mb-5">
                                 <label className="block mb-2 text-sm font-medium text-gray-300">Name (optional)</label>
@@ -145,6 +144,14 @@ export default function ContactsPage() {
                                     type="text"
                                     value={suiAddress}
                                     onChange={(e) => setSuiAddress(e.target.value)}
+                                    onFocus={(e) => {
+                                        if (!suiAddress && suinsName) {
+                                            (async () => {
+                                                const address = await getSuiNInfo("@" + suinsName);
+                                                setSuiAddress(address || "");
+                                            })();
+                                        }
+                                    }}
                                     className="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
                                     required
                                 />
@@ -156,10 +163,27 @@ export default function ContactsPage() {
                             >
                                 {isSubmitting ? "Saving..." : "Save Contact"}
                             </button>
+                            <div className="mt-4 text-center">
+                                <p className="text-sm text-gray-400">
+                                    Don't have a SuiNS name?{" "}
+                                    <a
+                                        href="https://suins.io/"
+                                        target="_blank"
+                                        className="text-blue-500 hover:text-blue-400 font-medium"
+                                    >
+                                        Register here
+                                    </a>
+                                </p>
+                            </div>
                         </form>
 
                         <button
-                            onClick={() => setIsModalOpen(false)}
+                            onClick={() => {
+                                setName("");
+                                setSuinsName("");
+                                setSuiAddress("");
+                                setIsModalOpen(false);
+                            }}
                             className="mt-4 w-full text-center text-red-500 hover:underline"
                         >
                             Cancel
