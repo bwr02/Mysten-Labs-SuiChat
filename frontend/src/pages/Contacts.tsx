@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { getSuiNInfo } from "../api/services/nameServices.ts";
-import { addContact, getSuiNSByAddress, getNameByAddress, getAllContacts } from "@/api/services/dbService.ts";
+import { addContact, getAllContacts } from "@/api/services/dbService.ts";
 import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { MoreVertical, Plus } from "lucide-react";
 
 interface Contact {
     address: string;
@@ -83,18 +83,27 @@ export default function ContactsPage() {
                         {contacts.map((contact, index) => (
                             <li
                                 key={index}
-                                className="p-3 py-8 border-b last:border-b-0 border-gray-600"
+                                className="flex justify-between items-center p-3 py-8 border-b last:border-b-0 border-gray-600 relative"
                                 onMouseEnter={() => setHoveredContact(contact.address)}
                                 onMouseLeave={() => setHoveredContact(null)}
                             >
-                                <p className="font-semibold">{contact.name || "(No Name)"}</p>
-
-                                {hoveredContact === contact.address && (
-                                    <>
-                                        <p className="text-gray-400">{contact.suins || "(No SuiNS)"}</p>
-                                        <p className="text-gray-400">{contact.address}</p>
-                                    </>
-                                )}
+                                <div>
+                                    <p className="font-semibold">{contact.name || "(No Name)"}</p>
+                                    {hoveredContact === contact.address && (
+                                        <>
+                                            <p className="text-gray-400">{contact.suins || "(No SuiNS)"}</p>
+                                            <p className="text-gray-400">{contact.address}</p>
+                                        </>
+                                    )}
+                                </div>
+                                
+                                {/* Three-dot button */}
+                                <button
+                                    className="p-2 rounded-full hover:bg-gray-700 transition"
+                                    onClick={() => console.log("Show more options for", contact.address)}
+                                >
+                                    <MoreVertical size={20} className="text-gray-400" />
+                                </button>
                             </li>
                         ))}
                     </ul>
