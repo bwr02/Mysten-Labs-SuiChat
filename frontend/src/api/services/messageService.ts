@@ -1,17 +1,11 @@
-import { Transaction } from '@mysten/sui/transactions';
-import { CONFIG } from '../config';
-import { checkBalance } from './walletService';
-import { normalizeSuiAddress } from '@mysten/sui/utils';
-import { bcs } from '@mysten/sui/bcs';
-import { deriveKeyFromSignature, generateSharedSecret, encryptMessage } from './cryptoService';
-import { WalletContextState } from '@suiet/wallet-kit';
-
-export interface SendMessageParams {
-    senderAddress: string;
-    recipientAddress: string;
-    content: string;
-    signature: string;
-}
+import {Transaction} from '@mysten/sui/transactions';
+import {CONFIG} from '../config';
+import {checkBalance} from './walletService';
+import {normalizeSuiAddress} from '@mysten/sui/utils';
+import {bcs} from '@mysten/sui/bcs';
+import {deriveKeyFromSignature, encryptMessage, generateSharedSecret} from './cryptoService';
+import {WalletContextState} from '@suiet/wallet-kit';
+import {SendMessageParams} from "@/types/types.ts";
 
 export const sendMessage = async ({
     senderAddress,
