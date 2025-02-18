@@ -1,3 +1,3 @@
-import { setupListeners } from './event-indexer';
+import { setupListeners } from "./event-indexer";
 
 setupListeners();

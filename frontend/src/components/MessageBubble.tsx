@@ -1,7 +1,14 @@
 import React, {useState} from "react";
 import {FaLink} from "react-icons/fa";
+import { Message} from "@/types/types.ts";
 
-export const MessageBubble = React.memo(({message, isLast}) => {
+
+interface MessageBubbleProps {
+    message: Message;
+    isLast: boolean;
+}
+
+export const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({ message, isLast }) => {
     const [showTimestamp, setShowTimestamp] = useState(false);
 
     const handleClick = () => {
@@ -76,4 +83,6 @@ export const MessageBubble = React.memo(({message, isLast}) => {
             )}
         </div>
     );
-});
+};
+
+export const MessageBubble = React.memo(MessageBubbleComponent);
