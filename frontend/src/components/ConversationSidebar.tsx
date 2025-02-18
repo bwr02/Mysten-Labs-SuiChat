@@ -3,6 +3,7 @@ import { SidebarConversationParams } from "@/types/SidebarType";
 import { getAllContactedAddresses, getDecryptedMessage, getAllContacts } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
 import { getSuiNInfo } from "@/api/services/nameServices";
+import { formatTimestamp } from "@/api/services/messageService";
 
 interface ChatSidebarProps {
   setRecipientAddress: (address: string) => void;
@@ -116,6 +117,40 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
     setSelectedAddress(address);
     setRecipientAddress(address);
   }, [setRecipientAddress]);
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8080');
+
+    ws.onmessage = async (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'new-message') {
+        const { sender, recipient } = data.message;
+        const otherAddress = sender === wallet?.address ? recipient : sender;
+
+        try {
+          const decryptedMessage = await getDecryptedMessage(otherAddress, wallet, data.message.text);
+
+          setConversations((prevConversations) => {
+            const updatedConversations = prevConversations.filter(conv => conv.address !== otherAddress);
+            const existingConversation = prevConversations.find(conv => conv.address === otherAddress);
+            const newConversation = {
+              address: otherAddress,
+              name: existingConversation?.name || data.message.name || otherAddress,
+              message: decryptedMessage || "No Messages",
+              time: formatTimestamp(data.message.timestamp),
+            };
+            return [newConversation, ...updatedConversations];
+          });
+        } catch (error) {
+          console.error(`Failed to decrypt message for ${otherAddress}`, error);
+        }
+      }
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, [wallet]);
 
   return (
     <div className="w-80 shrink-0 p-4 bg-medium-blue flex flex-col overflow-y-auto overflow-x-hidden">
