@@ -119,9 +119,10 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
   }, [setRecipientAddress]);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8080');
+    const wsNewMessage = new WebSocket('ws://localhost:8080');
+    const wsEditContact = new WebSocket('ws://localhost:8081');
 
-    ws.onmessage = async (event) => {
+    wsNewMessage.onmessage = async (event) => {
       const data = JSON.parse(event.data);
       if (data.type === 'new-message') {
         const { sender, recipient } = data.message;
@@ -147,8 +148,23 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
       }
     };
 
+    wsEditContact.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'edit-contact') {
+        const address = data.contact.address;
+        const newName = data.contact.contactName;
+
+        setConversations((prevConversations) => {
+          return prevConversations.map(conv => 
+            conv.address === address ? { ...conv, name: newName } : conv
+          );
+        });
+      }
+    };
+
     return () => {
-      ws.close();
+      wsNewMessage.close();
+      wsEditContact.close();
     };
   }, [wallet]);
 
