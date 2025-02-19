@@ -2,14 +2,15 @@ import cors from "cors";
 import express, { Request, Response, Application } from "express";
 import { prisma } from "./db";
 import {
-  formatPaginatedResponse,
-  parsePaginationForQuery,
-  parseWhereStatement,
-  WhereParam,
-  WhereParamTypes,
-} from "./utils/api-queries";
-import { setActiveAddress, getActiveAddress } from "./utils/activeAddressManager";
-import { formatTimestamp } from "./utils/timestampFormatting";
+	formatPaginatedResponse,
+	parsePaginationForQuery,
+	parseWhereStatement,
+	WhereParam,
+	WhereParamTypes,
+} from './utils/api-queries';
+import { setActiveAddress, getActiveAddress } from './utils/activeAddressManager';
+import { formatTimestamp } from './utils/timestampFormatting';
+import { WebSocketServer } from "ws"
 
 const app = express();
 app.use(cors());
@@ -336,9 +337,11 @@ app.post("/add-contact", async (req, res) => {
   }
 });
 
-app.put("/edit-contact/:addr", async (req, res) => {
-  const { addr } = req.params;
-  const { suiname, contactName } = req.body;
+const wss = new WebSocketServer({ port: 8081 });
+
+app.put('/edit-contact/:addr', async (req, res) => {
+    const { addr } = req.params;
+    const { suiname, contactName } = req.body;
 
   try {
     // Check if the contact exists
@@ -359,11 +362,28 @@ app.put("/edit-contact/:addr", async (req, res) => {
       },
     });
 
-    res.status(200).json(updatedContact);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to update contact" });
-  }
+        const broadcastMessage = (data: object) => {
+            wss.clients.forEach((client) => {
+                if (client.readyState === client.OPEN) {
+                    client.send(JSON.stringify(data));
+                }
+            });
+        };
+
+        broadcastMessage({
+            type: 'edit-contact',
+            contact: {
+                address: updatedContact.address,
+                suiname: updatedContact.suins,
+                contactName: updatedContact.name,
+            },
+        });
+
+        res.status(200).json(updatedContact);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to update contact' });
+    }
 });
 
 app.listen(3000, () => console.log(`🚀 Server ready at: http://localhost:3000`));
