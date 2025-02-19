@@ -38,7 +38,8 @@ export default function ContactsPage() {
             if (
                 dropdownRef.current &&
                 !dropdownRef.current.contains(e.target as Node) &&
-                !(e.target as HTMLElement).closest(".dropdown-toggle")
+                !(e.target as HTMLElement).closest(".dropdown-toggle") &&
+                !(e.target as HTMLElement).closest(".edit-button")
             ) {
                 setIsDropdownOpen(null);
             }
@@ -153,11 +154,11 @@ export default function ContactsPage() {
                                     {isDropdownOpen === contact.address && (
                                         <div className="absolute right-0 bg-gray-800 text-white shadow-lg rounded-lg w-28 mt-2">
                                             <button
-                                                onClick={() => handleEditContact(contact)}
-                                                className="w-full p-1.5 text-left hover:bg-gray-700"
-                                            >
-                                                Edit
-                                            </button>
+                                                    onClick={() => handleEditContact(contact)}
+                                                    className="w-full p-1.5 text-left hover:bg-gray-700 edit-button"
+                                                >
+                                                    Edit
+                                                </button>
                                         </div>
                                     )}
                                 </div>
