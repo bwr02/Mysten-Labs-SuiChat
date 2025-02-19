@@ -10,6 +10,7 @@ import {
 } from './utils/api-queries';
 import { setActiveAddress, getActiveAddress } from './utils/activeAddressManager';
 import { formatTimestamp } from './utils/timestampFormatting';
+import { WebSocketServer } from "ws"
 
 const app = express();
 app.use(cors());
@@ -345,6 +346,8 @@ app.post('/add-contact', async (req, res) => {
     }
 });
 
+const wss = new WebSocketServer({ port: 8081 });
+
 app.put('/edit-contact/:addr', async (req, res) => {
     const { addr } = req.params;
     const { suiname, contactName } = req.body;
@@ -365,6 +368,23 @@ app.put('/edit-contact/:addr', async (req, res) => {
             data: {
                 ...(suiname && { suins: suiname }),
                 ...(contactName && { name: contactName }),
+            },
+        });
+
+        const broadcastMessage = (data: object) => {
+            wss.clients.forEach((client) => {
+                if (client.readyState === client.OPEN) {
+                    client.send(JSON.stringify(data));
+                }
+            });
+        };
+
+        broadcastMessage({
+            type: 'edit-contact',
+            contact: {
+                address: updatedContact.address,
+                suiname: updatedContact.suins,
+                contactName: updatedContact.name,
             },
         });
 

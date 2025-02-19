@@ -3,6 +3,7 @@ import { MessageInputField } from "./MessageInputField";
 import { getMessagesWithAddress, getDecryptedMessage, getSuiNSByAddress, getNameByAddress, editContact } from "../api/services/dbService";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
 import { FaLink, FaInfoCircle } from 'react-icons/fa'; 
+import { formatTimestamp } from "@/api/services/messageService";
 import Modal from 'react-modal';
 
 
@@ -292,42 +293,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
                 messageData.text
             );
       
-          let timeString = "";
-          if (messageData.timestamp) {
-            const numericTimestamp = parseInt(messageData.timestamp, 10);
-
-            if (!isNaN(numericTimestamp)) {
-              const messageDate = new Date(numericTimestamp);
-              const currentDate = new Date();
-
-              // Calculate the difference in milliseconds
-              const msDifference = currentDate.getTime() - messageDate.getTime();
-              const hoursDifference = msDifference / (1000 * 60 * 60);
-              const daysDifference = msDifference / (1000 * 60 * 60 * 24);
-
-              if (messageDate.toDateString() === currentDate.toDateString()) {
-                // Same day, show time
-                timeString = messageDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-              } else if (daysDifference < 2 && messageDate.getDate() === currentDate.getDate() - 1) {
-                  // Yesterday, show "Yesterday"
-                  timeString = "Yesterday" +  messageDate.toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric',
-                  });
-              } else if (daysDifference < 7) {
-                  // Within a week, show day of the week (e.g., "Mon")
-                  timeString = messageDate.toLocaleDateString(undefined, {
-                      weekday: 'short',
-                  });
-              } else {
-                  // More than a week ago, show date (e.g., "Feb 10")
-                  timeString = messageDate.toLocaleDateString(undefined, {
-                      month: 'short',
-                      day: 'numeric',
-                  });
-              }
-            }
-          }
+          const timeString = formatTimestamp(messageData.timestamp);
 
           setMessages((prev) => [
             ...prev,
@@ -356,6 +322,21 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
       };
       return () => ws.close(); // Cleanup on unmount
   }, [recipientAddress, wallet]);
+
+  useEffect(() => {
+    const wsEditContact = new WebSocket('ws://localhost:8081');
+
+    wsEditContact.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'edit-contact') {
+        setRecipientName(data.contact.contactName);
+      }
+    };
+
+    return () => {
+      wsEditContact.close();
+    };
+  }, [setRecipientName]);
 
   // Fetch initial messages
   useEffect(() => {
