@@ -45,7 +45,7 @@ export default function HomePage() {
                         transition: "opacity 0.3s ease-in-out",
                     }}
                 >
-                    <ConnectButton />
+                    <ConnectButton  className=" bg-blue-800 "/>
                 </Box>
             )}
         </div>

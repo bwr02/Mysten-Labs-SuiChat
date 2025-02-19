@@ -1,13 +1,9 @@
-import React, { useState, useCallback, memo } from "react";
-import { useSuiWallet } from '../hooks/useSuiWallet';
-import { sendMessage } from '../api/services/messageService';
+import React, {memo, useCallback, useState} from "react";
+import {useSuiWallet} from '../hooks/useSuiWallet';
+import {sendMessage} from '../api/services/messageService';
+import {MessageInputFieldProps} from "@/types/types.ts";
 
-interface MessageInputFieldProps {
-  recipientAddress: string | null;
-  onMessageSent: (message: string, timestamp: number, txDigest: string) => void;
-}
-
-const SendButton = memo(({ sending, disabled, onClick }: { 
+const SendButton = memo(({ sending, disabled, onClick }: {
   sending: boolean; 
   disabled: boolean;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;

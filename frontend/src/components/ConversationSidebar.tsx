@@ -1,15 +1,12 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { SidebarConversationParams } from "@/types/SidebarType";
+import React, {useCallback, useEffect, useState} from "react";
+import {ChatSidebarProps, SidebarConversationParams} from "@/types/types.ts";
 import { getAllContactedAddresses, getDecryptedMessage, getAllContacts } from "../api/services/dbService";
-import { useSuiWallet } from "@/hooks/useSuiWallet";
-import { getSuiNInfo } from "@/api/services/nameServices";
+import {useSuiWallet} from "@/hooks/useSuiWallet";
+import {getSuiNInfo} from "@/api/services/nameServices";
 import { formatTimestamp } from "@/api/services/messageService";
 
-interface ChatSidebarProps {
-  setRecipientAddress: (address: string) => void;
-}
 
-const ConversationItem = React.memo(({ 
+const ConversationItem = React.memo(({
   conv, 
   isSelected, 
   onSelect 
