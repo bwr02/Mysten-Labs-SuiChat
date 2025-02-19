@@ -118,7 +118,6 @@ export default function ContactsPage() {
                                     )}
                                 </div>
                                 
-                                {/* Three-dot button */}
                                 <div className="relative">
                                     <button
                                         className="p-2 rounded-full hover:bg-gray-700 transition"
@@ -127,14 +126,18 @@ export default function ContactsPage() {
                                         <MoreVertical size={20} className="text-gray-400" />
                                     </button>
 
-                                    {/* Dropdown menu */}
                                     {isDropdownOpen === contact.address && (
-                                        <div className="absolute right-0 bg-gray-800 text-white shadow-lg rounded-lg w-28 mt-2">
+                                        <div className="absolute right-0 bg-gray-800 text-white shadow-lg rounded-lg w-32 mt-2">
                                             <button
                                                 onClick={() => handleEditContact(contact)}
                                                 className="w-full p-1.5 text-left hover:bg-gray-700"
                                             >
                                                 Edit
+                                            </button>
+                                            <button
+                                                className="w-full p-1.5 text-left hover:bg-red-700"
+                                            >
+                                                Delete
                                             </button>
                                         </div>
                                     )}
