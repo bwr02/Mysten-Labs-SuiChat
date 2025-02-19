@@ -92,7 +92,13 @@ export default function ContactsPage() {
             <h1 className="text-2xl py-3 px-4 font-bold mb-1 self-start border-b border-gray-700 shadow-md w-full">Contacts</h1>
             
             <button
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => {
+                    setName(""); 
+                    setSuinsName("");
+                    setSuiAddress("");
+                    setEditingContact(null); 
+                    setIsModalOpen(true);
+                }}
                 className="absolute top-4 right-4 p-3 rounded-full bg-blue-500 text-white shadow-lg hover:bg-blue-600 transition"
             >
                 <Plus size={24} />
@@ -170,7 +176,7 @@ export default function ContactsPage() {
                                     value={suinsName}
                                     onChange={(e) => setSuinsName(e.target.value)}
                                     onBlur={handleSuiNSBlur}
-                                    className={`w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white ${editingContact ? "bg-gray-600" : ""}`}
+                                    className={`w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white ${editingContact ? "bg-gray-800" : ""}`}
                                     disabled={editingContact ? true : false}
                                 />
                             </div>
@@ -180,7 +186,7 @@ export default function ContactsPage() {
                                     type="text"
                                     value={suiAddress}
                                     onChange={(e) => setSuiAddress(e.target.value)}
-                                    className={`w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white ${editingContact ? "bg-gray-600" : ""}`}
+                                    className={`w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white ${editingContact ? "bg-gray-800" : ""}`}
                                     required
                                     disabled={editingContact ? true : false}
                                 />
