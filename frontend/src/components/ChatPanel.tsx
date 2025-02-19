@@ -219,11 +219,6 @@ const MessageBubble = React.memo(({ message, isLast }) => {
   );
 });
 
-
-
-
-
-
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [recipientName, setRecipientName] = useState<string | null>(null);
@@ -231,7 +226,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const { wallet } = useSuiWallet();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth"});
+    messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
   }, []);
 
   useEffect(() => {
@@ -252,6 +247,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   
             if (suiNS) {
               setSuiNS(suiNS);
+            }
+            else{
+              setSuiNS(null);
             }
             return;
           }
@@ -274,6 +272,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
       } else {
         console.log("No recipient address provided");
         setRecipientName(null);
+        setSuiNS(null);
       }
     };
   
@@ -358,7 +357,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   console.log(messages);
 
   return (
-    <div className="flex flex-col h-screen flex-1 bg-light-blue overflow-auto">
+    <div className="flex flex-col h-screen flex-1 bg-light-blue overflow-auto no-scrollbar">
       <RecipientBar recipientName={recipientName} address={recipientAddress} suins={suiNS}/>
       <div className="flex-grow flex flex-col gap-2 px-4 py-2 justify-end mb-4">
         {messages.map((message, index) => (

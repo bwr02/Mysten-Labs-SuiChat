@@ -7,34 +7,34 @@ import { Link } from "react-router-dom";
 
 export function NavigationSidebar() {
   return (
-    <div className="h-screen relative" style={{ width: "48px" }}>
+    <div className="  h-screen bg-dark-blue w-12">
       <Sidebar
         aria-label="Custom sidebar"
-        className="h-full flex flex-col justify-between items-center absolute inset-0"
-        style={{
-          width: "48px",
-          minWidth: "48px",
-          maxWidth: "48px",
-          borderRight: "1px solid rgb(255, 255, 255)"}}
-      >
-        <Sidebar.Logo href="#" img="Sui_Symbol_Sea.svg" className="w-8 h-8" />
+        className=" h-full flex ">
+        <Link to="messages">
+        <Sidebar.Logo
+            href="/"
+            img="Sui_Symbol_Sea.svg"
+            className=" my-4 mx-auto pl-0 "
+        />
+        </Link>
         <Sidebar.Items>
-          <Sidebar.ItemGroup>
+          <Sidebar.ItemGroup className="!border-0 ">
             <Sidebar.Item
               as={Link}
               to="/messages"
               icon={HiAnnotation}
-              className="flex justify-start items-center p-2 mt-8"
+              className=" flex items-center justify-start  text-2xl mt-6 -ml-2 hover:w-10"
             >
-              <span className="hidden">Messages</span>
+              <span className="sr-only">Messages</span>
             </Sidebar.Item>
             <Sidebar.Item
               as={Link}
               to="/contacts"
               icon={FaAddressBook}
-              className="flex justify-start items-center p-2 mt-4"
+              className="flex justify-start items-center mt-2 -ml-2 pl-2 text-xl hover:w-10"
             >
-              <span className="hidden">Contacts</span>
+              <span className="sr-only">Contacts</span>
             </Sidebar.Item>
           </Sidebar.ItemGroup>
         </Sidebar.Items>
