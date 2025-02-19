@@ -40,6 +40,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
             if (suiNS) {
               setSuiNS(suiNS);
             }
+            else{
+              setSuiNS(null);
+            }
             return;
           }
   
@@ -61,6 +64,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
       } else {
         console.log("No recipient address provided");
         setRecipientName(null);
+        setSuiNS(null);
       }
     };
   
