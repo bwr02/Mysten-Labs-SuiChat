@@ -58,6 +58,7 @@ export default function ContactsPage() {
             } else {
                 await addContact(suiAddress, suinsName || undefined, name || undefined);
                 setMessage("Contact saved successfully!");
+                navigate("/messages", { state: { recipientAddress: suiAddress } });
             }
             setMessage("Contact saved successfully!");
             setName("");
@@ -65,7 +66,6 @@ export default function ContactsPage() {
             setSuiAddress("");
             setIsModalOpen(false);
             setEditingContact(null);
-            navigate("/messages", { state: { recipientAddress: suiAddress } });
             setContacts(await getAllContacts());
         } catch (error) {
             console.error("Error saving contact:", error);
@@ -129,10 +129,10 @@ export default function ContactsPage() {
 
                                     {/* Dropdown menu */}
                                     {isDropdownOpen === contact.address && (
-                                        <div className="absolute right-0 bg-gray-800 text-white shadow-lg rounded-lg w-40 mt-2">
+                                        <div className="absolute right-0 bg-gray-800 text-white shadow-lg rounded-lg w-28 mt-2">
                                             <button
                                                 onClick={() => handleEditContact(contact)}
-                                                className="w-full p-2 text-left hover:bg-gray-700"
+                                                className="w-full p-1.5 text-left hover:bg-gray-700"
                                             >
                                                 Edit
                                             </button>
