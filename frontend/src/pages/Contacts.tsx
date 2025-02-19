@@ -35,7 +35,11 @@ export default function ContactsPage() {
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(e.target as Node) &&
+                !(e.target as HTMLElement).closest(".dropdown-toggle")
+            ) {
                 setIsDropdownOpen(null);
             }
         };
@@ -139,12 +143,12 @@ export default function ContactsPage() {
                                 </div>
                                 
                                 <div className="relative" ref={dropdownRef}>
-                                    <button
-                                        className="p-2 rounded-full hover:bg-gray-700 transition"
-                                        onClick={() => handleToggleDropdown(contact.address)}
-                                    >
-                                        <MoreVertical size={20} className="text-gray-400" />
-                                    </button>
+                                <button
+                                    className="p-2 rounded-full hover:bg-gray-700 transition dropdown-toggle"
+                                    onClick={() => handleToggleDropdown(contact.address)}
+                                >
+                                    <MoreVertical size={20} className="text-gray-400" />
+                                </button>
 
                                     {isDropdownOpen === contact.address && (
                                         <div className="absolute right-0 bg-gray-800 text-white shadow-lg rounded-lg w-28 mt-2">
