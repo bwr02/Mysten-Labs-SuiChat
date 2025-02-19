@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getSuiNInfo } from "../api/services/nameServices.ts";
 import { addContact, getAllContacts, editContact } from "@/api/services/dbService.ts";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +22,7 @@ export default function ContactsPage() {
     const [hoveredContact, setHoveredContact] = useState<string | null>(null);
     const [editingContact, setEditingContact] = useState<Contact | null>(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState<string | null>(null);
-
+    const dropdownRef = useRef<HTMLDivElement | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -31,6 +31,20 @@ export default function ContactsPage() {
             setContacts(data);
         }
         fetchContacts();
+    }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+                setIsDropdownOpen(null);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
     }, []);
 
     const handleSuiNSBlur = async () => {
@@ -124,8 +138,7 @@ export default function ContactsPage() {
                                     )}
                                 </div>
                                 
-                                {/* Three-dot button */}
-                                <div className="relative">
+                                <div className="relative" ref={dropdownRef}>
                                     <button
                                         className="p-2 rounded-full hover:bg-gray-700 transition"
                                         onClick={() => handleToggleDropdown(contact.address)}
@@ -133,7 +146,6 @@ export default function ContactsPage() {
                                         <MoreVertical size={20} className="text-gray-400" />
                                     </button>
 
-                                    {/* Dropdown menu */}
                                     {isDropdownOpen === contact.address && (
                                         <div className="absolute right-0 bg-gray-800 text-white shadow-lg rounded-lg w-28 mt-2">
                                             <button
