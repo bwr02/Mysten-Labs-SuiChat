@@ -14,14 +14,14 @@ export function NavigationSidebar() {
         <Sidebar.Logo
             href="#"
             img="Sui_Symbol_Sea.svg"
-            className=" my-4 mx-auto pl-[--4px] " />
+            className=" my-4 mx-auto pl-0 " />
         <Sidebar.Items>
-          <Sidebar.ItemGroup className="!border-0">
+          <Sidebar.ItemGroup className="!border-0 ">
             <Sidebar.Item
               as={Link}
               to="/messages"
               icon={HiAnnotation}
-              className=" flex items-center justify-start pl-[--4px] text-2xl mt-6"
+              className=" flex items-center justify-start  text-2xl mt-6 -ml-2 hover:w-10"
             >
               <span className="sr-only">Messages</span>
             </Sidebar.Item>
@@ -29,7 +29,7 @@ export function NavigationSidebar() {
               as={Link}
               to="/contacts"
               icon={FaAddressBook}
-              className="flex justify-start items-center mt-2 pl-0 text-xl"
+              className="flex justify-start items-center mt-2 -ml-2 pl-2 text-xl hover:w-10"
             >
               <span className="sr-only">Contacts</span>
             </Sidebar.Item>
