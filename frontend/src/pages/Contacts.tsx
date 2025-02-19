@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getSuiNInfo } from "../api/services/nameServices.ts";
-import { addContact, getAllContacts } from "@/api/services/dbService.ts";
+import { addContact, getAllContacts, editContact } from "@/api/services/dbService.ts";
 import { useNavigate } from "react-router-dom";
 import { MoreVertical, Plus } from "lucide-react";
 
@@ -20,6 +20,8 @@ export default function ContactsPage() {
     const [message, setMessage] = useState(""); 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [hoveredContact, setHoveredContact] = useState<string | null>(null);
+    const [editingContact, setEditingContact] = useState<Contact | null>(null);
+    const [isDropdownOpen, setIsDropdownOpen] = useState<string | null>(null);
 
     const navigate = useNavigate();
 
@@ -50,12 +52,19 @@ export default function ContactsPage() {
         }
 
         try {
-            await addContact(suiAddress, suinsName || undefined, name || undefined);
+            if (editingContact) {
+                await editContact(suiAddress, suinsName || undefined, name || undefined);
+                setMessage("Contact updated successfully!");
+            } else {
+                await addContact(suiAddress, suinsName || undefined, name || undefined);
+                setMessage("Contact saved successfully!");
+            }
             setMessage("Contact saved successfully!");
             setName("");
             setSuinsName("");
             setSuiAddress("");
             setIsModalOpen(false);
+            setEditingContact(null);
             navigate("/messages", { state: { recipientAddress: suiAddress } });
             setContacts(await getAllContacts());
         } catch (error) {
@@ -72,6 +81,10 @@ export default function ContactsPage() {
         setSuinsName(contact.suins);
         setSuiAddress(contact.address);
         setIsModalOpen(true);
+    };
+
+    const handleToggleDropdown = (contactAddress: string) => {
+        setIsDropdownOpen(isDropdownOpen === contactAddress ? null : contactAddress);
     };
 
     return (
@@ -109,10 +122,22 @@ export default function ContactsPage() {
                                 <div className="relative">
                                     <button
                                         className="p-2 rounded-full hover:bg-gray-700 transition"
-                                        onClick={() => handleEditContact(contact)}
+                                        onClick={() => handleToggleDropdown(contact.address)}
                                     >
                                         <MoreVertical size={20} className="text-gray-400" />
                                     </button>
+
+                                    {/* Dropdown menu */}
+                                    {isDropdownOpen === contact.address && (
+                                        <div className="absolute right-0 bg-gray-800 text-white shadow-lg rounded-lg w-40 mt-2">
+                                            <button
+                                                onClick={() => handleEditContact(contact)}
+                                                className="w-full p-2 text-left hover:bg-gray-700"
+                                            >
+                                                Edit
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </li>
                         ))}
