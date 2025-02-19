@@ -11,10 +11,13 @@ export function NavigationSidebar() {
       <Sidebar
         aria-label="Custom sidebar"
         className=" h-full flex ">
+        <Link to="messages">
         <Sidebar.Logo
-            href="#"
+            href="/"
             img="Sui_Symbol_Sea.svg"
-            className=" my-4 mx-auto pl-0 " />
+            className=" my-4 mx-auto pl-0 "
+        />
+        </Link>
         <Sidebar.Items>
           <Sidebar.ItemGroup className="!border-0 ">
             <Sidebar.Item
