@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getSuiNInfo } from "../api/services/nameServices.ts";
 import { addContact, getAllContacts, editContact } from "@/api/services/dbService.ts";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +22,7 @@ export default function ContactsPage() {
     const [hoveredContact, setHoveredContact] = useState<string | null>(null);
     const [editingContact, setEditingContact] = useState<Contact | null>(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState<string | null>(null);
-
+    const dropdownRef = useRef<HTMLDivElement | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -31,6 +31,25 @@ export default function ContactsPage() {
             setContacts(data);
         }
         fetchContacts();
+    }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(e.target as Node) &&
+                !(e.target as HTMLElement).closest(".dropdown-toggle") &&
+                !(e.target as HTMLElement).closest(".edit-button")
+            ) {
+                setIsDropdownOpen(null);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
     }, []);
 
     const handleSuiNSBlur = async () => {
@@ -92,7 +111,13 @@ export default function ContactsPage() {
             <h1 className="text-2xl py-3 px-4 font-bold mb-1 self-start border-b border-gray-700 shadow-md w-full">Contacts</h1>
             
             <button
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => {
+                    setName(""); 
+                    setSuinsName("");
+                    setSuiAddress("");
+                    setEditingContact(null); 
+                    setIsModalOpen(true);
+                }}
                 className="absolute top-4 right-4 p-3 rounded-full bg-blue-500 text-white shadow-lg hover:bg-blue-600 transition"
             >
                 <Plus size={24} />
@@ -118,22 +143,22 @@ export default function ContactsPage() {
                                     )}
                                 </div>
                                 
-                                <div className="relative">
-                                    <button
-                                        className="p-2 rounded-full hover:bg-gray-700 transition"
-                                        onClick={() => handleToggleDropdown(contact.address)}
-                                    >
-                                        <MoreVertical size={20} className="text-gray-400" />
-                                    </button>
+                                <div className="relative" ref={dropdownRef}>
+                                <button
+                                    className="p-2 rounded-full hover:bg-gray-700 transition dropdown-toggle"
+                                    onClick={() => handleToggleDropdown(contact.address)}
+                                >
+                                    <MoreVertical size={20} className="text-gray-400" />
+                                </button>
 
                                     {isDropdownOpen === contact.address && (
                                         <div className="absolute right-0 bg-gray-800 text-white shadow-lg rounded-lg w-32 mt-2">
                                             <button
-                                                onClick={() => handleEditContact(contact)}
-                                                className="w-full p-1.5 text-left hover:bg-gray-700"
-                                            >
-                                                Edit
-                                            </button>
+                                                    onClick={() => handleEditContact(contact)}
+                                                    className="w-full p-1.5 text-left hover:bg-gray-700 edit-button"
+                                                >
+                                                    Edit
+                                                </button>
                                             <button
                                                 className="w-full p-1.5 text-left hover:bg-red-700"
                                             >
@@ -173,7 +198,8 @@ export default function ContactsPage() {
                                     value={suinsName}
                                     onChange={(e) => setSuinsName(e.target.value)}
                                     onBlur={handleSuiNSBlur}
-                                    className="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
+                                    className={`w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white ${editingContact ? "bg-gray-800" : ""}`}
+                                    disabled={editingContact ? true : false}
                                 />
                             </div>
                             <div className="mb-5">
@@ -182,8 +208,9 @@ export default function ContactsPage() {
                                     type="text"
                                     value={suiAddress}
                                     onChange={(e) => setSuiAddress(e.target.value)}
-                                    className="w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
+                                    className={`w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white ${editingContact ? "bg-gray-800" : ""}`}
                                     required
+                                    disabled={editingContact ? true : false}
                                 />
                             </div>
                             <button

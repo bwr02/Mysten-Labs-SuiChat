@@ -8,7 +8,7 @@ export interface SidebarConversationParams {
 export interface Message {
     sender: "sent" | "received";
     text: string | null;
-    timestamp?: number;
+    timestamp?: string;
     txDigest?: string;
 }
 
