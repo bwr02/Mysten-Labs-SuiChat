@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { getSuiNInfo } from "../api/services/nameServices.ts";
 import { addContact, getAllContacts, editContact } from "@/api/services/dbService.ts";
 import { useNavigate } from "react-router-dom";
-import { MoreVertical, Plus } from "lucide-react";
+import { MoreVertical, Plus, MessageCircle } from "lucide-react";
 
 interface Contact {
     address: string;
@@ -106,6 +106,11 @@ export default function ContactsPage() {
         setIsDropdownOpen(isDropdownOpen === contactAddress ? null : contactAddress);
     };
 
+    const handleMessageClick = (address: string) => {
+        console.log("Navigating to messages with address:", address);
+        navigate("/messages", { state: { recipientAddress: address } });
+    };
+
     return (
         <div className="bg-light-blue flex flex-col items-start p-4 flex-1 w-full h-full">
             <h1 className="text-2xl py-3 px-4 font-bold mb-1 self-start border-b border-gray-700 shadow-md w-full">Contacts</h1>
@@ -143,24 +148,34 @@ export default function ContactsPage() {
                                     )}
                                 </div>
                                 
-                                <div className="relative" ref={dropdownRef}>
-                                <button
-                                    className="p-2 rounded-full hover:bg-gray-700 transition dropdown-toggle"
-                                    onClick={() => handleToggleDropdown(contact.address)}
-                                >
-                                    <MoreVertical size={20} className="text-gray-400" />
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handleMessageClick(contact.address)}
+                                        className="p-2 rounded-full hover:bg-gray-700 transition"
+                                        title="Send Message"
+                                    >
+                                        <MessageCircle size={20} className="text-gray-400" />
+                                    </button>
+                                    
+                                    <div className="relative" ref={dropdownRef}>
+                                        <button
+                                            className="p-2 rounded-full hover:bg-gray-700 transition dropdown-toggle"
+                                            onClick={() => handleToggleDropdown(contact.address)}
+                                        >
+                                            <MoreVertical size={20} className="text-gray-400" />
+                                        </button>
 
-                                    {isDropdownOpen === contact.address && (
-                                        <div className="absolute right-0 bg-gray-800 text-white shadow-lg rounded-lg w-28 mt-2">
-                                            <button
+                                        {isDropdownOpen === contact.address && (
+                                            <div className="absolute right-0 bg-gray-800 text-white shadow-lg rounded-lg w-28 mt-2">
+                                                <button
                                                     onClick={() => handleEditContact(contact)}
                                                     className="w-full p-1.5 text-left hover:bg-gray-700 edit-button"
                                                 >
                                                     Edit
                                                 </button>
-                                        </div>
-                                    )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </li>
                         ))}
