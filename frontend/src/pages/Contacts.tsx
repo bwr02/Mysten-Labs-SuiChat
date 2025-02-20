@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { getSuiNInfo } from "../api/services/nameServices.ts";
-import { addContact, getAllContacts, editContact } from "@/api/services/dbService.ts";
+import { addContact, getAllContacts, editContact, deleteContact } from "@/api/services/dbService.ts";
 import { useNavigate } from "react-router-dom";
 import { MoreVertical, Plus } from "lucide-react";
 
@@ -39,7 +39,8 @@ export default function ContactsPage() {
                 dropdownRef.current &&
                 !dropdownRef.current.contains(e.target as Node) &&
                 !(e.target as HTMLElement).closest(".dropdown-toggle") &&
-                !(e.target as HTMLElement).closest(".edit-button")
+                !(e.target as HTMLElement).closest(".edit-button") &&
+                !(e.target as HTMLElement).closest(".delete-button")
             ) {
                 setIsDropdownOpen(null);
             }
@@ -102,6 +103,19 @@ export default function ContactsPage() {
         setIsModalOpen(true);
     };
 
+    const handleDeleteContact = async (contactAddress: string) => {
+        console.log("Attempting to delete:", contactAddress);
+        try {
+            await deleteContact(contactAddress);
+            console.log("Successfully deleted.");
+            setContacts((prevContacts) => prevContacts.filter((c) => c.address !== contactAddress));
+            setIsDropdownOpen(null);
+        } catch (error) {
+            console.error("Error deleting contact:", error);
+        }
+    };
+    
+
     const handleToggleDropdown = (contactAddress: string) => {
         setIsDropdownOpen(isDropdownOpen === contactAddress ? null : contactAddress);
     };
@@ -127,40 +141,36 @@ export default function ContactsPage() {
                 {contacts.length > 0 ? (
                     <ul>
                         {contacts.map((contact, index) => (
+                            
                             <li
                                 key={index}
                                 className="flex justify-between items-center p-3 py-8 border-b last:border-b-0 border-gray-600 relative"
-                                onMouseEnter={() => setHoveredContact(contact.address)}
-                                onMouseLeave={() => setHoveredContact(null)}
                             >
                                 <div>
                                     <p className="font-semibold">{contact.name || "(No Name)"}</p>
-                                    {hoveredContact === contact.address && (
-                                        <>
-                                            <p className="text-gray-400">{contact.suins || "(No SuiNS)"}</p>
-                                            <p className="text-gray-400">{contact.address}</p>
-                                        </>
-                                    )}
+                                    <p className="text-gray-400">{contact.suins || "(No SuiNS)"}</p>
+                                    <p className="text-gray-400">{contact.address}</p>
                                 </div>
                                 
                                 <div className="relative" ref={dropdownRef}>
-                                <button
-                                    className="p-2 rounded-full hover:bg-gray-700 transition dropdown-toggle"
-                                    onClick={() => handleToggleDropdown(contact.address)}
-                                >
-                                    <MoreVertical size={20} className="text-gray-400" />
-                                </button>
+                                    <button
+                                        className="p-2 rounded-full hover:bg-gray-700 transition dropdown-toggle"
+                                        onClick={() => handleToggleDropdown(contact.address)}
+                                    >
+                                        <MoreVertical size={20} className="text-gray-400" />
+                                    </button>
 
                                     {isDropdownOpen === contact.address && (
-                                        <div className="absolute right-0 bg-gray-800 text-white shadow-lg rounded-lg w-32 mt-2">
+                                        <div className="absolute right-0 top-0 bg-gray-800 text-white shadow-lg rounded-lg w-32 mt-2">
                                             <button
-                                                    onClick={() => handleEditContact(contact)}
-                                                    className="w-full p-1.5 text-left hover:bg-gray-700 edit-button"
-                                                >
-                                                    Edit
-                                                </button>
+                                                onClick={() => handleEditContact(contact)}
+                                                className="w-full p-1.5 text-left hover:bg-gray-700 edit-button"
+                                            >
+                                                Edit
+                                            </button>
                                             <button
-                                                className="w-full p-1.5 text-left hover:bg-red-700"
+                                                onClick={() => handleDeleteContact(contact.address)}
+                                                className="w-full p-1.5 text-left hover:bg-red-700 delete-button"
                                             >
                                                 Delete
                                             </button>
