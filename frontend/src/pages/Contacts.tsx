@@ -148,7 +148,7 @@ export default function ContactsPage() {
                                     <button
                                         onClick={() => handleEditContact(contact)}
                                         className="p-2 rounded-full hover:bg-gray-700 transition"
-                                        title="Send Message"
+                                        title="Edit"
                                     >
                                         <Pencil size={20} className="text-gray-400"/>
                                     </button>
@@ -156,7 +156,7 @@ export default function ContactsPage() {
                                     <button
                                         onClick={() => handleDeleteContact(contact.address)}
                                         className="p-2 rounded-full hover:bg-gray-700 transition"
-                                        title="Send Message"
+                                        title="Delete"
                                     >
                                         <TrashIcon size={20} className="text-red-600 "/>
                                     </button>
