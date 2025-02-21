@@ -3,13 +3,7 @@ import { getSuiNInfo } from "../api/services/nameServices.ts";
 import { addContact, getAllContacts, editContact, deleteContact } from "@/api/services/dbService.ts";
 import { useNavigate } from "react-router-dom";
 import {Plus, MessageCircle, Pencil, TrashIcon} from "lucide-react";
-
-interface Contact {
-    address: string;
-    suins: string;
-    name: string;
-    public_key: string;
-}
+import { Contact } from "@/types/types.ts";
 
 export default function ContactsPage() {
     const [contacts, setContacts] = useState<Contact[]>([]);
