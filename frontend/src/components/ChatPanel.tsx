@@ -314,7 +314,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
         if (data.type === 'new-message') {
           const { sender, recipient } = data.message;
           if ((sender === recipientAddress || recipient === recipientAddress)) {
-            console.log("New message received:", data);
+            // console.log("New message received:", data);
             handleNewMessage(data.message);
           }
         };
@@ -354,7 +354,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
     setMessages(prev => [...prev]);
   }, []);
 
-  console.log(messages);
+  // console.log(messages);
 
   return (
     <div className="flex flex-col h-screen flex-1 bg-light-blue overflow-auto no-scrollbar">
