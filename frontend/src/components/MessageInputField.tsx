@@ -11,7 +11,7 @@ const SendButton = memo(({ sending, disabled, onClick }: {
   <button
     type="submit"
     onClick={onClick}
-    className={`absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 ${
+    className={`absolute right-2 top-1/2 transform -translate-y-2/4 text-gray-500 ${
       disabled ? "opacity-50 cursor-not-allowed" : "hover:text-gray-800"
     }`}
     disabled={disabled}
@@ -124,7 +124,7 @@ export const MessageInputField = memo(({ recipientAddress, onMessageSent }: Mess
   const isDisabled = sending || !message.trim() || !address;
 
   return (
-    <div className="p-4">
+    <div className="p-4 -mb-2">
       {status && (
         <div className="text-gray-400 text-sm mb-2">
           {status}
@@ -140,7 +140,7 @@ export const MessageInputField = memo(({ recipientAddress, onMessageSent }: Mess
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             disabled={sending}
-            style={{minHeight: "1px"}} // Set your minimum height here
+            style={{minHeight: "3rem"}} // Set your minimum height here
         />
         <SendButton
             sending={sending}
