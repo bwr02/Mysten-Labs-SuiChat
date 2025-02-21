@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useState} from "react";
+import React, {memo, useCallback, useState, useRef, useEffect} from "react";
 import {useSuiWallet} from '../hooks/useSuiWallet';
 import {sendMessage} from '../api/services/messageService';
 import {MessageInputFieldProps} from "@/types/types.ts";
@@ -39,10 +39,20 @@ export const MessageInputField = memo(({ recipientAddress, onMessageSent }: Mess
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
 
   const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(event.target.value);
   }, []);
+
+  // Auto-resize the textarea whenever the message changes.
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto"; // Reset to auto
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [message]);
 
   const handleSendMessage = useCallback(async (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -121,19 +131,21 @@ export const MessageInputField = memo(({ recipientAddress, onMessageSent }: Mess
         </div>
       )}
       <div className="relative w-full">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          className="w-full px-5 py-4 text-sm text-gray-200 bg-lighter-blue border-none rounded-2xl outline-none placeholder-gray-500 pr-10"
-          value={message}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          disabled={sending}
+        <textarea
+            ref={textareaRef}
+            rows={1}
+            placeholder="Type a message..."
+            className="w-full px-5 py-4 text-sm text-gray-200 bg-lighter-blue border-none rounded-2xl outline-none placeholder-gray-500 pr-10 resize-none overflow-hidden"
+            value={message}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            disabled={sending}
+            style={{minHeight: "1px"}} // Set your minimum height here
         />
-        <SendButton 
-          sending={sending} 
-          disabled={isDisabled} 
-          onClick={handleSendMessage}
+        <SendButton
+            sending={sending}
+            disabled={isDisabled}
+            onClick={handleSendMessage}
         />
       </div>
     </div>
