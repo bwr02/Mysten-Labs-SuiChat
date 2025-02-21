@@ -124,7 +124,7 @@ export const MessageInputField = memo(({ recipientAddress, onMessageSent }: Mess
   const isDisabled = sending || !message.trim() || !address;
 
   return (
-    <div className="p-4 -mb-2">
+    <div className="p-4 -mb-1">
       {status && (
         <div className="text-gray-400 text-sm mb-2">
           {status}
