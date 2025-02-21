@@ -43,9 +43,10 @@ function App() {
     if (!address) {
         return (
             <div className="flex flex-col items-center justify-center h-screen bg-dark-blue">
+                <img src="Sui_Symbol_Sea.svg" alt="avatar" className="w-12 h-15 rounded-full object-cover mb-4"/>
                 <h1 className="text-white text-3xl font-bold mb-4">Welcome to SuiChat</h1>
                 <p className="text-white text-lg mb-8">Press Connect to start</p>
-                <ConnectButton />
+                <ConnectButton/>
             </div>
         );
     }
