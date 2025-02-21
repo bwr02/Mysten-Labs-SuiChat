@@ -17,6 +17,7 @@ export interface ChatPanelProps {
 }
 
 export interface ChatSidebarProps {
+    recipientAddress: string | null;
     setRecipientAddress: (address: string) => void;
 }
 
