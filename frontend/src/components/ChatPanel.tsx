@@ -67,7 +67,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
           setRecipientName(`${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`);
         }
       } else {
-        console.log("No recipient address provided");
+        // console.log("No recipient address provided");
         setRecipientName(null);
         setSuiNS(null);
       }

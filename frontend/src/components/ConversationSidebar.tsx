@@ -121,7 +121,7 @@ export const ConversationSidebar = ({ recipientAddress, setRecipientAddress }: C
       const defaultContact = conversations[0];
       setRecipientAddress(defaultContact.address);
       setSelectedAddress(defaultContact.address);
-      console.log("Default recipient set to:", defaultContact.address);
+      // console.log("Default recipient set to:", defaultContact.address);
     }
   }, [conversations, recipientAddress, setRecipientAddress]);
 
