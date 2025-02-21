@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 export function NavigationSidebar() {
   return (
     <div className="  h-screen bg-dark-blue w-12">
+      <div>
       <Link to="messages">
         <img
             alt="Logo"
@@ -15,9 +16,11 @@ export function NavigationSidebar() {
             className=" mx-0 pl-6 mt-6 flex justify-start -ml-3"
         />
       </Link>
+      </div>
+      <div>
       <Sidebar
         aria-label="Custom sidebar"
-        className=" h-full flex ">
+        className="  flex-1 ">
 
         <Sidebar.Items>
           <Sidebar.ItemGroup className="!border-0 ">
@@ -40,6 +43,7 @@ export function NavigationSidebar() {
           </Sidebar.ItemGroup>
         </Sidebar.Items>
       </Sidebar>
+      </div>
     </div>
   );
 }
