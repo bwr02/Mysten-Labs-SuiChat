@@ -26,6 +26,24 @@ export function createRegisterPublicKey(senderAddress: string, publicKey: Uint8A
   return tx;
 }
 
+export async function registerPublicKeyOnChain(
+  wallet: WalletContextState,
+  address: string,
+  publicKey: Uint8Array,
+): Promise<string> {
+  try {
+    const normalizedAddress = normalizeSuiAddress(address);
+    const tx = createRegisterPublicKey(normalizedAddress, publicKey);
+
+    const result = await wallet.signAndExecuteTransaction({ transaction: tx });
+    console.log("Public key registered. Transaction digest:", result.digest);
+    return result.digest;
+  } catch (error) {
+    console.error("Error registering public key:", error);
+    throw error;
+  }
+}
+
 
 /**
  * Returns the published public key (as a Uint8Array) for the given address.
@@ -63,20 +81,4 @@ export async function fetchUserPublicKey(
   }
 }
 
-export async function registerPublicKey(
-  wallet: WalletContextState,
-  address: string,
-  publicKey: Uint8Array,
-): Promise<string> {
-  try {
-    const normalizedAddress = normalizeSuiAddress(address);
-    const tx = createRegisterPublicKey(normalizedAddress, publicKey);
 
-    const result = await wallet.signAndExecuteTransaction({ transaction: tx });
-    console.log("Public key registered. Transaction digest:", result.digest);
-    return result.digest;
-  } catch (error) {
-    console.error("Error registering public key:", error);
-    throw error;
-  }
-}
