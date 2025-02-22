@@ -1,25 +1,25 @@
 import React, {useEffect, useRef, useState} from "react";
 import {editContact} from "@/api/services/dbService.ts";
 import {FaInfoCircle} from "react-icons/fa";
-import {RecipientBarProps} from "@/types/types.ts";
+import { RecipientBarProps } from "../types/types";
+
 
 export const RecipientBar: React.FC<RecipientBarProps> = ({
-                                                              recipientName,
-                                                              suins,
-                                                              address,
-                                                          }) => {
+    recipientName,
+    suins,
+    address,
+}) => {
     const [popupIsOpen, setPopupIsOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
-    const [editedName, setEditedName] = useState(recipientName);
+    const [editedName, setEditedName] = useState<string>(recipientName || '');
 
     const popupRef = useRef<HTMLDivElement>(null);
     const iconRef = useRef<HTMLDivElement>(null);
 
     const togglePopup = () => {
-        // If closing the popup, also abort editing and reset input
         if (popupIsOpen) {
             setIsEditing(false);
-            setEditedName(null); // Reset the name if editing was in progress
+            setEditedName('');  // Reset with empty string
         }
         setPopupIsOpen(!popupIsOpen);
     };
@@ -33,8 +33,8 @@ export const RecipientBar: React.FC<RecipientBarProps> = ({
                 !iconRef.current.contains(event.target as Node)
             ) {
                 setPopupIsOpen(false);
-                setIsEditing(false); // Abort editing if clicked outside
-                setEditedName(null); // Reset to original name when closing
+                setIsEditing(false);
+                setEditedName('');  // Reset with empty string
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -48,13 +48,13 @@ export const RecipientBar: React.FC<RecipientBarProps> = ({
     };
 
     const handleSaveClick = async () => {
-        await editContact(address, suins, editedName);
+        await editContact(address, suins || undefined, editedName || undefined);
         setIsEditing(false);
     };
 
     const handleKeyPress = async (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter") {
-            await editContact(address, suins, editedName);
+            await editContact(address, suins || undefined, editedName || undefined);
             setIsEditing(false);
         }
     };

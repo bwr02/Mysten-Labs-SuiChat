@@ -17,11 +17,6 @@ interface ChatPanelProps {
 }
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
-  // Throw error if no recipient address
-  if (!recipientAddress) {
-    throw new Error("No recipient address provided");
-  }
-
   const [messages, setMessages] = useState<Message[]>([]);
   const [recipientName, setRecipientName] = useState<string | null>(null);
   const [suiNS, setSuiNS] = useState<string | null>(null);
@@ -35,19 +30,23 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-
   useEffect(() => {
     const fetchRecipientName = async () => {
+      if (!recipientAddress) {
+        console.error("No recipient address provided");
+        return;
+      }
+
       try {
         const name = await getNameByAddress(recipientAddress);
+        const suiNS = await getSuiNSByAddress(recipientAddress);
+        
         if (name) {
           setRecipientName(name);
-          const suiNS = await getSuiNSByAddress(recipientAddress);
-          setSuiNS(suiNS || null);
+          setSuiNS(suiNS);
           return;
         }
-
-        const suiNS = await getSuiNSByAddress(recipientAddress);
+        
         if (suiNS) {
           setRecipientName(suiNS);
           setSuiNS(suiNS);
@@ -58,7 +57,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
         setSuiNS(null);
       } catch (error) {
         console.error("Error fetching recipient name:", error);
-        setRecipientName(`${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`);
+        if (recipientAddress) {
+          setRecipientName(`${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`);
+        }
       }
     };
 
@@ -68,48 +69,50 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
 
 
   useEffect(() => {
-      const ws = new WebSocket('ws://localhost:8080');
+    if (!recipientAddress) return;
+    
+    const ws = new WebSocket(`ws://${window.location.host}/ws`);
 
-      const handleNewMessage = async (messageData: broadcastMessageParams) => {
-        try {
-            const decryptedMessage = await getDecryptedMessage(
-                recipientAddress,
-                wallet,
-                messageData.text
-            );
-      
-          const timeString = formatTimestamp(messageData.timestamp);
+    const handleNewMessage = async (messageData: broadcastMessageParams) => {
+      try {
+          const decryptedMessage = await getDecryptedMessage(
+              recipientAddress,
+              wallet,
+              messageData.text
+          );
+    
+        const timeString = formatTimestamp(messageData.timestamp);
 
-          setMessages((prev) => [
-            ...prev,
-            {
-              sender: messageData.messageType,
-              text: decryptedMessage,
-              timestamp: timeString,
-              txDigest: messageData.txDigest,
-            },
-          ]);
-        } catch (error) {
-            console.error('Error decrypting message:', error);
-        }
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: messageData.messageType,
+            text: decryptedMessage,
+            timestamp: timeString,
+            txDigest: messageData.txDigest,
+          },
+        ]);
+      } catch (error) {
+          console.error('Error decrypting message:', error);
+      }
     }
 
 
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type === 'new-message') {
-          const { sender, recipient } = data.message;
-          if ((sender === recipientAddress || recipient === recipientAddress)) {
-            // console.log("New message received:", data);
-            handleNewMessage(data.message);
-          }
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'new-message') {
+        const { sender, recipient } = data.message;
+        if ((sender === recipientAddress || recipient === recipientAddress)) {
+          // console.log("New message received:", data);
+          handleNewMessage(data.message);
         }
-      };
-      return () => ws.close(); // Cleanup on unmount
+      }
+    };
+    return () => ws.close(); // Cleanup on unmount
   }, [recipientAddress, wallet]);
 
   useEffect(() => {
-    const wsEditContact = new WebSocket('ws://localhost:8081');
+    const wsEditContact = new WebSocket(`ws://${window.location.host}/ws-contact`);
 
     wsEditContact.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -140,13 +143,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
     setMessages(prev => [...prev]);
   }, []);
 
-  // console.log(messages);
 
   return (
     <div className="flex flex-col h-screen flex-1 bg-light-blue overflow-auto no-scrollbar">
       <RecipientBar 
-        recipientName={recipientName} 
-        address={recipientAddress}
+        recipientName={recipientName}
+        address={recipientAddress || ''}
         suins={suiNS}
       />
       <div className="flex-grow flex flex-col gap-2 px-4 py-2 justify-end mb-4">

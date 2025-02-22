@@ -6,16 +6,13 @@ import { useSuiWallet } from "@/hooks/useSuiWallet";
 import { useEffect, useState } from 'react';
 import {ConnectButton} from "@suiet/wallet-kit";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-
 function App() {
     const { address } = useSuiWallet(); // Pull address from Suiet to give to backend
     const [activeAddressLoaded, setActiveAddressLoaded] = useState(false);
 
-    // When the wallet address becomes available or changes, send it to the backend.
     useEffect(() => {
         if (address) {
-            fetch(`${BACKEND_URL}/api/setActiveAddress`, {
+            fetch('/api/setActiveAddress', {  // Use relative path with proxy
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -36,7 +33,6 @@ function App() {
                 .catch((err) => console.error("Error setting active address:", err));
         }
     }, [address]);
-
 
     // Do not load full SuiChat until active address is set and show welcome screen
     // If wallet is not connected, show a welcome screen in the center of the screen.

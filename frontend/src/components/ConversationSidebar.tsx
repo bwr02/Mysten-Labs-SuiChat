@@ -126,8 +126,8 @@ export const ConversationSidebar = ({ recipientAddress, setRecipientAddress }: C
   }, [conversations, recipientAddress, setRecipientAddress]);
 
   useEffect(() => {
-    const wsNewMessage = new WebSocket('ws://localhost:8080');
-    const wsEditContact = new WebSocket('ws://localhost:8081');
+    const wsNewMessage = new WebSocket(`ws://${window.location.host}/ws`);
+    const wsEditContact = new WebSocket(`ws://${window.location.host}/ws-contact`);
 
     wsNewMessage.onmessage = async (event) => {
       const data = JSON.parse(event.data);

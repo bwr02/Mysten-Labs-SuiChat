@@ -5,7 +5,7 @@ import {Contact, Message, SidebarConversationParams} from "@/types/types.ts";
 
 export async function getAllMessages(): Promise<Message[]> {
     try {
-        const response = await fetch(`http://localhost:3000/messages`);
+        const response = await fetch('/api/messages');
         if (!response.ok) {
             console.error("Failed to fetch messages. Status:", response.status);
             throw new Error('Failed to fetch messages');
@@ -22,7 +22,7 @@ export async function getAllMessages(): Promise<Message[]> {
 export async function getAllBySender(sender: string): Promise<Message[]> {
     try {
         // console.log(`Calling API for sender: ${sender}`);
-        const response = await fetch(`http://localhost:3000/messages/by-sender/${sender}`);
+        const response = await fetch(`/api/messages/by-sender/${sender}`);
         if (!response.ok) {
             console.error("Failed to fetch messages. Status:", response.status);
             throw new Error('Failed to fetch messages');
@@ -40,7 +40,7 @@ export async function getAllBySender(sender: string): Promise<Message[]> {
 export async function getAllByRecipient(recipient: string): Promise<Message[]> {
     try {
         // console.log(`Calling API for recipient: ${recipient}`);
-        const response = await fetch(`http://localhost:3000/messages/by-recipient/${recipient}`);
+        const response = await fetch(`/api/messages/by-recipient/${recipient}`);
         if (!response.ok) {
             console.error("Failed to fetch messages. Status:", response.status);
             throw new Error('Failed to fetch messages');
@@ -88,7 +88,7 @@ export async function getDecryptedMessage(otherAddr: string|null, wallet: Wallet
  
 export async function getMessagesWithAddress(otherAddr: string|null, wallet: WalletContextState | null): Promise<Message[]> {
     try {
-        const response = await fetch(`http://localhost:3000/messages/with-given-address/${otherAddr}`);
+        const response = await fetch(`/api/messages/with-given-address/${otherAddr}`);
         if (!response.ok) {
             console.error("Failed to fetch messages. Status:", response.status);
             throw new Error('Failed to fetch messages');
@@ -134,7 +134,7 @@ export async function getMessagesWithAddress(otherAddr: string|null, wallet: Wal
 
 export async function getAllContactedAddresses(): Promise<SidebarConversationParams[]> {
     try {
-        const response = await fetch('http://localhost:3000/contacts/metadata');
+        const response = await fetch('/api/contacts/metadata');
         if (!response.ok) {
             console.error('Failed to fetch contacted addresses. Status:', response.status);
             throw new Error('Failed to fetch contacted addresses');
@@ -152,7 +152,7 @@ export async function getAllContactedAddresses(): Promise<SidebarConversationPar
 
 export async function getAllContacts(): Promise<Contact[]> {
     try {
-        const response = await fetch('http://localhost:3000/contacts/all-contacts');
+        const response = await fetch('/api/contacts/all-contacts');
         if (!response.ok) {
             console.error('Failed to fetch contacted addresses. Status:', response.status);
             throw new Error('Failed to fetch contacted addresses');
@@ -171,7 +171,7 @@ export async function getAllContacts(): Promise<Contact[]> {
 
 export async function addContact(addr: string, suiname?: string, contactName?: string) {
     try {
-        const response = await fetch('http://localhost:3000/add-contact', {
+        const response = await fetch('/api/add-contact', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ export async function addContact(addr: string, suiname?: string, contactName?: s
 
 export async function editContact(addr: string, suiname?: string, contactName?: string) {
     try {
-        const response = await fetch(`http://localhost:3000/edit-contact/${addr}`, {
+        const response = await fetch(`/api/edit-contact/${addr}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -215,7 +215,7 @@ export async function editContact(addr: string, suiname?: string, contactName?: 
 
 export async function deleteContact(addr: string): Promise<void> {
     try {
-        const response = await fetch(`http://localhost:3000/delete-contact/${addr}`, {
+        const response = await fetch(`/api/delete-contact/${addr}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -235,7 +235,7 @@ export async function deleteContact(addr: string): Promise<void> {
 
 export async function getSuiNSByAddress(addr: string): Promise<string|null>{
     try {
-        const response = await fetch(`http://localhost:3000/contacts/get-suins/${addr}`);
+        const response = await fetch(`/api/contacts/get-suins/${addr}`);
         if (!response.ok) {
             console.error("Failed to fetch suins. Status:", response.status);
             throw new Error('Failed to fetch suins');
@@ -251,7 +251,7 @@ export async function getSuiNSByAddress(addr: string): Promise<string|null>{
 
 export async function getNameByAddress(addr: string): Promise<string|null>{
     try {
-        const response = await fetch(`http://localhost:3000/contacts/get-name/${addr}`);
+        const response = await fetch(`/api/contacts/get-name/${addr}`);
         if (!response.ok) {
             console.error("Failed to fetch name. Status:", response.status);
             throw new Error('Failed to fetch name');
