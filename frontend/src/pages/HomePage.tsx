@@ -33,7 +33,7 @@ export default function HomePage() {
         <div className="flex flex-col h-screen bg-dark-blue">
             {/* flex with Sidebar and Chat Panel */}
             <Flex className="h-full flex-row bg-dark-blue">
-                <ConversationSidebar setRecipientAddress={setRecipientAddress} />
+                <ConversationSidebar recipientAddress={recipientAddress} setRecipientAddress={setRecipientAddress} />
                 <ChatPanel recipientAddress={recipientAddress} />
             </Flex>
             {!isMinimized && (

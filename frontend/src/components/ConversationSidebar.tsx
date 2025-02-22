@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from "react";
 import {ChatSidebarProps, SidebarConversationParams} from "@/types/types.ts";
-import { getAllContactedAddresses, getDecryptedMessage, getAllContacts } from "../api/services/dbService";
+import { getAllContactedAddresses, getDecryptedMessage } from "../api/services/dbService";
 import {useSuiWallet} from "@/hooks/useSuiWallet";
 import {getSuiNInfo} from "@/api/services/nameServices";
 import { formatTimestamp } from "@/api/services/messageService";
@@ -34,11 +34,12 @@ const ConversationItem = React.memo(({
 
 ConversationItem.displayName = 'ConversationItem';
 
-export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) => {
+export const ConversationSidebar = ({ recipientAddress, setRecipientAddress }: ChatSidebarProps) => {
   const [conversations, setConversations] = useState<SidebarConversationParams[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
   const { wallet } = useSuiWallet();
+
 
   const handleSearchInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
@@ -73,11 +74,6 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
     const fetchContacts = async () => {
       try {
         const initialContacts = await getAllContactedAddresses();
-        if (initialContacts.length > 0) {
-          const mostRecentContact = initialContacts[0];
-          setRecipientAddress(mostRecentContact.address);
-          setSelectedAddress(mostRecentContact.address);
-        }
 
         const decryptedContacts = await Promise.all(
           initialContacts.map(async (contact) => {
@@ -98,7 +94,6 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
             }
           })
         );
-
         setConversations(decryptedContacts);
       } catch (error) {
         console.error("Error fetching contacts:", error);
@@ -110,10 +105,25 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
     }
   }, [wallet]);
 
-  const handleSelectConversation = useCallback((address: string) => {
-    setSelectedAddress(address);
-    setRecipientAddress(address);
-  }, [setRecipientAddress]);
+  const handleSelectConversation = useCallback(
+      (address: string) => {
+        if (selectedAddress !== address) {
+          setSelectedAddress(address);
+          setRecipientAddress(address);
+        }
+      },
+      [recipientAddress, setRecipientAddress],
+  );
+
+  useEffect(() => {
+    // If there are conversations and no recipient is set, use the first one.
+    if (conversations.length > 0 && !recipientAddress) {
+      const defaultContact = conversations[0];
+      setRecipientAddress(defaultContact.address);
+      setSelectedAddress(defaultContact.address);
+      // console.log("Default recipient set to:", defaultContact.address);
+    }
+  }, [conversations, recipientAddress, setRecipientAddress]);
 
   useEffect(() => {
     const wsNewMessage = new WebSocket('ws://localhost:8080');
@@ -184,7 +194,7 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
           <ConversationItem 
             key={conv.address}
             conv={conv}
-            isSelected={selectedAddress === conv.address}
+            isSelected={recipientAddress === conv.address}
             onSelect={() => handleSelectConversation(conv.address)}
           />
         ))}

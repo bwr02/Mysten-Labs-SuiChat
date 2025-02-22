@@ -1,15 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { getSuiNInfo } from "../api/services/nameServices.ts";
-import { addContact, getAllContacts, editContact } from "@/api/services/dbService.ts";
+import { addContact, getAllContacts, editContact, deleteContact } from "@/api/services/dbService.ts";
 import { useNavigate } from "react-router-dom";
-import { MoreVertical, Plus } from "lucide-react";
-
-interface Contact {
-    address: string;
-    suins: string;
-    name: string;
-    public_key: string;
-}
+import {Plus, MessageCircle, Pencil, TrashIcon} from "lucide-react";
+import { Contact } from "@/types/types.ts";
 
 export default function ContactsPage() {
     const [contacts, setContacts] = useState<Contact[]>([]);
@@ -21,8 +15,6 @@ export default function ContactsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [hoveredContact, setHoveredContact] = useState<string | null>(null);
     const [editingContact, setEditingContact] = useState<Contact | null>(null);
-    const [isDropdownOpen, setIsDropdownOpen] = useState<string | null>(null);
-    const dropdownRef = useRef<HTMLDivElement | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -33,24 +25,7 @@ export default function ContactsPage() {
         fetchContacts();
     }, []);
 
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (
-                dropdownRef.current &&
-                !dropdownRef.current.contains(e.target as Node) &&
-                !(e.target as HTMLElement).closest(".dropdown-toggle") &&
-                !(e.target as HTMLElement).closest(".edit-button")
-            ) {
-                setIsDropdownOpen(null);
-            }
-        };
 
-        document.addEventListener("mousedown", handleClickOutside);
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
 
     const handleSuiNSBlur = async () => {
         if (suinsName.trim()) {
@@ -102,8 +77,20 @@ export default function ContactsPage() {
         setIsModalOpen(true);
     };
 
-    const handleToggleDropdown = (contactAddress: string) => {
-        setIsDropdownOpen(isDropdownOpen === contactAddress ? null : contactAddress);
+    const handleDeleteContact = async (contactAddress: string) => {
+        console.log("Attempting to delete:", contactAddress);
+        try {
+            await deleteContact(contactAddress);
+            console.log("Successfully deleted.");
+            setContacts((prevContacts) => prevContacts.filter((c) => c.address !== contactAddress));
+        } catch (error) {
+            console.error("Error deleting contact:", error);
+        }
+    };
+
+    const handleMessageClick = (address: string) => {
+        console.log("Navigating to messages with address:", address);
+        navigate("/messages", { state: { recipientAddress: address } });
     };
 
     return (
@@ -142,26 +129,33 @@ export default function ContactsPage() {
                                         </>
                                     )}
                                 </div>
-                                
-                                <div className="relative" ref={dropdownRef}>
-                                <button
-                                    className="p-2 rounded-full hover:bg-gray-700 transition dropdown-toggle"
-                                    onClick={() => handleToggleDropdown(contact.address)}
-                                >
-                                    <MoreVertical size={20} className="text-gray-400" />
-                                </button>
 
-                                    {isDropdownOpen === contact.address && (
-                                        <div className="absolute right-0 bg-gray-800 text-white shadow-lg rounded-lg w-28 mt-2">
-                                            <button
-                                                    onClick={() => handleEditContact(contact)}
-                                                    className="w-full p-1.5 text-left hover:bg-gray-700 edit-button"
-                                                >
-                                                    Edit
-                                                </button>
-                                        </div>
-                                    )}
-                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handleMessageClick(contact.address)}
+                                        className="p-2 rounded-full hover:bg-gray-700 transition"
+                                        title="Send Message"
+                                    >
+                                        <MessageCircle size={20} className="text-gray-400"/>
+                                    </button>
+
+                                    <button
+                                        onClick={() => handleEditContact(contact)}
+                                        className="p-2 rounded-full hover:bg-gray-700 transition"
+                                        title="Edit"
+                                    >
+                                        <Pencil size={20} className="text-gray-400"/>
+                                    </button>
+
+                                    <button
+                                        onClick={() => handleDeleteContact(contact.address)}
+                                        className="p-2 rounded-full hover:bg-gray-700 transition"
+                                        title="Delete"
+                                    >
+                                        <TrashIcon size={20} className="text-red-600 "/>
+                                    </button>
+
+                                    </div>
                             </li>
                         ))}
                     </ul>
@@ -169,11 +163,11 @@ export default function ContactsPage() {
                     <p className="text-gray-500 text-center">No contacts found.</p>
                 )}
             </div>
-            
+
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-gray-800 shadow-md rounded-lg p-6 w-full max-w-md">
-                        <h1 className="text-2xl font-bold text-center text-gray-200 mb-6">
+                    <h1 className="text-2xl font-bold text-center text-gray-200 mb-6">
                             {editingContact ? "Edit Contact" : "New Contact"}
                         </h1>
                         <form onSubmit={handleSubmit}>
@@ -194,7 +188,7 @@ export default function ContactsPage() {
                                     onChange={(e) => setSuinsName(e.target.value)}
                                     onBlur={handleSuiNSBlur}
                                     className={`w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white ${editingContact ? "bg-gray-800" : ""}`}
-                                    disabled={editingContact ? true : false}
+                                    disabled={!!editingContact}
                                 />
                             </div>
                             <div className="mb-5">
@@ -205,7 +199,7 @@ export default function ContactsPage() {
                                     onChange={(e) => setSuiAddress(e.target.value)}
                                     className={`w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white ${editingContact ? "bg-gray-800" : ""}`}
                                     required
-                                    disabled={editingContact ? true : false}
+                                    disabled={!!editingContact}
                                 />
                             </div>
                             <button

@@ -213,7 +213,25 @@ export async function editContact(addr: string, suiname?: string, contactName?: 
     }
 }
 
+export async function deleteContact(addr: string): Promise<void> {
+    try {
+        const response = await fetch(`http://localhost:3000/delete-contact/${addr}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
+        if (!response.ok) {
+            throw new Error(`Failed to delete contact: ${response.statusText}`);
+        }
+
+        console.log('Contact deleted successfully');
+    } catch (error) {
+        console.error('Error deleting contact:', error);
+        throw error; 
+    }
+}
 
 export async function getSuiNSByAddress(addr: string): Promise<string|null>{
     try {

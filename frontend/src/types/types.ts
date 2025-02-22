@@ -7,8 +7,8 @@ export interface SidebarConversationParams {
 
 export interface Message {
     sender: "sent" | "received";
-    text: string | null;
-    timestamp?: string;
+    text: string;
+    timestamp: string;
     txDigest?: string;
 }
 
@@ -17,6 +17,7 @@ export interface ChatPanelProps {
 }
 
 export interface ChatSidebarProps {
+    recipientAddress: string | null;
     setRecipientAddress: (address: string) => void;
 }
 
@@ -28,7 +29,7 @@ export interface MessageInputFieldProps {
 export interface RecipientBarProps {
     recipientName: string | null;
     suins: string | null;
-    address: string | null;
+    address: string;
 }
 
 export interface Contact {
@@ -43,4 +44,13 @@ export interface SendMessageParams {
     recipientAddress: string;
     content: string;
     signature: string;
+}
+
+export interface broadcastMessageParams {
+    messageType: "sent" | "received";
+    sender: string;
+    recipient: string;
+    text: string;
+    timestamp: string;
+    txDigest: string;
 }

@@ -3,7 +3,7 @@ import Layout from "./layout";
 import HomePage from "./pages/HomePage";
 import Contacts from "./pages/Contacts";
 import { useSuiWallet } from "@/hooks/useSuiWallet";
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {ConnectButton} from "@suiet/wallet-kit";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -44,7 +44,6 @@ function App() {
         return (
             <div className="flex flex-col items-center justify-center h-screen bg-dark-blue">
                 <img src="Sui_Symbol_Sea.svg" alt="avatar" className="w-12 h-15 rounded-full object-cover mb-4"/>
-
                 <h1 className="text-white text-3xl font-bold mb-4">Welcome to SuiChat</h1>
                 <p className="text-white text-lg mb-8">Press Connect to start</p>
                 <ConnectButton/>
