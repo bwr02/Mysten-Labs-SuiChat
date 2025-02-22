@@ -13,7 +13,7 @@ export interface Message {
 }
 
 export interface ChatPanelProps {
-    recipientAddress: string | null;
+    recipientAddress: string;
 }
 
 export interface ChatSidebarProps {
@@ -29,7 +29,7 @@ export interface MessageInputFieldProps {
 export interface RecipientBarProps {
     recipientName: string | null;
     suins: string | null;
-    address: string;
+    recipientAddress: string;
 }
 
 export interface Contact {
