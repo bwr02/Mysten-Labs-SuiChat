@@ -5,7 +5,7 @@ import {
   getMessagesWithAddress,
   getNameByAddress,
   getSuiNSByAddress
-} from "../api/services/dbService";
+} from "../api/services/messageDbService";
 import {useSuiWallet} from "@/hooks/useSuiWallet";
 import {formatTimestamp} from "@/api/services/messageService";
 import {RecipientBar} from "@/components/RecipientBar.tsx";

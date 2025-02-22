@@ -299,6 +299,21 @@ app.get("/contacts/get-name/:addr", async (req, res) => {
   }
 });
 
+app.get("/contacts/get-public-key/:addr", async (req, res) => {
+  const { addr } = req.params;
+  const contact = await prisma.contact.findUnique({
+    where: {
+      address: addr,
+    },
+  });
+
+  if (contact && contact.public_key) {
+    res.json(contact.public_key); // Send the public key as JSON
+  } else {
+    res.json(null); // Send null if no public key is found
+  }
+});
+
 app.get("/contacts/get-suins/:addr", async (req, res) => {
   const { addr } = req.params;
   const contact = await prisma.contact.findUnique({
