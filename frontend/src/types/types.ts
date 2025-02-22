@@ -13,7 +13,7 @@ export interface Message {
 }
 
 export interface ChatPanelProps {
-    recipientAddress: string | null;
+    recipientAddress: string;
 }
 
 export interface ChatSidebarProps {
@@ -22,14 +22,14 @@ export interface ChatSidebarProps {
 }
 
 export interface MessageInputFieldProps {
-    recipientAddress: string | null;
+    recipientAddress: string;
     onMessageSent: (message: string, timestamp: number, txDigest: string) => void;
 }
 
 export interface RecipientBarProps {
     recipientName: string | null;
     suins: string | null;
-    address: string;
+    recipientAddress: string;
 }
 
 export interface Contact {

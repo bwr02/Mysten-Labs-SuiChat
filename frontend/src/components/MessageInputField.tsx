@@ -42,7 +42,7 @@ export const MessageInputField = memo(({ recipientAddress, onMessageSent }: Mess
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 
-  const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(event.target.value);
   }, []);
 
@@ -54,7 +54,9 @@ export const MessageInputField = memo(({ recipientAddress, onMessageSent }: Mess
     }
   }, [message]);
 
-  const handleSendMessage = useCallback(async (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLInputElement>) => {
+  const handleSendMessage = useCallback(async (
+    event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLTextAreaElement>
+  ) => {
     event.preventDefault();
     
     if (!address || !recipientAddress || !message.trim() || !wallet) {
@@ -107,7 +109,7 @@ export const MessageInputField = memo(({ recipientAddress, onMessageSent }: Mess
     }
   }, [address, recipientAddress, message, wallet, onMessageSent, refreshBalance]);
 
-  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       handleSendMessage(event);
     }
