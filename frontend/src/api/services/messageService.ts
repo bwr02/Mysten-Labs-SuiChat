@@ -3,9 +3,23 @@ import {CONFIG} from '../config';
 import {checkBalance} from './walletService';
 import {normalizeSuiAddress} from '@mysten/sui/utils';
 import {bcs} from '@mysten/sui/bcs';
-import {deriveKeyFromSignature, encryptMessage, generateSharedSecret} from './cryptoService';
+import {prepareEncryptedMessage} from './cryptoService';
 import {WalletContextState} from '@suiet/wallet-kit';
 import {SendMessageParams} from "@/types/types.ts";
+
+function createSendMessageTransaction(senderAddress: string, recipientAddress: string, encryptedContent: string, timestamp: number): Transaction {
+    const tx = new Transaction();
+    tx.moveCall({
+        target: `${CONFIG.MESSAGE_CONTRACT.packageId}::send_message::send_message`,
+        arguments: [
+            tx.pure(bcs.Address.serialize(senderAddress)),
+            tx.pure(bcs.Address.serialize(recipientAddress)),
+            tx.pure(bcs.String.serialize(encryptedContent)),
+            tx.pure(bcs.U64.serialize(timestamp))
+        ],
+    });
+    return tx;
+}
 
 export const sendMessage = async ({
     senderAddress,
@@ -16,28 +30,14 @@ export const sendMessage = async ({
 }: SendMessageParams & { wallet: WalletContextState }) => {
     try {
         const normalizedSenderAddress = normalizeSuiAddress(senderAddress);
-        const balanceInfo = await checkBalance(normalizedSenderAddress);
-        if (BigInt(balanceInfo.totalBalance) === BigInt(0) || balanceInfo.coins.length === 0) {
-            throw new Error('Insufficient balance. Please request tokens from the faucet.');
-        }
-
-        const tempPrivKey = deriveKeyFromSignature(signature);
-        const sharedSecret = generateSharedSecret(tempPrivKey, recipientAddress);
-        console.log("SENDER SHARED SECRET: " + sharedSecret);
-        const encryptedContent = encryptMessage(content, sharedSecret);
-        const tx = new Transaction();
+        // check if sender has enough balance
+        await checkBalance(normalizedSenderAddress); 
+        // get temp priv key, generate shared secret, encrypt message
+        const encryptedContent = await prepareEncryptedMessage(content, signature, recipientAddress); 
+        // create transaction with encrypted message
         const timestamp = Date.now();
-        
-        tx.moveCall({
-            target: `${CONFIG.MESSAGE_CONTRACT.packageId}::send_message::send_message`,
-            arguments: [
-                tx.pure(bcs.Address.serialize(senderAddress)),
-                tx.pure(bcs.Address.serialize(recipientAddress)),
-                tx.pure(bcs.String.serialize(encryptedContent)),
-                tx.pure(bcs.U64.serialize(timestamp))
-            ],
-        });
-
+        const tx = createSendMessageTransaction(normalizedSenderAddress, recipientAddress, encryptedContent, timestamp);
+        // sign transaction and execute on chain
         const result = await wallet.signAndExecuteTransaction({
             transaction: tx,
         });

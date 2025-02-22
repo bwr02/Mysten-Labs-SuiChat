@@ -99,3 +99,9 @@ export function decryptMessage(encryptedBase64: string | null, sharedSecret: Uin
   return decipher.output.toString(); // Return the decrypted message
 
 }
+
+export async function prepareEncryptedMessage(content: string, signature: string, recipientAddress: string): Promise<string> {
+    const tempPrivKey = deriveKeyFromSignature(signature);
+    const sharedSecret = generateSharedSecret(tempPrivKey, recipientAddress);
+    return encryptMessage(content, sharedSecret);
+}
