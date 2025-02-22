@@ -3,14 +3,13 @@ import {MessageInputField} from "./MessageInputField";
 import {
   getDecryptedMessage,
   getMessagesWithAddress,
-  getNameByAddress,
-  getSuiNSByAddress
 } from "../api/services/messageDbService";
 import {useSuiWallet} from "@/hooks/useSuiWallet";
 import {formatTimestamp} from "@/api/services/messageService";
 import {RecipientBar} from "@/components/RecipientBar.tsx";
 import {MessageBubble} from "@/components/MessageBubble.tsx";
 import {Message, broadcastMessageParams} from "@/types/types.ts";
+import { getNameByAddress, getSuiNSByAddress } from "@/api/services/contactDbService";
 
 interface ChatPanelProps {
   recipientAddress: string | null;
