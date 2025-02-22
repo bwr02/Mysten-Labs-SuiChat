@@ -2,7 +2,7 @@ import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 import { getActiveAddress } from './utils/activeAddressManager';
 
-export type Network = 'mainnet' | 'testnet' | 'devnet' | 'localnet';
+export type Network = "mainnet" | "testnet" | "devnet" | "localnet";
 
 // Use environment variable if available, default to testnet
 export const ACTIVE_NETWORK: Network = 'testnet'
@@ -10,7 +10,7 @@ export const ACTIVE_NETWORK: Network = 'testnet'
 
 /** Get the client for the specified network. */
 export const getClient = (network: Network) => {
-    return new SuiClient({ url: getFullnodeUrl(network) });
+  return new SuiClient({ url: getFullnodeUrl(network) });
 };
 
 /** A helper to sign & execute a transaction using wallet. */
@@ -32,17 +32,17 @@ export const signAndExecute = async (
 };
 
 export const validateNetwork = (network: Network) => {
-    const validNetworks: Network[] = ['mainnet', 'testnet', 'devnet', 'localnet'];
-    if (!validNetworks.includes(network)) {
-        throw new Error(`Invalid network: ${network}. Must be one of: ${validNetworks.join(', ')}`);
-    }
+  const validNetworks: Network[] = ["mainnet", "testnet", "devnet", "localnet"];
+  if (!validNetworks.includes(network)) {
+    throw new Error(`Invalid network: ${network}. Must be one of: ${validNetworks.join(", ")}`);
+  }
 };
 
 export const getNetworkConfig = (network: Network) => {
-    validateNetwork(network);
-    return {
-        url: getFullnodeUrl(network),
-    };
+  validateNetwork(network);
+  return {
+    url: getFullnodeUrl(network),
+  };
 };
 
 export const checkConnection = async (network: Network) => {
@@ -56,3 +56,4 @@ export const checkConnection = async (network: Network) => {
         return false;
     }
 };
+

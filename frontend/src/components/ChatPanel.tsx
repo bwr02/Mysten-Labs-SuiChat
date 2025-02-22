@@ -10,6 +10,8 @@ import { useMessageSending } from "../hooks/useMessageSending";
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const wallet = useWallet();
+  const [recipientName, setRecipientName] = useState<string | null>(null);
+  const [suiNS, setSuiNS] = useState<string | null>(null);
   const [recipientPub, setRecipientPub] = useState<Uint8Array | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { messages, error: listenError } = useListenMessages({
@@ -54,8 +56,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   }, [listenError]);
 
   return (
-    <div className="flex flex-col h-screen flex-1 bg-light-blue overflow-auto">
-      <RecipientBar recipientAddress={recipientAddress} />
+    <div className="flex flex-col h-screen flex-1 bg-light-blue overflow-auto no-scrollbar">
+      <RecipientBar recipientName={recipientName} address={recipientAddress} suins={suiNS}/>
       <div className="flex-grow flex flex-col gap-2 px-4 py-2 justify-end mb-4">
         {messages.map((message, index) => (
           <MessageBubble

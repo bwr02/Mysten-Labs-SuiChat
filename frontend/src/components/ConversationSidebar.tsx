@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { SidebarConversationParams, ChatSidebarProps } from "@/types/types";
-import { useSuiWallet } from "@/hooks/useSuiWallet";
-import { getSuiNInfo } from "@/api/services/nameServices";
-import { fetchAndDecryptChatHistory } from "../api/services/decryptService";
-import { useListenMessages } from "../hooks/useListenMessages";
+import React, {useCallback, useEffect, useState} from "react";
+import {ChatSidebarProps, SidebarConversationParams} from "@/types/types.ts";
+import { getAllContactedAddresses, getDecryptedMessage } from "../api/services/dbService";
+import {useSuiWallet} from "@/hooks/useSuiWallet";
+import {getSuiNInfo} from "@/api/services/nameServices";
+import { formatTimestamp } from "@/api/services/messageService";
 
 
-const ConversationItem = React.memo(({ 
+const ConversationItem = React.memo(({
   conv, 
   isSelected, 
   onSelect 
@@ -17,7 +17,7 @@ const ConversationItem = React.memo(({
 }) => (
     <div
         onClick={onSelect}
-        className={`flex items-start gap-2 cursor-pointer p-2 rounded
+        className={`flex items-start gap-2 cursor-pointer p-2 rounded-2xl
       ${isSelected ? "bg-blue-800" : "hover:bg-gray-600"}`}>
       <img src="user.png" alt="avatar" className="w-10 h-10 rounded-full object-cover"/>
       <div className="flex flex-col flex-grow overflow-hidden">
@@ -34,40 +34,11 @@ const ConversationItem = React.memo(({
 
 ConversationItem.displayName = 'ConversationItem';
 
-export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) => {
+export const ConversationSidebar = ({ recipientAddress, setRecipientAddress }: ChatSidebarProps) => {
   const [conversations, setConversations] = useState<SidebarConversationParams[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
   const { wallet } = useSuiWallet();
-
-  // For the selected conversation
-  const [selectedRecipientPub, setSelectedRecipientPub] = useState<Uint8Array | null>(null);
-
-  // Use the hook for the selected conversation
-  const { messages: selectedMessages } = useListenMessages({
-    recipientAddress: selectedAddress,
-    recipientPub: selectedRecipientPub,
-    wallet: wallet || null,
-  });
-
-  useEffect(() => {
-    if (selectedAddress && selectedMessages.length > 0) {
-      const latestMessage = selectedMessages[selectedMessages.length - 1];
-      setConversations(prevConvs => 
-        prevConvs.map(conv => 
-          conv.address === selectedAddress 
-            ? { 
-                ...conv, 
-                message: latestMessage.text || "No message content",
-                time: latestMessage.timestamp 
-                ? new Date(latestMessage.timestamp).toLocaleTimeString()
-                : new Date().toLocaleTimeString()
-              }
-            : conv
-        )
-      );
-    }
-  }, [selectedMessages, selectedAddress]);
 
 
   const handleSearchInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,6 +52,7 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
       const targetAddress = await getSuiNInfo("@" + searchText);
       if (targetAddress) {
         setRecipientAddress(targetAddress);
+        setSelectedAddress(targetAddress);
         setSearchText("");
       } else {
         console.log("No target address found for the given name.");
@@ -100,38 +72,108 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
 
   useEffect(() => {
     const fetchContacts = async () => {
-      if (!wallet || !selectedAddress || !selectedRecipientPub) return;
-
       try {
-        const history = await fetchAndDecryptChatHistory(
-          selectedAddress,
-          selectedRecipientPub,
-          wallet
-        );
-        
-        // Convert Message[] to SidebarConversationParams[]
-        const conversationPreviews: SidebarConversationParams[] = history.map(msg => ({
-          address: selectedAddress,
-          name: selectedAddress, // You might want to get a display name from somewhere
-          message: msg.text || "No message content",
-          time: msg.timestamp 
-    ? new Date(msg.timestamp).toLocaleTimeString()
-    : new Date().toLocaleTimeString()
-        }));
+        const initialContacts = await getAllContactedAddresses();
 
-        setConversations(conversationPreviews);
+        const decryptedContacts = await Promise.all(
+          initialContacts.map(async (contact) => {
+            try {
+              if (!contact.message) {
+                return { ...contact, message: "No Messages" };
+              }
+              
+              const decryptedMessage = await getDecryptedMessage(
+                contact.address,
+                wallet,
+                contact.message
+              );
+              return { ...contact, message: decryptedMessage || "No Messages" };
+            } catch (error) {
+              console.error(`Failed to decrypt message for ${contact.address}`, error);
+              return { ...contact, message: "(decryption error)" };
+            }
+          })
+        );
+        setConversations(decryptedContacts);
       } catch (error) {
         console.error("Error fetching contacts:", error);
       }
     };
 
-    fetchContacts();
-  }, [wallet, selectedAddress, selectedRecipientPub]);
+    if (wallet) {
+      fetchContacts();
+    }
+  }, [wallet]);
 
-  const handleSelectConversation = useCallback((address: string) => {
-    setSelectedAddress(address);
-    setRecipientAddress(address);
-  }, [setRecipientAddress]);
+  const handleSelectConversation = useCallback(
+      (address: string) => {
+        if (selectedAddress !== address) {
+          setSelectedAddress(address);
+          setRecipientAddress(address);
+        }
+      },
+      [recipientAddress, setRecipientAddress],
+  );
+
+  useEffect(() => {
+    // If there are conversations and no recipient is set, use the first one.
+    if (conversations.length > 0 && !recipientAddress) {
+      const defaultContact = conversations[0];
+      setRecipientAddress(defaultContact.address);
+      setSelectedAddress(defaultContact.address);
+      // console.log("Default recipient set to:", defaultContact.address);
+    }
+  }, [conversations, recipientAddress, setRecipientAddress]);
+
+  useEffect(() => {
+    const wsNewMessage = new WebSocket('ws://localhost:8080');
+    const wsEditContact = new WebSocket('ws://localhost:8081');
+
+    wsNewMessage.onmessage = async (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'new-message') {
+        const { sender, recipient } = data.message;
+        const otherAddress = sender === wallet?.address ? recipient : sender;
+
+        try {
+          const decryptedMessage = await getDecryptedMessage(otherAddress, wallet, data.message.text);
+
+          setConversations((prevConversations) => {
+            const updatedConversations = prevConversations.filter(conv => conv.address !== otherAddress);
+            const existingConversation = prevConversations.find(conv => conv.address === otherAddress);
+            const newConversation = {
+              address: otherAddress,
+              name: existingConversation?.name || data.message.name || otherAddress,
+              message: decryptedMessage || "No Messages",
+              time: formatTimestamp(data.message.timestamp),
+            };
+            return [newConversation, ...updatedConversations];
+          });
+        } catch (error) {
+          console.error(`Failed to decrypt message for ${otherAddress}`, error);
+        }
+      }
+    };
+
+    wsEditContact.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'edit-contact') {
+        const address = data.contact.address;
+        const newName = data.contact.contactName;
+
+        setConversations((prevConversations) => {
+          return prevConversations.map(conv => 
+            conv.address === address ? { ...conv, name: newName } : conv
+          );
+        });
+      }
+    };
+
+    return () => {
+      wsNewMessage.close();
+      wsEditContact.close();
+    };
+  }, [wallet]);
 
   return (
     <div className="w-80 shrink-0 p-4 bg-medium-blue flex flex-col overflow-y-auto overflow-x-hidden">
@@ -152,7 +194,7 @@ export const ConversationSidebar = ({ setRecipientAddress }: ChatSidebarProps) =
           <ConversationItem 
             key={conv.address}
             conv={conv}
-            isSelected={selectedAddress === conv.address}
+            isSelected={recipientAddress === conv.address}
             onSelect={() => handleSelectConversation(conv.address)}
           />
         ))}

@@ -2,7 +2,8 @@ import { prisma } from '../../../../api/db'
 // FE should not directly import a backend constant (prisma). 
 // TODO: Create an API endpoint in the backend to handle database interactions 
 // and fetch data via HTTP requests instead of importing backend logic directly.
-import { Message, SidebarConversationParams } from "@/types/types";
+import { Message, Contact, SidebarConversationParams } from "@/types/types";
+
 
 
 export async function getAllMessages(): Promise<Message[]> {
@@ -58,9 +59,10 @@ export async function getAllByRecipient(recipient: string): Promise<Message[]> {
 }
 
 
-export async function getAllContactedAddresses(): Promise<SidebarConversationParams[]> {
+
+export async function getAllContacts(): Promise<Contact[]> {
     try {
-        const response = await fetch('http://localhost:3000/contacts/metadata');
+        const response = await fetch('http://localhost:3000/contacts/all-contacts');
         if (!response.ok) {
             console.error('Failed to fetch contacted addresses. Status:', response.status);
             throw new Error('Failed to fetch contacted addresses');
@@ -68,7 +70,7 @@ export async function getAllContactedAddresses(): Promise<SidebarConversationPar
 
         // Now we expect an array of SidebarConversationParams from the server
         // Note as of now the server is passing in encrypted messages and the name is address
-        const data: SidebarConversationParams[] = await response.json();
+        const data: Contact[] = await response.json();
         // console.log('Fetched contacted addresses:', data);
         return data;
     } catch (error) {
@@ -121,35 +123,58 @@ export async function editContact(addr: string, suiname?: string, contactName?: 
     }
 }
 
+export async function deleteContact(addr: string): Promise<void> {
+    try {
+        const response = await fetch(`http://localhost:3000/delete-contact/${addr}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
+        if (!response.ok) {
+            throw new Error(`Failed to delete contact: ${response.statusText}`);
+        }
+
+        console.log('Contact deleted successfully');
+    } catch (error) {
+        console.error('Error deleting contact:', error);
+        throw error; 
+    }
+}
 
 export async function getSuiNSByAddress(addr: string): Promise<string|null>{
-    const contact = await prisma.contact.findUnique({
-        where: {
-          address: addr,
-        },
-      })
-    if(contact){
-        return contact.suins;
-    }
-    else{ //null case
-        return contact
+    try {
+        const response = await fetch(`http://localhost:3000/contacts/get-suins/${addr}`);
+        if (!response.ok) {
+            console.error("Failed to fetch suins. Status:", response.status);
+            throw new Error('Failed to fetch suins');
+        }
+
+        const suins = await response.json();
+        return suins;
+    } catch (error) {
+        console.error('Error fetching suins:', error);
+        return "";
     }
 }
 
 export async function getNameByAddress(addr: string): Promise<string|null>{
-    const contact = await prisma.contact.findUnique({
-        where: {
-          address: addr,
-        },
-      })
-    if(contact){
-        return contact.name;
-    }
-    else{ //null case
-        return contact
+    try {
+        const response = await fetch(`http://localhost:3000/contacts/get-name/${addr}`);
+        if (!response.ok) {
+            console.error("Failed to fetch name. Status:", response.status);
+            throw new Error('Failed to fetch name');
+        }
+
+        const name = await response.json();
+        return name;
+    } catch (error) {
+        console.error('Error fetching name:', error);
+        return "";
     }
 }
+
 
 export async function getPublicKeyByAddress(addr: string): Promise<string|null>{
     const contact = await prisma.contact.findUnique({

@@ -1,29 +1,58 @@
-import React, { useState, useCallback, memo } from "react";
-import { SendButton } from "./SendButton";
-import { useMessageSending } from "@/hooks/useMessageSending";
-import { MessageInputFieldProps } from "@/types/types";
-import { useSuiWallet } from "@/hooks/useSuiWallet";
+import React, {memo, useCallback, useState, useRef, useEffect} from "react";
+import {useSuiWallet} from '../hooks/useSuiWallet';
+import {sendMessage} from '../api/services/messageService';
+import {MessageInputFieldProps} from "@/types/types.ts";
 
-export const MessageInputField = memo(
-  ({
-    recipientAddress,
-    recipientPub,
-    onMessageSent,
-  }: MessageInputFieldProps) => {
-    const [message, setMessage] = useState("");
-    const { loading, error, address } = useSuiWallet();
-    const { sending, status, sendMessageWithWallet } = useMessageSending(
-      recipientAddress,
-      recipientPub,
-      onMessageSent,
-    );
+const SendButton = memo(({ sending, disabled, onClick }: {
+  sending: boolean; 
+  disabled: boolean;
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}) => (
+  <button
+    type="submit"
+    onClick={onClick}
+    className={`absolute right-2 top-1/2 transform -translate-y-2/4 text-gray-500 ${
+      disabled ? "opacity-50 cursor-not-allowed" : "hover:text-gray-800"
+    }`}
+    disabled={disabled}
+  >
+    {sending ? (
+      <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
+    ) : (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor"
+        viewBox="0 0 24 24"
+        width="24"
+        height="24"
+      >
+        <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />
+      </svg>
+    )}
+  </button>
+));
 
-    const handleInputChange = useCallback(
-      (event: React.ChangeEvent<HTMLInputElement>) => {
-        setMessage(event.target.value);
-      },
-      [],
-    );
+SendButton.displayName = 'SendButton';
+
+export const MessageInputField = memo(({ recipientAddress, onMessageSent }: MessageInputFieldProps) => {
+  const { address, loading, error, refreshBalance, wallet } = useSuiWallet();
+  const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
+  const [status, setStatus] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+
+  const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(event.target.value);
+  }, []);
+
+  // Auto-resize the textarea whenever the message changes.
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto"; // Reset to auto
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [message]);
 
     const handleSendMessage = useCallback(
       async (
@@ -59,28 +88,31 @@ export const MessageInputField = memo(
 
     const isDisabled = sending || !message.trim() || !address;
 
-    return (
-      <div className="p-4">
-        {status && <div className="text-gray-400 text-sm mb-2">{status}</div>}
-        <div className="relative w-full">
-          <input
-            type="text"
+  return (
+    <div className="p-4 -mb-2">
+      {status && (
+        <div className="text-gray-400 text-sm mb-2">
+          {status}
+        </div>
+      )}
+      <div className="relative w-full">
+        <textarea
+            ref={textareaRef}
+            rows={1}
             placeholder="Type a message..."
-            className="w-full px-5 py-4 text-sm text-gray-200 bg-lighter-blue border-none rounded-2xl outline-none placeholder-gray-500 pr-10"
+            className="w-full px-5 py-4 text-sm text-gray-200 bg-lighter-blue border-none rounded-2xl outline-none placeholder-gray-500 pr-10 resize-none overflow-hidden"
             value={message}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             disabled={sending}
-          />
-          <SendButton
+            style={{minHeight: "3rem"}} // Set your minimum height here
+        />
+        <SendButton
             sending={sending}
             disabled={isDisabled}
             onClick={handleSendMessage}
-          />
-        </div>
+        />
       </div>
-    );
-  },
-);
-
-MessageInputField.displayName = "MessageInputField";
+    </div>
+  );
+});
