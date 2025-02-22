@@ -15,7 +15,7 @@ import { SendMessageParams } from "../../types/types";
 export const sendMessage = async ({
   senderAddress,
   recipientAddress,
-  recipientPub,
+  recipientPub, // TODO: resolve type error
   content,
   wallet,
 }: SendMessageParams & { wallet: WalletContextState }) => {
