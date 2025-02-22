@@ -22,7 +22,7 @@ export interface ChatSidebarProps {
 }
 
 export interface MessageInputFieldProps {
-    recipientAddress: string | null;
+    recipientAddress: string;
     onMessageSent: (message: string, timestamp: number, txDigest: string) => void;
 }
 

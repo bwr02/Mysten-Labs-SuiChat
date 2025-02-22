@@ -31,10 +31,18 @@ export default function HomePage() {
 
     return (
         <div className="flex flex-col h-screen bg-dark-blue">
-            {/* flex with Sidebar and Chat Panel */}
             <Flex className="h-full flex-row bg-dark-blue">
-                <ConversationSidebar recipientAddress={recipientAddress} setRecipientAddress={setRecipientAddress} />
-                <ChatPanel recipientAddress={recipientAddress} />
+                <ConversationSidebar 
+                    recipientAddress={recipientAddress} 
+                    setRecipientAddress={setRecipientAddress} 
+                />
+                {recipientAddress ? (
+                    <ChatPanel recipientAddress={recipientAddress} />
+                ) : (
+                    <div className="flex-1 flex items-center justify-center text-gray-300">
+                        <p>Select a contact to start chatting</p>
+                    </div>
+                )}
             </Flex>
             {!isMinimized && (
                 <Box
