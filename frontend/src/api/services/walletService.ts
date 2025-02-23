@@ -20,15 +20,13 @@ export const getUserCoins = async (address: string) => {
 };
 
 
-export const checkBalance = async (address: string): Promise<BalanceInfo> => {
+export const checkBalance = async (address: string): Promise<void> => {
     try {
         const coins = await getUserCoins(address);
         const totalBalance = coins.reduce((acc, coin) => acc + BigInt(coin.balance), BigInt(0));
-        return {
-            coins,
-            totalBalance: totalBalance.toString(),
-            formattedBalance: `${Number(totalBalance) / 1000000000} SUI`
-        };
+        if (BigInt(totalBalance) === BigInt(0) || coins.length === 0) {
+            throw new Error('Insufficient balance. Please request tokens from the faucet.');
+        }
     } catch (error) {
         console.error('Error checking balance:', error);
         throw new Error('Failed to check balance');

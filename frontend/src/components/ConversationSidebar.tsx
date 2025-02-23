@@ -1,9 +1,10 @@
 import React, {useCallback, useEffect, useState} from "react";
 import {ChatSidebarProps, SidebarConversationParams} from "@/types/types.ts";
-import { getAllContactedAddresses, getDecryptedMessage } from "../api/services/dbService";
+import { getDecryptedMessage } from "@/api/services/messageDbService";
 import {useSuiWallet} from "@/hooks/useSuiWallet";
 import {getSuiNInfo} from "@/api/services/nameServices";
 import { formatTimestamp } from "@/api/services/messageService";
+import { getAllContactedAddresses } from "../api/services/contactDbService";
 
 
 const ConversationItem = React.memo(({

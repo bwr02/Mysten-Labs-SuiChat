@@ -3,12 +3,13 @@ import {MessageInputField} from "./MessageInputField";
 import {
   getDecryptedMessage,
   getMessagesWithAddress,
-} from "../api/services/dbService";
+} from "@/api/services/messageDbService";
 import {useSuiWallet} from "@/hooks/useSuiWallet";
 import {formatTimestamp} from "@/api/services/messageService";
 import {RecipientBar} from "@/components/RecipientBar.tsx";
 import {MessageBubble} from "@/components/MessageBubble.tsx";
-import {Message, broadcastMessageParams, ChatPanelProps} from "@/types/types.ts";
+import {ChatPanelProps, Message, broadcastMessageParams} from "@/types/types.ts";
+import { getNameByAddress, getSuiNSByAddress } from "@/api/services/contactDbService";
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getSuiNInfo } from "../api/services/nameServices.ts";
-import { addContact, getAllContacts, editContact, deleteContact } from "@/api/services/dbService.ts";
+import { addContact, getAllContacts, editContact, deleteContact } from "@/api/services/contactDbService.ts";
 import { useNavigate } from "react-router-dom";
 import {Plus, MessageCircle, Pencil, TrashIcon} from "lucide-react";
 import { Contact } from "@/types/types.ts";

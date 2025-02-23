@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {editContact, getNameByAddress, getSuiNSByAddress} from "@/api/services/dbService.ts";
+import {editContact, getNameByAddress, getSuiNSByAddress} from "@/api/services/contactDbService.ts";
 import {FaInfoCircle} from "react-icons/fa";
 import { RecipientBarProps } from "../types/types";
 
