@@ -27,8 +27,6 @@ export interface MessageInputFieldProps {
 }
 
 export interface RecipientBarProps {
-    recipientName: string | null;
-    suins: string | null;
     recipientAddress: string;
 }
 

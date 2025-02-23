@@ -1,18 +1,17 @@
 import React, {useEffect, useRef, useState} from "react";
-import {editContact} from "@/api/services/contactDbService.ts";
+import {editContact, getNameByAddress, getSuiNSByAddress} from "@/api/services/contactDbService.ts";
 import {FaInfoCircle} from "react-icons/fa";
 import { RecipientBarProps } from "../types/types";
 
 
 export const RecipientBar: React.FC<RecipientBarProps> = ({
-    recipientName,
-    suins,
     recipientAddress,
 }) => {
     const [popupIsOpen, setPopupIsOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [recipientName, setRecipientName] = useState<string | null>(null);
+    const [suins, setSuiNS] = useState<string | null>(null);
     const [editedName, setEditedName] = useState<string>(recipientName || '');
-
     const popupRef = useRef<HTMLDivElement>(null);
     const iconRef = useRef<HTMLDivElement>(null);
 
@@ -23,6 +22,59 @@ export const RecipientBar: React.FC<RecipientBarProps> = ({
         }
         setPopupIsOpen(!popupIsOpen);
     };
+
+    useEffect(() => {
+        const fetchRecipientName = async () => {
+            try {
+                const name = await getNameByAddress(recipientAddress);
+
+                if (name) {
+                    setRecipientName(name);
+                    const suiNS = await getSuiNSByAddress(recipientAddress);
+
+                    if (suiNS) {
+                        setSuiNS(suiNS);
+                    }
+                    else{
+                        setSuiNS(null);
+                    }
+                    return;
+                }
+
+                const suiNS = await getSuiNSByAddress(recipientAddress);
+
+                if (suiNS) {
+                    setRecipientName(suiNS);
+                    setSuiNS(suiNS);
+                    return;
+                }
+
+                // If no name or SuiNS, use the shortened address
+                setRecipientName(`${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`);
+                setSuiNS(null);
+            } catch (error) {
+                console.error("Error fetching recipient name:", error);
+                setRecipientName(`${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`);
+            }
+        };
+
+        fetchRecipientName();
+    }, [recipientAddress]);
+
+    useEffect(() => {
+        const wsEditContact = new WebSocket('ws://localhost:8081');
+
+        wsEditContact.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'edit-contact') {
+                setRecipientName(data.contact.contactName);
+            }
+        };
+
+        return () => {
+            wsEditContact.close();
+        };
+    }, [setRecipientName]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
