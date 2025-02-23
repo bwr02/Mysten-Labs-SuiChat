@@ -32,46 +32,39 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
 
   useEffect(() => {
     const fetchRecipientName = async () => {
-  
-      if (recipientAddress) {
-        try {
-          const name = await getNameByAddress(recipientAddress);
-  
-          if (name) {
-            setRecipientName(name);
-            const suiNS = await getSuiNSByAddress(recipientAddress);
-  
-            if (suiNS) {
-              setSuiNS(suiNS);
-            }
-            else{
-              setSuiNS(null);
-            }
-            return;
-          }
-  
+      try {
+        const name = await getNameByAddress(recipientAddress);
+
+        if (name) {
+          setRecipientName(name);
           const suiNS = await getSuiNSByAddress(recipientAddress);
-  
+
           if (suiNS) {
-            setRecipientName(suiNS);
             setSuiNS(suiNS);
-            return;
           }
-  
-          // If no name or SuiNS, use the shortened address
-          setRecipientName(`${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`);
-          setSuiNS(null);
-        } catch (error) {
-          console.error("Error fetching recipient name:", error);
-          setRecipientName(`${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`);
+          else{
+            setSuiNS(null);
+          }
+          return;
         }
-      } else {
-        // console.log("No recipient address provided");
-        setRecipientName(null);
+
+        const suiNS = await getSuiNSByAddress(recipientAddress);
+
+        if (suiNS) {
+          setRecipientName(suiNS);
+          setSuiNS(suiNS);
+          return;
+        }
+
+        // If no name or SuiNS, use the shortened address
+        setRecipientName(`${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`);
         setSuiNS(null);
+      } catch (error) {
+        console.error("Error fetching recipient name:", error);
+        setRecipientName(`${recipientAddress.slice(0, 7)}...${recipientAddress.slice(-4)}`);
       }
     };
-  
+
     fetchRecipientName();
   }, [recipientAddress]);
   
@@ -135,15 +128,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
 
   // Fetch initial messages
   useEffect(() => {
-      const fetchMessages = async () => {
-          const initialMessages = await getMessagesWithAddress(recipientAddress, wallet);
-          setMessages(initialMessages);
-      };
+    const fetchMessages = async () => {
+      const initialMessages = await getMessagesWithAddress(recipientAddress, wallet);
+      setMessages(initialMessages);
+    };
 
-      if (recipientAddress) {
-        fetchMessages();
-      }
-
+    fetchMessages();
   }, [recipientAddress, wallet]);
 
   const handleMessageSent = useCallback(() => {
@@ -154,7 +144,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
 
   return (
     <div className="flex flex-col h-screen flex-1 bg-light-blue overflow-auto no-scrollbar">
-      <RecipientBar recipientName={recipientName} address={recipientAddress} suins={suiNS}/>
+      <RecipientBar 
+        recipientName={recipientName} 
+        recipientAddress={recipientAddress} 
+        suins={suiNS}
+      />
       <div className="flex-grow flex flex-col gap-2 px-4 py-2 justify-end mb-4">
         {messages.map((message, index) => (
           <MessageBubble key={`${index}-${message.timestamp}`} message={message} isLast={index === messages.length - 1}/>
