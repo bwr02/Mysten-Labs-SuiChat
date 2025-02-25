@@ -1,7 +1,42 @@
 import { fromBase64 } from '@mysten/bcs';
 import nacl from 'tweetnacl';
 import * as forge from 'node-forge';
+import { blake2b } from "@noble/hashes/blake2b";
+import { bytesToHex } from "@noble/hashes/utils";
 
+
+export function deriveKeysFromSignature(signature: string): {
+  privateKey: Uint8Array;
+  publicKey: Uint8Array;
+} {
+  const sigBytes = fromBase64(signature);
+  if (sigBytes.length !== 97) {
+    throw new Error(
+      `Invalid Sui signature length: ${sigBytes.length}, expected 97`,
+    );
+  }
+
+  // Extract the signature body and ignore the embedded Ed25519 public key
+  const sigBody = sigBytes.slice(33);
+
+  // Derive the ephemeral X25519 private key from the signature body using Blake2b and clamping.
+  const priv = blake2b(sigBody, { dkLen: 32 });
+  priv[0] &= 248;
+  priv[31] &= 127;
+  priv[31] |= 64;
+
+  // Compute the matching X25519 public key directly from the derived private key.
+  // Using nacl.scalarMult.base(priv) ensures that the public key is mathematically coupled to the private key.
+  const pub = nacl.scalarMult.base(priv);
+
+  console.log("Derived ephemeral private key (hex):", bytesToHex(priv));
+  console.log("Derived ephemeral public key (hex):", bytesToHex(pub));
+
+  return {
+    privateKey: priv,
+    publicKey: pub,
+  };
+}
 
 
 export function deriveKeyFromSignature(signature: string) {

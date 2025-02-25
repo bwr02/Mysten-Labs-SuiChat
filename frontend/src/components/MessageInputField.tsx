@@ -2,6 +2,9 @@ import React, {memo, useCallback, useState, useRef, useEffect} from "react";
 import {useSuiWallet} from '../hooks/useSuiWallet';
 import {sendMessage} from '../api/services/messageService';
 import {MessageInputFieldProps} from "@/types/types.ts";
+import { fetchUserPublicKey, registerPublicKeyOnChain } from "../api/services/publicKeyService";
+import { deriveKeysFromSignature } from "../api/services/cryptoService";
+import { normalizeSuiAddress } from "@mysten/sui/utils";
 
 const SendButton = memo(({ sending, disabled, onClick }: {
   sending: boolean; 
@@ -75,6 +78,7 @@ export const MessageInputField = memo(({ recipientAddress, onMessageSent }: Mess
 
       // Get or create signature
       let signature = localStorage.getItem('walletSignature');
+      let pubKey = localStorage.getItem('publicKey');
       if (!signature) {
         const messageBytes = new TextEncoder().encode("Random message for key derivation");
         const signatureData = await wallet?.signPersonalMessage({
@@ -85,6 +89,25 @@ export const MessageInputField = memo(({ recipientAddress, onMessageSent }: Mess
         }
         signature = signatureData.signature;
         localStorage.setItem('walletSignature', signature);
+      }
+      if (!pubKey) {
+        console.log("Here no pubkey found");
+        const {privateKey, publicKey} = deriveKeysFromSignature(signature);
+        const tx = registerPublicKeyOnChain(wallet, address, publicKey);
+        const txDigest = await tx;
+        console.log(`✅ Public key registered successfully! Transaction Digest: ${txDigest}`);
+        await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds
+        const normalizedAddress = normalizeSuiAddress(address);
+        console.log(`Fetching public key for address: ${normalizedAddress}...`);
+        const retrievedKey = await fetchUserPublicKey(normalizeSuiAddress(address));
+
+        if (retrievedKey) {
+            console.log(`✅ Retrieved Public Key:`, retrievedKey);
+            console.log("✅ Public key matches:", Buffer.from(retrievedKey).toString("hex") === Buffer.from(publicKey).toString("hex"));
+            localStorage.setItem('publicKey', Buffer.from(retrievedKey).toString("hex"));
+        } else {
+            console.log("❌ Public key not found on-chain.");
+        }
       }
 
       setStatus("Sending message...");
