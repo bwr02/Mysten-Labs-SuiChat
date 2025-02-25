@@ -33,7 +33,7 @@ export const sendMessage = async ({
         // check if sender has enough balance
         await checkBalance(normalizedSenderAddress); 
         // get temp priv key, generate shared secret, encrypt message
-        const encryptedContent = await prepareEncryptedMessage(content, signature, recipientAddress); 
+        const encryptedContent = await prepareEncryptedMessage(content, signature); 
         // create transaction with encrypted message
         const timestamp = Date.now();
         const tx = createSendMessageTransaction(normalizedSenderAddress, recipientAddress, encryptedContent, timestamp);
