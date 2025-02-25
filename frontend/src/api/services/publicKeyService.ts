@@ -1,28 +1,22 @@
-import { SuiClient } from "@mysten/sui/client";
-import { bcs } from "@mysten/sui/bcs";
-import {
-  getClient,
-  ACTIVE_NETWORK,
-} from "../../../../api/sui-utils";
+import { suiClient } from "../suiClient";
 import { Transaction } from "@mysten/sui/transactions";
 import { WalletContextState } from "@suiet/wallet-kit";
 import { CONFIG } from "../config";
 import { normalizeSuiAddress } from "@mysten/sui/utils";
+import { bcs } from "@mysten/sui/bcs";
 
-
-export function createRegisterPublicKey(senderAddress: string, publicKey: Uint8Array): Transaction {
+function createRegisterPublicKey(senderAddress: string, publicKey: Uint8Array): Transaction {
   const tx = new Transaction();
-  const serializedPublicKey = bcs.vector(bcs.u8()).serialize(publicKey).toBytes();
 
   tx.moveCall({
-    target: `${CONFIG.MESSAGE_CONTRACT.packageId}::chat::public_keys::publish_key`,
+    target: `${CONFIG.MESSAGE_CONTRACT.packageId}::public_keys::publish_key`,
     arguments: [
       tx.pure(bcs.Address.serialize(senderAddress)),
-      tx.pure(serializedPublicKey),
+      tx.pure(bcs.vector(bcs.u8()).serialize(Array.from(publicKey)))
     ],
-    typeArguments: [],
   });
 
+  tx.setGasBudget(100_000_000);
   return tx;
 }
 
@@ -34,9 +28,11 @@ export async function registerPublicKeyOnChain(
   try {
     const normalizedAddress = normalizeSuiAddress(address);
     const tx = createRegisterPublicKey(normalizedAddress, publicKey);
-
-    const result = await wallet.signAndExecuteTransaction({ transaction: tx });
-    console.log("Public key registered. Transaction digest:", result.digest);
+    const result = await wallet.signAndExecuteTransaction({
+      transaction: tx
+    });
+    
+    console.log("Public key registered. Full result:", result);
     return result.digest;
   } catch (error) {
     console.error("Error registering public key:", error);
@@ -55,24 +51,21 @@ export async function fetchUserPublicKey(
   address: string,
 ): Promise<Uint8Array | null> {
   try {
-    const client: SuiClient = getClient(ACTIVE_NETWORK);
-    const response = await client.getOwnedObjects({
+    const response = await suiClient.getOwnedObjects({
       owner: address,
-      filter: { StructType: "chat::public_keys::UserPublicKey" },
+      filter: { StructType: `${CONFIG.MESSAGE_CONTRACT.packageId}::public_keys::UserPublicKey` },
+      options: { showContent: true }
     });
-
-    if (response.data.length === 0) return null;
 
     // Get the first object with proper type checking
     const obj = response.data[0];
     if (obj.data?.content?.dataType === "moveObject") {
-      const fields = obj.data.content.fields as { key: string | number[] };
+      const fields = obj.data.content.fields as { public_key: string | number[] };
 
-      if (Array.isArray(fields.key)) {
-        return Uint8Array.from(fields.key);
+      if (Array.isArray(fields.public_key)) {
+        return Uint8Array.from(fields.public_key);
       }
-      // Handle the case where the key is a string (if it was stored as Base64 or hex)
-      return new Uint8Array(Buffer.from(fields.key, "base64"));
+      return new Uint8Array(Buffer.from(fields.public_key, "base64"));
     }
     return null;
   } catch (error) {
@@ -80,5 +73,4 @@ export async function fetchUserPublicKey(
     return null;
   }
 }
-
 

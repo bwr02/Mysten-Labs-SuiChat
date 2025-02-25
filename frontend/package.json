@@ -12,6 +12,7 @@
   "dependencies": {
     "@mysten/bcs": "^1.3.0",
     "@mysten/dapp-kit": "^0.14.29",
+    "@mysten/sui": "^1.14.4",
     "@mysten/suins": "^0.4.1",
     "@radix-ui/colors": "^3.0.0",
     "@radix-ui/react-icons": "^1.3.0",
