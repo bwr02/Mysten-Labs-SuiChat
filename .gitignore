@@ -135,3 +135,4 @@ yarn-debug.log*
 yarn-error.log*
 *.db
 *.db-journal
+/api/utils/activeAddress.json
