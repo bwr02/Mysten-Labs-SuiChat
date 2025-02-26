@@ -1289,7 +1289,7 @@
     tweetnacl "^1.0.3"
     valibot "^0.36.0"
 
-"@mysten/sui@1.21.2", "@mysten/sui@^1.14.4", "@mysten/sui@^1.17.0":
+"@mysten/sui@1.21.2", "@mysten/sui@^1.17.0":
   version "1.21.2"
   resolved "https://registry.yarnpkg.com/@mysten/sui/-/sui-1.21.2.tgz#725375e1c7b5d67f8637769c192ac10e18805130"
   integrity sha512-8AesvczokAUv796XiOo8af2+1IYA9bRon11Ra+rwehvqhz+sMRT8A+Cw5sDnlSc9/aQwM51JQKUnvMczNbpfYA==
