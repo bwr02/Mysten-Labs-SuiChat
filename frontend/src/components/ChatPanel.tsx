@@ -9,7 +9,6 @@ import {formatTimestamp} from "@/api/services/messageService";
 import {RecipientBar} from "@/components/RecipientBar.tsx";
 import {MessageBubble} from "@/components/MessageBubble.tsx";
 import {ChatPanelProps, Message, broadcastMessageParams} from "@/types/types.ts";
-import { getNameByAddress, getSuiNSByAddress } from "@/api/services/contactDbService";
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);
