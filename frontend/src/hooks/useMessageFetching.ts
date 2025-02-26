@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Message } from '@/types/types';
-import { getMessagesWithAddress } from '@/api/services/messageDbService';
+import { fetchAndDecryptChatHistory } from '@/api/services/decryptService';
 import { WalletContextState } from '@suiet/wallet-kit';
 
 export function useMessageFetching(
@@ -10,7 +10,7 @@ export function useMessageFetching(
 ) {
   useEffect(() => {
     const fetchMessages = async () => {
-      const initialMessages = await getMessagesWithAddress(recipientAddress, wallet);
+      const initialMessages = await fetchAndDecryptChatHistory(recipientAddress, recipientPub, wallet);
       setMessages(initialMessages);
     };
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { SidebarConversationParams } from '@/types/types';
 import { WalletContextState } from '@suiet/wallet-kit';
 import { getAllContactedAddresses } from '@/api/services/contactDbService';
-import { getDecryptedMessage } from '@/api/services/messageDbService';
+import { decryptSingleMessage } from '@/api/services/decryptService';
 import { formatTimestamp } from '@/api/services/messageService';
 
 export function useConversations(wallet: WalletContextState | null) {
@@ -17,10 +17,10 @@ export function useConversations(wallet: WalletContextState | null) {
             if (!contact.message) {
               return { ...contact, message: "No Messages" };
             }
-            const decryptedMessage = await getDecryptedMessage(
-              contact.address,
-              wallet,
-              contact.message
+            const decryptedMessage = await decryptSingleMessage(
+              contact.message,
+              contact.publicKey,
+              wallet
             );
             return { ...contact, message: decryptedMessage || "No Messages" };
           } catch (error) {
@@ -54,7 +54,7 @@ export function useConversations(wallet: WalletContextState | null) {
         const otherAddress = sender === wallet.address ? recipient : sender;
 
         try {
-          const decryptedMessage = await getDecryptedMessage(otherAddress, wallet, data.message.text);
+          const decryptedMessage = await decryptSingleMessage(data.message.text, otherAddress, wallet);
           setConversations((prevConversations) => {
             const updatedConversations = prevConversations.filter(conv => conv.address !== otherAddress);
             const existingConversation = prevConversations.find(conv => conv.address === otherAddress);

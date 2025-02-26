@@ -45,8 +45,6 @@ export function decrypt(
   }
 }
 
-
-// TODO: implement below functions in useListenMessages hook
 export async function decryptSingleMessage(
   encryptedText: string,
   recipientPub: Uint8Array,

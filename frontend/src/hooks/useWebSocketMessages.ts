@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Message, broadcastMessageParams } from '@/types/types';
-import { getDecryptedMessage } from '@/api/services/messageDbService';
+import { decryptSingleMessage } from '@/api/services/decryptService';
 import { formatTimestamp } from '@/api/services/messageService';
 import { WalletContextState } from '@suiet/wallet-kit';
 
@@ -14,10 +14,10 @@ export function useWebSocketMessages(
 
     const handleNewMessage = async (messageData: broadcastMessageParams) => {
       try {
-        const decryptedMessage = await getDecryptedMessage(
+        const decryptedMessage = await decryptSingleMessage(
+          messageData.text,
           recipientAddress,
-          wallet,
-          messageData.text
+          wallet
         );
     
         const timeString = formatTimestamp(messageData.timestamp);

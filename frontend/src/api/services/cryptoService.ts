@@ -122,3 +122,41 @@ export function generateSharedSecret(
   // Hash the raw secret for consistency.
   return bytesToHex(blake2b(rawSecretAB, { dkLen: 32 }));
 }
+
+export function storeKeyPair(publicKey: Uint8Array, privateKey: Uint8Array) {
+  localStorage.setItem(
+    STORAGE_KEYS.PUBLIC_KEY,
+    Buffer.from(publicKey).toString("base64"),
+  );
+  localStorage.setItem(
+    STORAGE_KEYS.PRIVATE_KEY,
+    Buffer.from(privateKey).toString("base64"),
+  );
+}
+
+export function getStoredKeyPair(): {
+  publicKey: Uint8Array | null;
+  privateKey: Uint8Array | null;
+} {
+  const publicKeyB64 = localStorage.getItem(STORAGE_KEYS.PUBLIC_KEY);
+  const privateKeyB64 = localStorage.getItem(STORAGE_KEYS.PRIVATE_KEY);
+
+  if (!publicKeyB64 || !privateKeyB64) {
+    return { publicKey: null, privateKey: null };
+  }
+
+  try {
+    // Convert base64 string back to Uint8Array
+    const publicKey = new Uint8Array(Buffer.from(publicKeyB64, "base64"));
+    const privateKey = new Uint8Array(Buffer.from(privateKeyB64, "base64"));
+    return { publicKey, privateKey };
+  } catch (error) {
+    console.error("Failed to parse stored private key:", error);
+    return { publicKey: null, privateKey: null };
+  }
+}
+
+export function clearStoredKeys() {
+  localStorage.removeItem(STORAGE_KEYS.PUBLIC_KEY);
+  localStorage.removeItem(STORAGE_KEYS.PRIVATE_KEY);
+}
