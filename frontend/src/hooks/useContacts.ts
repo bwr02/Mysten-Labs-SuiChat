@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Contact } from '@/types/types';
 import { getAllContacts, addContact, editContact, deleteContact } from '@/api/services/contactDbService';
 import { getSuiNInfo } from '@/api/services/nameServices';
+import { fetchUserPublicKey } from '@/api/services/publicKeyService';
 
 const sendWebSocketUpdate = () => {
   const ws = new WebSocket('ws://localhost:8081');
@@ -14,6 +15,7 @@ const sendWebSocketUpdate = () => {
 export function useContacts() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchContacts();
@@ -32,30 +34,41 @@ export function useContacts() {
     return null;
   };
 
-  const addNewContact = async (suiAddress: string, suinsName?: string, name?: string) => {
+  const addNewContact = async (address: string, suinsName?: string, name?: string) => {
     setIsSubmitting(true);
+    setError(null);
     try {
-      await addContact(suiAddress, suinsName, name);
+      // Check if the user has registered their public key
+      const publicKey = await fetchUserPublicKey(address);
+      if (!publicKey) {
+        setError("This user hasn't registered their public key yet. They need to register their key before you can add them as a contact.");
+        return false;
+      }
+
+      await addContact(address, suinsName, name);
       await fetchContacts();
       sendWebSocketUpdate();
       return true;
     } catch (error) {
       console.error("Error adding contact:", error);
+      setError("Failed to add contact. Please try again.");
       return false;
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const updateContact = async (suiAddress: string, suinsName?: string, name?: string) => {
+  const updateContact = async (address: string, suinsName?: string, name?: string) => {
     setIsSubmitting(true);
+    setError(null);
     try {
-      await editContact(suiAddress, suinsName, name);
+      await editContact(address, suinsName, name);
       await fetchContacts();
       sendWebSocketUpdate();
       return true;
     } catch (error) {
       console.error("Error updating contact:", error);
+      setError("Failed to update contact. Please try again.");
       return false;
     } finally {
       setIsSubmitting(false);
@@ -63,6 +76,7 @@ export function useContacts() {
   };
 
   const removeContact = async (contactAddress: string) => {
+    setError(null);
     try {
       await deleteContact(contactAddress);
       setContacts((prev) => prev.filter((c) => c.address !== contactAddress));
@@ -70,6 +84,7 @@ export function useContacts() {
       return true;
     } catch (error) {
       console.error("Error deleting contact:", error);
+      setError("Failed to delete contact. Please try again.");
       return false;
     }
   };
@@ -77,6 +92,7 @@ export function useContacts() {
   return {
     contacts,
     isSubmitting,
+    error,
     handleSuiNSLookup,
     addNewContact,
     updateContact,

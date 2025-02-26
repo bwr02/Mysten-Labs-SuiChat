@@ -4,7 +4,8 @@ import { Contact } from '@/types/types';
 interface ContactFormProps {
   editingContact: Contact | null;
   isSubmitting: boolean;
-  onSubmit: (suiAddress: string, suinsName: string, name: string) => Promise<void>;
+  error: string | null;
+  onSubmit: (address: string, suinsName: string, name: string) => Promise<void>;
   onCancel: () => void;
   onSuiNSBlur: (suinsName: string) => Promise<string | null>;
 }
@@ -12,23 +13,24 @@ interface ContactFormProps {
 export const ContactForm: React.FC<ContactFormProps> = ({
   editingContact,
   isSubmitting,
+  error,
   onSubmit,
   onCancel,
   onSuiNSBlur
 }) => {
   const [name, setName] = useState(editingContact?.name || "");
   const [suinsName, setSuinsName] = useState(editingContact?.suins || "");
-  const [suiAddress, setSuiAddress] = useState(editingContact?.address || "");
+  const [address, setAddress] = useState(editingContact?.address || "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!suiAddress.trim()) return;
-    await onSubmit(suiAddress, suinsName, name);
+    if (!address.trim()) return;
+    await onSubmit(address, suinsName, name);
   };
 
   const handleSuiNSBlur = async () => {
     const address = await onSuiNSBlur(suinsName);
-    if (address) setSuiAddress(address);
+    if (address) setAddress(address);
   };
 
   return (
@@ -57,13 +59,18 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         <label className="block mb-2 text-sm font-medium text-gray-300">Sui Address</label>
         <input
           type="text"
-          value={suiAddress}
-          onChange={(e) => setSuiAddress(e.target.value)}
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
           className={`w-full p-2 border border-gray-600 rounded-lg bg-gray-700 text-white ${editingContact ? "bg-gray-800" : ""}`}
           required
           disabled={!!editingContact}
         />
       </div>
+      {error && (
+        <div className="mb-4 text-sm text-red-400 break-words">
+          {error}
+        </div>
+      )}
       <button
         type="submit"
         className={`w-full text-white font-medium rounded-lg px-5 py-2.5 ${isSubmitting ? "bg-gray-600" : "bg-blue-700 hover:bg-blue-800"}`}

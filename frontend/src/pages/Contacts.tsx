@@ -8,7 +8,7 @@ import { ContactListItem } from "@/components/ContactListItem";
 
 export default function ContactsPage() {
     const navigate = useNavigate();
-    const { contacts, isSubmitting, handleSuiNSLookup, addNewContact, updateContact, removeContact } = useContacts();
+    const { contacts, isSubmitting, error, handleSuiNSLookup, addNewContact, updateContact, removeContact } = useContacts();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [hoveredContact, setHoveredContact] = useState<string | null>(null);
     const [editingContact, setEditingContact] = useState<Contact | null>(null);
@@ -74,6 +74,7 @@ export default function ContactsPage() {
                         <ContactForm
                             editingContact={editingContact}
                             isSubmitting={isSubmitting}
+                            error={error}
                             onSubmit={handleSubmit}
                             onCancel={() => {
                                 setEditingContact(null);
