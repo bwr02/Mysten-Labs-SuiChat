@@ -17,6 +17,7 @@ export async function getOrCreateSignature(
   let signature = localStorage.getItem("walletSignature");
 
   if (!signature) {
+     // TODO: extract message to avoid hardcoding
     const messageBytes = new TextEncoder().encode(
       "Random message for key derivation",
     );

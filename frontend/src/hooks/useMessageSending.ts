@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { WalletContextState } from '@suiet/wallet-kit';
 import { sendMessage } from '../api/services/messageService';
-import { useSignature } from './useSignature';
+import { getOrCreateSignature } from '@/api/services/cryptoService';
 
 export interface UseMessageSendingProps {
   address: string;
@@ -20,7 +20,6 @@ export const useMessageSending = ({
 }: UseMessageSendingProps) => {
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState("");
-  const { getOrCreateSignature } = useSignature();
 
   const sendMessageHandler = useCallback(async (message: string): Promise<boolean> => {
     if (!address || !recipientAddress || !message.trim() || !wallet) {
@@ -63,7 +62,7 @@ export const useMessageSending = ({
     } finally {
       setSending(false);
     }
-  }, [address, recipientAddress, wallet, onMessageSent, refreshBalance, getOrCreateSignature]);
+  }, [address, recipientAddress, wallet, onMessageSent, refreshBalance]);
 
   return {
     sending,
