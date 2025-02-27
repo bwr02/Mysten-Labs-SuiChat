@@ -1,13 +1,8 @@
 import { useEffect, useState } from 'react';
 import { deriveKeysFromSignature, storeKeyPair, getOrCreateSignature } from '@/api/services/cryptoService';
 import { registerPublicKeyOnChain, fetchUserPublicKey } from '@/api/services/publicKeyService';
-import { ChatWalletState } from '@/types/types';
+import { ChatWalletState, STORAGE_KEYS } from '@/types/types';
 
-const STORAGE_KEYS = {
-  PRIVATE_KEY: 'chat_private_key',
-  PUBLIC_KEY: 'chat_public_key',
-  WALLET_SIGNATURE: 'walletSignature'
-};
 
 export function useChatWalletInit(wallet: ChatWalletState | null) {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -23,10 +18,10 @@ export function useChatWalletInit(wallet: ChatWalletState | null) {
       try {
         // First check if public key is already registered on chain
         const onChainPublicKey = await fetchUserPublicKey(wallet.address);
-        
+       
+        const storedSignature = localStorage.getItem(STORAGE_KEYS.WALLET_SIGNATURE);
         const storedPrivateKey = localStorage.getItem(STORAGE_KEYS.PRIVATE_KEY);
         const storedPublicKey = localStorage.getItem(STORAGE_KEYS.PUBLIC_KEY);
-        const storedSignature = localStorage.getItem(STORAGE_KEYS.WALLET_SIGNATURE);
 
         // Case 1: Public key is on chain
         if (onChainPublicKey) {

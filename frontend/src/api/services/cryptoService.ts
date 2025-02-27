@@ -5,12 +5,8 @@ import { blake2b } from "@noble/hashes/blake2b";
 import { x25519 } from "@noble/curves/ed25519";
 import { bytesToHex } from "@noble/hashes/utils";
 import { WalletContextState } from '@suiet/wallet-kit';
+import { STORAGE_KEYS } from '../../types/types';
 
-const STORAGE_KEYS = {
-  PUBLIC_KEY: "chat_public_key",
-  PRIVATE_KEY: "chat_private_key",
-  WALLET_SIGNATURE: "walletSignature"
-};
 
 export async function getOrCreateSignature(
   wallet: WalletContextState,

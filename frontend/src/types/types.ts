@@ -11,6 +11,13 @@ export interface ChatWalletState {
     suiWallet: WalletContextState;
 }
 
+// Local Storage Types
+export const STORAGE_KEYS = {
+  WALLET_SIGNATURE: "wallet_signature",
+  PUBLIC_KEY: "public_key",
+  PRIVATE_KEY: "private_key",
+};
+
 // Conversation Types
 export interface SidebarConversationParams {
     address: string;

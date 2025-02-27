@@ -1,12 +1,8 @@
-import { Message } from "@/types/types";
+import { Message, STORAGE_KEYS } from "@/types/types";
 import { generateSharedSecret } from "./cryptoService";
 import { WalletContextState } from "@suiet/wallet-kit";
 import * as forge from "node-forge";
 
-// TODO: remove redundant definition
-const STORAGE_KEYS = {
-  PRIVATE_KEY: 'chat_private_key',
-};
 
 // Decrypts an encrypted message using AES-CBC with a key derived from a shared secret
 export function decrypt(
