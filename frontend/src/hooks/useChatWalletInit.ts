@@ -21,53 +21,63 @@ export function useChatWalletInit(wallet: ChatWalletState | null) {
       }
 
       try {
+        // First check if public key is already registered on chain
+        const onChainPublicKey = await fetchUserPublicKey(wallet.address);
+        
         const storedPrivateKey = localStorage.getItem(STORAGE_KEYS.PRIVATE_KEY);
         const storedPublicKey = localStorage.getItem(STORAGE_KEYS.PUBLIC_KEY);
         const storedSignature = localStorage.getItem(STORAGE_KEYS.WALLET_SIGNATURE);
 
-        // If we have all stored data, verify it's registered on chain
-        if (storedPrivateKey && storedPublicKey) {
-          // Check if public key is registered on chain
-          const onChainPublicKey = await fetchUserPublicKey(wallet.address);
-          
-          if (onChainPublicKey) {
+        // Case 1: Public key is on chain
+        if (onChainPublicKey) {
+          // TODO: implement animated UI with checkmarks or list item screen so this message displays and is not overridded by 'Please sign a message...'
+          setMessage("Found public key associated with your wallet on chain...");
+          if (storedPrivateKey && storedPublicKey) {
             setIsInitialized(true);
             return;
           }
 
-          // TODO: check logic, why would keys exist but not be registered if we are checking for them on chain
-          // If keys exist but aren't registered, only register them
-          await registerPublicKeyOnChain(
-            wallet.suiWallet, 
-            wallet.address, 
-            new Uint8Array(Buffer.from(storedPublicKey, 'base64'))
-          );
+          // Case 1.1: Stored signature but no keys, derive and store keys
+          if (storedSignature) {
+            const { privateKey, publicKey } = deriveKeysFromSignature(storedSignature);
+            storeKeyPair(publicKey, privateKey);
+            setIsInitialized(true);
+            return;
+          }
+
+          // Case 1.2: No stored signature or keys, derive and store all
+          setMessage("Please sign a message to generate your encryption keys...");
+          const signature = await getOrCreateSignature(wallet.suiWallet);
+          const { privateKey, publicKey } = deriveKeysFromSignature(signature);
+          storeKeyPair(publicKey, privateKey);
           setIsInitialized(true);
           return;
         }
 
-        // If we have a signature but no keys, derive them
+        // Case 2: No public key on chain - need to register
         let signature = storedSignature;
         if (!signature) {
           setMessage("Please sign a message to generate your encryption keys...");
-          // Only request signature if we don't have one stored
           signature = await getOrCreateSignature(wallet.suiWallet);
         }
 
-        // Derive keys from signature
-        const { privateKey, publicKey } = deriveKeysFromSignature(signature);
-        storeKeyPair(publicKey, privateKey);
-        
+        // Derive keys if we don't have them stored
+        if (!storedPrivateKey || !storedPublicKey) {
+          const { privateKey, publicKey } = deriveKeysFromSignature(signature);
+          storeKeyPair(publicKey, privateKey);
+        }
+
+        // Register the public key on chain
         setMessage("Registering your public key on chain (requires a transaction signature)...");
-        // Register public key on chain using the same signature
         await registerPublicKeyOnChain(
-          wallet.suiWallet, 
-          wallet.address, 
-          publicKey
+          wallet.suiWallet,
+          wallet.address,
+          new Uint8Array(Buffer.from(localStorage.getItem(STORAGE_KEYS.PUBLIC_KEY)!, 'base64'))
         );
+        // TODO: implement UI if user rejects the transaction
 
         setIsInitialized(true);
-        // TODO: implement UI if user rejects the transaction
+        setMessage(null);
         setError(null);
       } catch (error) {
         console.error('Error initializing wallet:', error);
