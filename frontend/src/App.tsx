@@ -2,15 +2,12 @@ import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom
 import Layout from "./layout";
 import HomePage from "@/pages/HomePage";
 import Contacts from "@/pages/Contacts";
-import WelcomeScreen from "@/components/WelcomeScreen";
-import InitializingScreen from "@/components/InitializingScreen";
+import StatusScreen from "@/components/StatusScreen";
 import { useEffect, useState } from 'react';
 import { useChatWallet } from '@/hooks/useChatWallet';
 import { useChatWalletInit } from '@/hooks/useChatWalletInit';
-import LoadingScreen from "@/components/LoadingScreen";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-
 
 function App() {
     const wallet = useChatWallet();
@@ -43,16 +40,16 @@ function App() {
     }, [wallet?.address]);
 
     if (!wallet?.connected) {
-        return <WelcomeScreen />;
+        return <StatusScreen type="welcome" />;
     }
 
     if (!isInitialized) {
-        return <InitializingScreen error={error} />;
+        return <StatusScreen type="initializing" error={error} />;
     }
 
     // If wallet is connected but the backend hasn't confirmed the active address, show a loading state.
     if (wallet.address && !activeAddressLoaded) {
-        return <LoadingScreen />;
+        return <StatusScreen type="loading" />;
     }
 
     return (
