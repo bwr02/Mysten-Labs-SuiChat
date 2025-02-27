@@ -16,8 +16,7 @@ export function useWebSocketMessages(
       try {
         const decryptedMessage = await decryptSingleMessage(
           messageData.text,
-          recipientAddress,
-          wallet
+          messageData.publicKey,
         );
     
         const timeString = formatTimestamp(messageData.timestamp);

@@ -21,6 +21,7 @@ export const STORAGE_KEYS = {
 // Conversation Types
 export interface SidebarConversationParams {
     address: string;
+    publicKey: Uint8Array;
     name: string;
     message: string;
     time: string;

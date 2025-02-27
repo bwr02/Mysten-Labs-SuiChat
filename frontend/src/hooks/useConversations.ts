@@ -17,10 +17,12 @@ export function useConversations(wallet: WalletContextState | null) {
             if (!contact.message) {
               return { ...contact, message: "No Messages" };
             }
+            if (!wallet) {
+                throw new Error("Wallet is not available");
+            }
             const decryptedMessage = await decryptSingleMessage(
               contact.message,
               contact.publicKey,
-              wallet
             );
             return { ...contact, message: decryptedMessage || "No Messages" };
           } catch (error) {
@@ -54,14 +56,15 @@ export function useConversations(wallet: WalletContextState | null) {
         const otherAddress = sender === wallet.address ? recipient : sender;
 
         try {
-          const decryptedMessage = await decryptSingleMessage(data.message.text, otherAddress, wallet);
+          const decryptedMessage = await decryptSingleMessage(data.message.text, data.message.publicKey);
           setConversations((prevConversations) => {
             const updatedConversations = prevConversations.filter(conv => conv.address !== otherAddress);
             const existingConversation = prevConversations.find(conv => conv.address === otherAddress);
-            const newConversation = {
+            const newConversation: SidebarConversationParams = {
               address: otherAddress,
+              publicKey: existingConversation?.publicKey || new Uint8Array(),
               name: existingConversation?.name || data.message.name || otherAddress,
-              message: decryptedMessage || "No Messages",
+              message: decryptedMessage || "No Messages", 
               time: formatTimestamp(data.message.timestamp),
             };
             return [newConversation, ...updatedConversations];

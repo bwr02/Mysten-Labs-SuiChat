@@ -10,7 +10,7 @@ export function useMessageFetching(
 ) {
   useEffect(() => {
     const fetchMessages = async () => {
-      const initialMessages = await fetchAndDecryptChatHistory(recipientAddress, recipientPub, wallet);
+      const initialMessages = await fetchAndDecryptChatHistory(recipientAddress, recipientPub);
       setMessages(initialMessages);
     };
 

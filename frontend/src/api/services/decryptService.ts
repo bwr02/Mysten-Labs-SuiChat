@@ -47,12 +47,7 @@ export function decrypt(
 export async function decryptSingleMessage(
   encryptedText: string,
   recipientPub: Uint8Array,
-  wallet: WalletContextState,
 ): Promise<string> {
-  if (!wallet?.connected) {
-    throw new Error("Wallet not connected");
-  }
-
   const storedPrivateKey = localStorage.getItem(STORAGE_KEYS.PRIVATE_KEY);
   if (!storedPrivateKey) {
     throw new Error("Private key not found. Please reconnect your wallet.");
@@ -67,13 +62,8 @@ export async function decryptSingleMessage(
 export async function fetchAndDecryptChatHistory(
   recipientAddress: string,
   recipientPub: Uint8Array,
-  wallet: WalletContextState,
 ): Promise<Message[]> {
   try {
-    if (!recipientPub) {
-      throw new Error("Recipient public key is missing.");
-    }
-    
     const response = await fetch(
       `http://localhost:3000/messages/with-given-address/${recipientAddress}`,
     );
@@ -91,7 +81,7 @@ export async function fetchAndDecryptChatHistory(
         }
         return {
           ...message,
-          text: await decryptSingleMessage(message.text, recipientPub, wallet),
+          text: await decryptSingleMessage(message.text, recipientPub),
         };
       })
     );
