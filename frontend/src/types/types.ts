@@ -1,3 +1,17 @@
+import { WalletContextState } from '@suiet/wallet-kit';
+
+// Wallet Types
+export interface ChatWalletState {
+    address: string | null;
+    connected: boolean;
+    loading: boolean;
+    error: string | null;
+    refreshBalance: () => Promise<string | null>;
+    signPersonalMessage: (message: string) => Promise<{ signature: string }>;
+    suiWallet: WalletContextState;
+}
+
+// Conversation Types
 export interface SidebarConversationParams {
     address: string;
     name: string;
@@ -12,6 +26,7 @@ export interface Message {
     txDigest?: string;
 }
 
+// Component Props
 export interface ChatPanelProps {
     recipientAddress: string;
 }
@@ -30,6 +45,7 @@ export interface RecipientBarProps {
     recipientAddress: string;
 }
 
+// Contact Types
 export interface Contact {
     address: string;
     suins: string;
@@ -37,6 +53,7 @@ export interface Contact {
     public_key: string;
 }
 
+// Message Service Types
 export interface SendMessageParams {
     senderAddress: string;
     recipientAddress: string;
