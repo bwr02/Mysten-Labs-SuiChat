@@ -3,10 +3,11 @@ import { useState, useEffect } from "react";
 
 interface StatusScreenProps {
     type: 'welcome' | 'initializing' | 'loading';
+    message?: string | null;
     error?: string | null;
 }
 
-export default function StatusScreen({ type, error }: StatusScreenProps) {
+export default function StatusScreen({ type, message, error }: StatusScreenProps) {
     const [timedOut, setTimedOut] = useState(false);
 
     useEffect(() => {
@@ -27,7 +28,7 @@ export default function StatusScreen({ type, error }: StatusScreenProps) {
         },
         initializing: {
             title: "Initializing wallet...",
-            subtitle: error || "",
+            subtitle: message || error || "",
             showLogo: true,
             titleSize: "text-xl"
         },

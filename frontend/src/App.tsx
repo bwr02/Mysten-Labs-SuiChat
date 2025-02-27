@@ -11,9 +11,10 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 function App() {
     const wallet = useChatWallet();
-    const { isInitialized, error } = useChatWalletInit(wallet);
+    const { isInitialized, message, error } = useChatWalletInit(wallet);
     const [activeAddressLoaded, setActiveAddressLoaded] = useState(false);
 
+    // TODO: extract this to a separate hook
     // When the wallet address becomes available or changes, send it to the backend.
     useEffect(() => {
         if (wallet?.address) {
@@ -44,7 +45,7 @@ function App() {
     }
 
     if (!isInitialized) {
-        return <StatusScreen type="initializing" error={error} />;
+        return <StatusScreen type="initializing" message={message} error={error} />;
     }
 
     // If wallet is connected but the backend hasn't confirmed the active address, show a loading state.

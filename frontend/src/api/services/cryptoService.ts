@@ -9,12 +9,13 @@ import { WalletContextState } from '@suiet/wallet-kit';
 const STORAGE_KEYS = {
   PUBLIC_KEY: "chat_public_key",
   PRIVATE_KEY: "chat_private_key",
+  WALLET_SIGNATURE: "walletSignature"
 };
 
 export async function getOrCreateSignature(
   wallet: WalletContextState,
 ): Promise<string> {
-  let signature = localStorage.getItem("walletSignature");
+  let signature = localStorage.getItem(STORAGE_KEYS.WALLET_SIGNATURE);
 
   if (!signature) {
      // TODO: extract message to avoid hardcoding
@@ -30,7 +31,7 @@ export async function getOrCreateSignature(
     }
 
     signature = signatureData.signature;
-    localStorage.setItem("walletSignature", signature);
+    localStorage.setItem(STORAGE_KEYS.WALLET_SIGNATURE, signature);
   }
 
   return signature;
@@ -91,7 +92,7 @@ export function encrypt(message: string | null, sharedSecret: string): string {
 
   // Convert the hex string to a Buffer (binary data)
   const keyBuffer = Buffer.from(sharedSecret, "hex");
-  // Create the key as a string of bytes using forge’s buffer.
+  // Create the key as a string of bytes using forge's buffer.
   const key = forge.util.createBuffer(keyBuffer).bytes();
 
   // Generate a random 16-byte IV
@@ -160,4 +161,5 @@ export function getStoredKeyPair(): {
 export function clearStoredKeys() {
   localStorage.removeItem(STORAGE_KEYS.PUBLIC_KEY);
   localStorage.removeItem(STORAGE_KEYS.PRIVATE_KEY);
+  localStorage.removeItem(STORAGE_KEYS.WALLET_SIGNATURE);
 }

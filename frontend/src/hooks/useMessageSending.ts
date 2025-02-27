@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { WalletContextState } from '@suiet/wallet-kit';
 import { sendMessage } from '../api/services/messageService';
-import { getOrCreateSignature } from '@/api/services/cryptoService';
+// import { getOrCreateSignature } from '@/api/services/cryptoService';
 
 export interface UseMessageSendingProps {
   address: string;
@@ -36,7 +36,10 @@ export const useMessageSending = ({
       setSending(true);
       setStatus("Signing message...");
 
-      const signature = await getOrCreateSignature(wallet);
+    //   const signature = await getOrCreateSignature(wallet);
+    // TODO: fix hardcode walletSignature, this is done for debugging
+      const signature = localStorage.getItem("walletSignature");
+
       if (!signature) {
         throw new Error("Failed to obtain a valid signature.");
       }
