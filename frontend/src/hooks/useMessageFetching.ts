@@ -5,6 +5,7 @@ import { WalletContextState } from '@suiet/wallet-kit';
 
 export function useMessageFetching(
   recipientAddress: string,
+  recipientPub: Uint8Array,
   wallet: WalletContextState | null,
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>
 ) {

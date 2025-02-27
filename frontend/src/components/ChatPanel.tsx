@@ -8,13 +8,13 @@ import { useWebSocketMessages } from "@/hooks/useWebSocketMessages";
 import { useMessageFetching } from "@/hooks/useMessageFetching";
 import { useScrollToBottom } from "@/hooks/useScrollToBottom";
 
-export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
+export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress, recipientPub }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const { suiWallet } = useChatWallet();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  useWebSocketMessages(recipientAddress, suiWallet, setMessages);
-  useMessageFetching(recipientAddress, suiWallet, setMessages);
+  useWebSocketMessages(recipientAddress, recipientPub, suiWallet, setMessages);
+  useMessageFetching(recipientAddress, recipientPub, suiWallet, setMessages);
   useScrollToBottom(messagesEndRef, messages);
 
   const handleMessageSent = () => {

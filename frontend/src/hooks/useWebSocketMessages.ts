@@ -6,6 +6,7 @@ import { WalletContextState } from '@suiet/wallet-kit';
 
 export function useWebSocketMessages(
   recipientAddress: string,
+  recipientPub: Uint8Array,
   wallet: WalletContextState | null,
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>
 ) {
@@ -16,7 +17,7 @@ export function useWebSocketMessages(
       try {
         const decryptedMessage = await decryptSingleMessage(
           messageData.text,
-          messageData.publicKey,
+          recipientPub,
         );
     
         const timeString = formatTimestamp(messageData.timestamp);
@@ -46,5 +47,5 @@ export function useWebSocketMessages(
     };
 
     return () => ws.close();
-  }, [recipientAddress, wallet, setMessages]);
+  }, [recipientAddress, recipientPub, wallet, setMessages]);
 } 
