@@ -37,11 +37,13 @@ export interface Message {
 // Component Props
 export interface ChatPanelProps {
     recipientAddress: string;
+    recipientPub: Uint8Array;
 }
 
 export interface ChatSidebarProps {
     recipientAddress: string | null;
-    setRecipientAddress: (address: string) => void;
+    recipientPub: Uint8Array | null;
+    setRecipient: (address: string, publicKey: Uint8Array) => void;
 }
 
 export interface MessageInputFieldProps {

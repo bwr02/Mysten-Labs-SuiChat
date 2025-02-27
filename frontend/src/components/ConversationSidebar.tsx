@@ -5,25 +5,25 @@ import { ConversationItem } from "./ConversationItem";
 import { useConversations } from "@/hooks/useConversations";
 import { useConversationSearch } from "@/hooks/useConversationSearch";
 
-export const ConversationSidebar = ({ recipientAddress, setRecipientAddress }: ChatSidebarProps) => {
+export const ConversationSidebar = ({ recipientAddress, setRecipient }: ChatSidebarProps) => {
   const { suiWallet } = useChatWallet();
   const { conversations } = useConversations(suiWallet);
-  const { searchText, handleSearchInputChange, handleSearchKeyDown } = useConversationSearch(setRecipientAddress);
+  const { searchText, handleSearchInputChange, handleSearchKeyDown } = useConversationSearch(setRecipient);
 
   const handleSelectConversation = useCallback(
-    (address: string) => {
-      setRecipientAddress(address);
+    (address: string, publicKey: Uint8Array) => {
+      setRecipient(address, publicKey);
     },
-    [setRecipientAddress]
+    [setRecipient]
   );
 
   useEffect(() => {
     // If there are conversations and no recipient is set, use the first one.
     if (conversations.length > 0 && !recipientAddress) {
       const defaultContact = conversations[0];
-      setRecipientAddress(defaultContact.address);
+      setRecipient(defaultContact.address, defaultContact.publicKey);
     }
-  }, [conversations, recipientAddress, setRecipientAddress]);
+  }, [conversations, recipientAddress, setRecipient]);
 
   return (
     <div className="w-80 shrink-0 p-4 bg-medium-blue flex flex-col overflow-y-auto overflow-x-hidden">
@@ -45,7 +45,7 @@ export const ConversationSidebar = ({ recipientAddress, setRecipientAddress }: C
             key={conv.address}
             conv={conv}
             isSelected={recipientAddress === conv.address}
-            onSelect={() => handleSelectConversation(conv.address)}
+            onSelect={() => handleSelectConversation(conv.address, conv.publicKey)}
           />
         ))}
       </div>

@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
 import { getSuiNInfo } from '@/api/services/nameServices';
+import { fetchUserPublicKey } from '@/api/services/publicKeyService';
 
-export function useConversationSearch(setRecipientAddress: (address: string) => void) {
+export function useConversationSearch(setRecipient: (address: string, publicKey: Uint8Array) => void) {
   const [searchText, setSearchText] = useState("");
 
   const handleSearchInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -14,15 +15,21 @@ export function useConversationSearch(setRecipientAddress: (address: string) => 
     try {
       const targetAddress = await getSuiNInfo("@" + searchText);
       if (targetAddress) {
-        setRecipientAddress(targetAddress);
-        setSearchText("");
+        const publicKey = await fetchUserPublicKey(targetAddress);
+        if (publicKey) {
+          setRecipient(targetAddress, publicKey);
+          setSearchText("");
+        } else {
+            // TOOD: instead of logging, show popup to user
+          console.log("No public key found for the given address.");
+        }
       } else {
         console.log("No target address found for the given name.");
       }
     } catch (error) {
       console.error("Error fetching target address:", error);
     }
-  }, [searchText, setRecipientAddress]);
+  }, [searchText, setRecipient]);
 
   const handleSearchKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {

@@ -10,14 +10,22 @@ import { useLocation } from "react-router-dom";
 export default function HomePage() {
     const location = useLocation();
     const [recipientAddress, setRecipientAddress] = useState<string | null>(null);
+    const [recipientPub, setRecipientPub] = useState<Uint8Array | null>(null);
     const [isMinimized, setIsMinimized] = useState(false);
 
     useEffect(() => {
-        // Check if the navigation state contains a recipientAddress from the ContactsPage
-        if (location.state && (location.state as any).recipientAddress) {
-            setRecipientAddress((location.state as any).recipientAddress);
+        // Check if the navigation state contains recipient info from the ContactsPage
+        if (location.state) {
+            const { recipientAddress, recipientPub } = location.state;
+            if (recipientAddress) setRecipientAddress(recipientAddress);
+            if (recipientPub) setRecipientPub(recipientPub);
         }
     }, [location]);
+
+    const handleSetRecipient = (address: string, publicKey: Uint8Array) => {
+        setRecipientAddress(address);
+        setRecipientPub(publicKey);
+    };
 
     useEffect(() => {
         const handleResize = () => {
@@ -33,11 +41,15 @@ export default function HomePage() {
         <div className="flex flex-col h-screen bg-dark-blue">
             <Flex className="h-full flex-row bg-dark-blue">
                 <ConversationSidebar 
-                    recipientAddress={recipientAddress} 
-                    setRecipientAddress={setRecipientAddress} 
+                    recipientAddress={recipientAddress}
+                    recipientPub={recipientPub}
+                    setRecipient={handleSetRecipient}
                 />
-                {recipientAddress ? (
-                    <ChatPanel recipientAddress={recipientAddress} />
+                {recipientAddress && recipientPub ? (
+                    <ChatPanel 
+                        recipientAddress={recipientAddress} 
+                        recipientPub={recipientPub}
+                    />
                 ) : (
                     <div className="flex-1 flex items-center justify-center text-gray-300">
                         <p>Select a contact to start chatting</p>
@@ -53,7 +65,7 @@ export default function HomePage() {
                         transition: "opacity 0.3s ease-in-out",
                     }}
                 >
-                    <ConnectButton  className=" bg-blue-800 "/>
+                    <ConnectButton className="bg-blue-800" />
                 </Box>
             )}
         </div>
