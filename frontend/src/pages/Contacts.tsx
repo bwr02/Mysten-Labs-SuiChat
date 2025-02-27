@@ -5,6 +5,7 @@ import { Contact } from "@/types/types";
 import { useContacts } from "@/hooks/useContacts";
 import { ContactForm } from "@/components/ContactForm";
 import { ContactListItem } from "@/components/ContactListItem";
+import { fetchUserPublicKey } from "@/api/services/publicKeyService";
 
 export default function ContactsPage() {
     const navigate = useNavigate();
@@ -22,13 +23,30 @@ export default function ContactsPage() {
             setIsModalOpen(false);
             setEditingContact(null);
             if (!editingContact) {
-                navigate("/messages", { state: { recipientAddress: suiAddress } });
+                // Fetch the public key before navigating
+                const publicKey = await fetchUserPublicKey(suiAddress);
+                if (publicKey) {
+                    navigate("/messages", { 
+                        state: { 
+                            recipientAddress: suiAddress,
+                            recipientPub: publicKey
+                        } 
+                    });
+                }
             }
         }
     };
 
-    const handleMessageClick = (address: string) => {
-        navigate("/messages", { state: { recipientAddress: address } });
+    const handleMessageClick = async (address: string) => {
+        const publicKey = await fetchUserPublicKey(address);
+        if (publicKey) {
+            navigate("/messages", { 
+                state: { 
+                    recipientAddress: address,
+                    recipientPub: publicKey
+                } 
+            });
+        }
     };
 
     return (
