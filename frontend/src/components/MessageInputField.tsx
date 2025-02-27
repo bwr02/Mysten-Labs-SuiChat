@@ -1,19 +1,19 @@
 import React, { memo, useCallback, useState, useRef } from "react";
-import { useSuiWallet } from '../hooks/useSuiWallet';
+import { useChatWallet } from '../hooks/useChatWallet';
 import { MessageInputFieldProps } from "@/types/types.ts";
 import { SendButton } from "./SendButton";
 import { useMessageSending } from "@/hooks/useMessageSending";
 import { useTextareaAutosize } from "@/hooks/useTextareaAutosize";
 
 export const MessageInputField = memo(({ recipientAddress, onMessageSent }: MessageInputFieldProps) => {
-  const { address, loading, error, refreshBalance, wallet } = useSuiWallet();
+  const { address, loading, error, refreshBalance, suiWallet } = useChatWallet();
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { sending, status, sendMessageHandler } = useMessageSending({
     address: address || "",
     recipientAddress,
-    wallet,
+    wallet: suiWallet,
     onMessageSent,
     refreshBalance
   });

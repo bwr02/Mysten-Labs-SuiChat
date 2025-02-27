@@ -1,13 +1,13 @@
 import { useCallback, useEffect } from "react";
 import { ChatSidebarProps } from "@/types/types";
-import { useSuiWallet } from "@/hooks/useSuiWallet";
+import { useChatWallet } from "@/hooks/useChatWallet";
 import { ConversationItem } from "./ConversationItem";
 import { useConversations } from "@/hooks/useConversations";
 import { useConversationSearch } from "@/hooks/useConversationSearch";
 
 export const ConversationSidebar = ({ recipientAddress, setRecipientAddress }: ChatSidebarProps) => {
-  const { wallet } = useSuiWallet();
-  const { conversations } = useConversations(wallet);
+  const { suiWallet } = useChatWallet();
+  const { conversations } = useConversations(suiWallet);
   const { searchText, handleSearchInputChange, handleSearchKeyDown } = useConversationSearch(setRecipientAddress);
 
   const handleSelectConversation = useCallback(

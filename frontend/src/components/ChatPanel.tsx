@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { MessageInputField } from "./MessageInputField";
-import { useSuiWallet } from "@/hooks/useSuiWallet";
+import { useChatWallet } from "@/hooks/useChatWallet";
 import { RecipientBar } from "@/components/RecipientBar.tsx";
 import { MessageBubble } from "@/components/MessageBubble.tsx";
 import { ChatPanelProps, Message } from "@/types/types.ts";
@@ -10,11 +10,11 @@ import { useScrollToBottom } from "@/hooks/useScrollToBottom";
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const { wallet } = useSuiWallet();
+  const { suiWallet } = useChatWallet();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  useWebSocketMessages(recipientAddress, wallet, setMessages);
-  useMessageFetching(recipientAddress, wallet, setMessages);
+  useWebSocketMessages(recipientAddress, suiWallet, setMessages);
+  useMessageFetching(recipientAddress, suiWallet, setMessages);
   useScrollToBottom(messagesEndRef, messages);
 
   const handleMessageSent = () => {

@@ -1,9 +1,12 @@
 import { Message } from "@/types/types";
-import { deriveKeysFromSignature, getOrCreateSignature } from "./cryptoService";
-import { WalletContextState } from "@suiet/wallet-kit";
 import { generateSharedSecret } from "./cryptoService";
+import { WalletContextState } from "@suiet/wallet-kit";
 import * as forge from "node-forge";
 
+// TODO: remove redundant definition
+const STORAGE_KEYS = {
+  PRIVATE_KEY: 'chat_private_key',
+};
 
 // Decrypts an encrypted message using AES-CBC with a key derived from a shared secret
 export function decrypt(
@@ -54,9 +57,12 @@ export async function decryptSingleMessage(
     throw new Error("Wallet not connected");
   }
 
-  const signature = await getOrCreateSignature(wallet);
-  const { privateKey: myPriv, publicKey: _ } =
-    deriveKeysFromSignature(signature);
+  const storedPrivateKey = localStorage.getItem(STORAGE_KEYS.PRIVATE_KEY);
+  if (!storedPrivateKey) {
+    throw new Error("Private key not found. Please reconnect your wallet.");
+  }
+
+  const myPriv = new Uint8Array(Buffer.from(storedPrivateKey, 'base64'));
   const sharedSecret = generateSharedSecret(myPriv, recipientPub);
 
   return decrypt(encryptedText, sharedSecret);
@@ -83,16 +89,16 @@ export async function fetchAndDecryptChatHistory(
     const encryptedMessages: Message[] = await response.json();
 
     const decryptedMessages = await Promise.all(
-  encryptedMessages.map(async (message) => {
-    if (!message.text) {
-      return { ...message, text: "" }; // set empty string if text is null
-    }
-    return {
-      ...message,
-      text: await decryptSingleMessage(message.text, recipientPub, wallet),
-    };
-  })
-);
+      encryptedMessages.map(async (message) => {
+        if (!message.text) {
+          return { ...message, text: "" }; // set empty string if text is null
+        }
+        return {
+          ...message,
+          text: await decryptSingleMessage(message.text, recipientPub, wallet),
+        };
+      })
+    );
     return decryptedMessages;
   } catch (error) {
     console.error("Error fetching chat history:", error);
