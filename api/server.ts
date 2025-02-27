@@ -330,16 +330,21 @@ app.get("/contacts/get-suins/:addr", async (req, res) => {
 });
 
 app.post("/add-contact", async (req, res) => {
-  const { addr, suiname, contactName } = req.body;
+  const { addr, recipientPub, suiname, contactName } = req.body;
 
   if (!addr) {
     return res.status(400).json({ error: "Address is required" });
+  }
+
+  if (!recipientPub) {
+    return res.status(400).json({ error: "Public key is required" });
   }
 
   try {
     const contact = await prisma.contact.create({
       data: {
         address: addr,
+        public_key: recipientPub,
         ...(suiname && { suins: suiname }),
         ...(contactName && { name: contactName }),
       },

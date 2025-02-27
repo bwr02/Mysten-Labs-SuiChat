@@ -39,13 +39,13 @@ export function useContacts() {
     setError(null);
     try {
       // Check if the user has registered their public key
-      const publicKey = await fetchUserPublicKey(address);
-      if (!publicKey) {
+      const recipientPub = await fetchUserPublicKey(address);
+      if (!recipientPub) {
         setError("This user hasn't registered their SuiChat public key yet. They need to register their key before you can add them as a contact.");
         return false;
       }
 
-      await addContact(address, suinsName, name);
+      await addContact(address, recipientPub, suinsName, name);
       await fetchContacts();
       sendWebSocketUpdate();
       return true;

@@ -37,14 +37,15 @@ export async function getAllContacts(): Promise<Contact[]> {
     }
 }
 
-export async function addContact(addr: string, suiname?: string, contactName?: string) {
+export async function addContact(addr: string, recipientPub: Uint8Array, suiname?: string, contactName?: string) {
     try {
+        const formattedRecipientPub = Buffer.from(recipientPub).toString('base64');
         const response = await fetch('http://localhost:3000/add-contact', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ addr, suiname, contactName }),
+            body: JSON.stringify({ addr, recipientPub: formattedRecipientPub, suiname, contactName }),
         });
 
         if (!response.ok) {
