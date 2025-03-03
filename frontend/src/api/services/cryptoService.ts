@@ -72,9 +72,6 @@ export function deriveKeysFromSignature(signature: string): {
   // Using nacl.scalarMult.base(priv) ensures that the public key is mathematically coupled to the private key.
   const pub = nacl.scalarMult.base(priv);
 
-  console.log("Derived ephemeral private key (hex):", bytesToHex(priv));
-  console.log("Derived ephemeral public key (hex):", bytesToHex(pub));
-
   return {
     privateKey: priv,
     publicKey: pub,

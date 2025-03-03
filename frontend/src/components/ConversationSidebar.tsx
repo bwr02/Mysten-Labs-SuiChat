@@ -12,7 +12,11 @@ export const ConversationSidebar = ({ recipientAddress, setRecipient }: ChatSide
 
   const handleSelectConversation = useCallback(
     (conv: SidebarConversationParams) => {
-      setRecipient(conv.address, conv.publicKey);
+      if (conv.publicKey) {
+        setRecipient(conv.address, conv.publicKey);
+      } else {
+        console.error("Public key not found for conversation:", conv.address);
+      }
     },
     [setRecipient]
   );
@@ -21,7 +25,11 @@ export const ConversationSidebar = ({ recipientAddress, setRecipient }: ChatSide
     // If there are conversations and no recipient is set, use the first one.
     if (conversations.length > 0 && !recipientAddress) {
       const defaultContact = conversations[0];
+      if (defaultContact.publicKey) {
       setRecipient(defaultContact.address, defaultContact.publicKey);
+      } else {
+        console.error("Public key not found for default contact:", defaultContact.address);
+      }
     }
   }, [conversations, recipientAddress, setRecipient]);
 

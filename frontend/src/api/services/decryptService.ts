@@ -12,9 +12,6 @@ export function decrypt(
   if (!encryptedText) return "failed";
 
   try {
-    console.log("Decrypting message:", encryptedText);
-    console.log("Using shared secret:", Array.from(sharedSecret));
-
     // Convert the hex string to a Buffer and then to a byte string.
     const keyBuffer = Buffer.from(sharedSecret, "hex");
     const key = forge.util.createBuffer(keyBuffer).bytes();
@@ -32,10 +29,10 @@ export function decrypt(
     decipher.update(forge.util.createBuffer(ciphertext));
 
     const success = decipher.finish();
-    console.log("Decryption success:", success);
-
     if (!success) {
       throw new Error("Decryption failed");
+    } else {
+      console.log("Decryption success:", success);
     }
     return decipher.output.toString();
   } catch (error) {
@@ -55,7 +52,6 @@ export async function decryptSingleMessage(
 
   const myPriv = new Uint8Array(Buffer.from(storedPrivateKey, 'base64'));
   const sharedSecret = generateSharedSecret(myPriv, recipientPub);
-  console.log("shared secret", sharedSecret);
   return decrypt(encryptedText, sharedSecret);
 }
 
