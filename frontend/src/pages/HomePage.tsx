@@ -52,6 +52,7 @@ export default function HomePage() {
                     />
                 ) : (
                     <div className="flex-1 flex items-center justify-center text-gray-300">
+                        {/* TODO: message should not show if there are no contacts to select */}
                         <p>Select a contact to start chatting</p>
                     </div>
                 )}

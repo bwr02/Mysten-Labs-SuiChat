@@ -265,7 +265,15 @@ app.get("/contacts/metadata", async (req, res) => {
 
 app.get("/contacts/all-contacts", async (req, res) => {
   try {
+    const myAddress = getActiveAddress();
+    if (!myAddress) {
+      return res.status(400).json({ error: "No active wallet address" });
+    }
+
     const contacts = await prisma.contact.findMany({
+      where: {
+        ownerAddress: myAddress
+      },
       distinct: ["address"],
       orderBy: {
         address: "asc",
@@ -274,6 +282,7 @@ app.get("/contacts/all-contacts", async (req, res) => {
         address: true,
         name: true,
         suins: true,
+        public_key: true,
       },
     });
 
@@ -286,31 +295,37 @@ app.get("/contacts/all-contacts", async (req, res) => {
 
 app.get("/contacts/get-name/:addr", async (req, res) => {
   const { addr } = req.params;
-  const contact = await prisma.contact.findUnique({
+  const ownerAddress = getActiveAddress();
+  
+  const contact = await prisma.contact.findFirst({
     where: {
       address: addr,
+      ownerAddress
     },
   });
 
   if (contact && contact.name) {
-    res.json(contact.name); // Send the name as JSON
+    res.json(contact.name);
   } else {
-    res.json(null); // Send null if no contact is found
+    res.json(null);
   }
 });
 
 app.get("/contacts/get-public-key/:addr", async (req, res) => {
   const { addr } = req.params;
-  const contact = await prisma.contact.findUnique({
+  const ownerAddress = getActiveAddress();
+  
+  const contact = await prisma.contact.findFirst({
     where: {
       address: addr,
+      ownerAddress
     },
   });
 
   if (contact && contact.public_key) {
-    res.json(contact.public_key); // Send the public key as JSON
+    res.json(contact.public_key);
   } else {
-    res.json(null); // Send null if no public key is found
+    res.json(null);
   }
 });
 
@@ -331,6 +346,7 @@ app.get("/contacts/get-suins/:addr", async (req, res) => {
 
 app.post("/add-contact", async (req, res) => {
   const { addr, recipientPub, suiname, contactName } = req.body;
+  const ownerAddress = getActiveAddress();
 
   if (!addr) {
     return res.status(400).json({ error: "Address is required" });
@@ -340,11 +356,16 @@ app.post("/add-contact", async (req, res) => {
     return res.status(400).json({ error: "Public key is required" });
   }
 
+  if (!ownerAddress) {
+    return res.status(400).json({ error: "No active wallet address" });
+  }
+
   try {
     const contact = await prisma.contact.create({
       data: {
         address: addr,
         public_key: recipientPub,
+        ownerAddress,
         ...(suiname && { suins: suiname }),
         ...(contactName && { name: contactName }),
       },
@@ -429,5 +450,22 @@ app.delete('/delete-contact/:addr', async (req, res) => {
   }
 });
 
+// Clear contacts for a wallet
+app.delete("/contacts/clear/:walletAddress", async (req, res) => {
+  const { walletAddress } = req.params;
+  
+  try {
+    await prisma.contact.deleteMany({
+      where: {
+        ownerAddress: walletAddress
+      }
+    });
+    
+    res.status(200).json({ message: "Contacts cleared successfully" });
+  } catch (error) {
+    console.error("Error clearing contacts:", error);
+    res.status(500).json({ error: "Failed to clear contacts" });
+  }
+});
 
 app.listen(3000, () => console.log(`🚀 Server ready at: http://localhost:3000`));
