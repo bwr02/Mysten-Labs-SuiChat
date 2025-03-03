@@ -252,12 +252,24 @@ app.get("/contacts/metadata", async (req, res) => {
           },
         });
 
+        // Convert hex-formatted public key to Uint8Array
+        let publicKey: Uint8Array | null = null;
+        if (contact?.public_key) {
+          try {
+
+            const keyBuffer = Buffer.from(contact.public_key, 'hex');
+            publicKey = Uint8Array.from(keyBuffer);
+          } catch (error) {
+            console.error(`Failed to convert public key for ${address}:`, error);
+          }
+        }
+
         return {
           address,
           name: contact?.name || contact?.suins || address,
           message: mostRecentMessage || "",
           time: timeString,
-          publicKey: contact?.public_key ? new Uint8Array(Buffer.from(contact.public_key, 'base64')) : null
+          publicKey: publicKey ? Array.from(publicKey) : null  // Convert to regular array for JSON serialization
         };
       }),
     );

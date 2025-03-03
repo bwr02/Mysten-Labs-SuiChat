@@ -55,7 +55,7 @@ export async function decryptSingleMessage(
 
   const myPriv = new Uint8Array(Buffer.from(storedPrivateKey, 'base64'));
   const sharedSecret = generateSharedSecret(myPriv, recipientPub);
-
+  console.log("shared secret", sharedSecret);
   return decrypt(encryptedText, sharedSecret);
 }
 
