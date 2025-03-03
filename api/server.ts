@@ -201,6 +201,9 @@ app.get("/contacts", async (req, res) => {
 app.get("/contacts/metadata", async (req, res) => {
   try {
     const myAddress = getActiveAddress();
+    if (!myAddress) {
+      return res.status(400).json({ error: "No active wallet address" });
+    }
 
     // Fetch all messages involving the current SuiChat user
     const messages = await prisma.message.findMany({
@@ -208,16 +211,11 @@ app.get("/contacts/metadata", async (req, res) => {
         OR: [{ sender: myAddress }, { recipient: myAddress }],
       },
       orderBy: {
-        timestamp: "desc", // Order by timestamp descending for easy aggregation
+        timestamp: "desc",
       },
     });
 
-    // contactMap will store info about each contact
-    // key = contactAddress, value = { mostRecentMessage, timestamp }
-    const contactMap: Record<
-      string,
-      { mostRecentMessage: string | null; timestamp: string | null }
-    > = {};
+    const contactMap: Record<string, { mostRecentMessage: string | null; timestamp: string | null }> = {};
 
     // Build our map with the first (i.e. most recent) message
     messages.forEach((message) => {
@@ -242,16 +240,24 @@ app.get("/contacts/metadata", async (req, res) => {
           timeString = formatTimestamp(timestamp);
         }
 
-        const contact = await prisma.contact.findUnique({
-          where: { address },
-          select: { name: true, suins: true },
+        const contact = await prisma.contact.findFirst({
+          where: { 
+            address,
+            ownerAddress: myAddress
+          },
+          select: { 
+            name: true, 
+            suins: true,
+            public_key: true 
+          },
         });
 
         return {
           address,
-          name: contact?.name || contact?.suins || address, // Use name if available, otherwise suins, otherwise address
+          name: contact?.name || contact?.suins || address,
           message: mostRecentMessage || "",
-          time: timeString, // This will be something like '1:30 PM'
+          time: timeString,
+          publicKey: contact?.public_key ? new Uint8Array(Buffer.from(contact.public_key, 'base64')) : null
         };
       }),
     );

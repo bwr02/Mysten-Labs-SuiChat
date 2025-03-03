@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { ChatSidebarProps } from "@/types/types";
+import { ChatSidebarProps, SidebarConversationParams } from "@/types/types";
 import { useChatWallet } from "@/hooks/useChatWallet";
 import { ConversationItem } from "./ConversationItem";
 import { useConversations } from "@/hooks/useConversations";
@@ -11,8 +11,8 @@ export const ConversationSidebar = ({ recipientAddress, setRecipient }: ChatSide
   const { searchText, handleSearchInputChange, handleSearchKeyDown } = useConversationSearch(setRecipient);
 
   const handleSelectConversation = useCallback(
-    (address: string, publicKey: Uint8Array) => {
-      setRecipient(address, publicKey);
+    (conv: SidebarConversationParams) => {
+      setRecipient(conv.address, conv.publicKey);
     },
     [setRecipient]
   );
@@ -45,7 +45,7 @@ export const ConversationSidebar = ({ recipientAddress, setRecipient }: ChatSide
             key={conv.address}
             conv={conv}
             isSelected={recipientAddress === conv.address}
-            onSelect={() => handleSelectConversation(conv.address, conv.publicKey)}
+            onSelect={() => handleSelectConversation(conv)}
           />
         ))}
       </div>
