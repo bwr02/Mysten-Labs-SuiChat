@@ -37,14 +37,23 @@ export async function getAllContacts(): Promise<Contact[]> {
     }
 }
 
-export async function addContact(addr: string, suiname?: string, contactName?: string) {
+export async function addContact(addr: string, recipientPub: Uint8Array, suiname?: string, contactName?: string) {
     try {
+        console.log('Original recipientPub:', recipientPub);
+        // First ensure we have a proper Uint8Array
+        const pubKeyArray = Array.from(recipientPub);
+        console.log('Public key as array:', pubKeyArray);
+        
+        // Convert to hex string for storage
+        const formattedRecipientPub = Buffer.from(pubKeyArray).toString('hex');
+        console.log('Formatted public key (hex):', formattedRecipientPub);
+        
         const response = await fetch('http://localhost:3000/add-contact', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ addr, suiname, contactName }),
+            body: JSON.stringify({ addr, recipientPub: formattedRecipientPub, suiname, contactName }),
         });
 
         if (!response.ok) {

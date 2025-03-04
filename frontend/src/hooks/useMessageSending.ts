@@ -1,26 +1,41 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { WalletContextState } from '@suiet/wallet-kit';
 import { sendMessage } from '../api/services/messageService';
-import { useSignature } from './useSignature';
+import { STORAGE_KEYS } from '../types/types';
 
 export interface UseMessageSendingProps {
   address: string;
   recipientAddress: string;
+  recipientPubKey: Uint8Array;
   wallet: WalletContextState | null;
   onMessageSent: (message: string, timestamp: number, txId: string) => void;
   refreshBalance: () => Promise<string | null>;
+  setSendingComplete: () => void;
 }
 
 export const useMessageSending = ({
   address,
   recipientAddress,
+  recipientPubKey,
   wallet,
   onMessageSent,
-  refreshBalance
+  refreshBalance,
+  setSendingComplete
 }: UseMessageSendingProps) => {
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState("");
-  const { getOrCreateSignature } = useSignature();
+
+  useEffect(() => {
+    const handleMessageSent = (event: CustomEvent) => {
+      setSending(false);
+      setSendingComplete();
+    };
+
+    window.addEventListener('messageSent', handleMessageSent as EventListener);
+    return () => {
+      window.removeEventListener('messageSent', handleMessageSent as EventListener);
+    };
+  }, [setSendingComplete]);
 
   const sendMessageHandler = useCallback(async (message: string): Promise<boolean> => {
     if (!address || !recipientAddress || !message.trim() || !wallet) {
@@ -35,23 +50,14 @@ export const useMessageSending = ({
 
     try {
       setSending(true);
-      setStatus("Signing message...");
-
-      const signature = await getOrCreateSignature(wallet);
-      if (!signature) {
-        throw new Error("Failed to obtain a valid signature.");
-      }
-
-      setStatus("Sending message...");
       const result = await sendMessage({
         senderAddress: address,
         recipientAddress,
-        content: message,
-        signature,
+        recipientPubKey,
+        message,
         wallet,
       });
       
-      setStatus(`Message sent! Transaction ID: ${result.txId}`);
       onMessageSent(message, result.timestamp, result.txId);
       await refreshBalance();
       return true;
@@ -59,11 +65,10 @@ export const useMessageSending = ({
     } catch (error) {
       console.error('Error:', error);
       setStatus(`Error: ${error instanceof Error ? error.message : 'Failed to send message'}`);
-      return false;
-    } finally {
       setSending(false);
+      return false;
     }
-  }, [address, recipientAddress, wallet, onMessageSent, refreshBalance, getOrCreateSignature]);
+  }, [address, recipientAddress, wallet, onMessageSent, refreshBalance]);
 
   return {
     sending,

@@ -1,8 +1,29 @@
 import { useWallet } from '@suiet/wallet-kit';
 import { checkBalance } from '../api/services/walletService';
+import { ChatWalletState } from '@/types/types';
+import { useEffect, useRef } from 'react';
 
-export const useSuiWallet = () => {
+export const useChatWallet = (): ChatWalletState => {
     const wallet = useWallet();
+    const previousAddressRef = useRef<string | null>(null);
+
+    useEffect(() => {
+        const currentAddress = wallet.account?.address;
+        const previousAddress = previousAddressRef.current;
+
+        // If we have a new address and it's different from the previous one
+        if (currentAddress && previousAddress && currentAddress !== previousAddress) {
+            // Clear contacts for the previous wallet
+            fetch(`http://localhost:3000/contacts/clear/${previousAddress}`, {
+                method: 'DELETE',
+            }).catch(error => {
+                console.error('Error clearing previous wallet contacts:', error);
+            });
+        }
+
+        // Update the ref with the current address
+        previousAddressRef.current = currentAddress ?? null;
+    }, [wallet.account?.address]);
 
     /**
      * Refresh the user's wallet balance.
@@ -49,6 +70,6 @@ export const useSuiWallet = () => {
         error: wallet.status === 'disconnected' ? 'Wallet disconnected' : null,
         refreshBalance,
         signPersonalMessage,
-        wallet
+        suiWallet: wallet
     };
 };

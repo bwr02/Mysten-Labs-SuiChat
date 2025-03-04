@@ -33,8 +33,11 @@ model Cursor {
 }
 
 model Contact {
-  address String @id
-  suins String?
-  name String?
-  public_key String?
+  address      String  @id
+  ownerAddress String  // The wallet address that owns this contact
+  public_key   String
+  suins        String?
+  name         String?
+
+  @@unique([address, ownerAddress])
 }

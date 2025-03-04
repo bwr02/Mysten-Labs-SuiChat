@@ -1,133 +1,30 @@
-import {decryptMessage, deriveKeyFromSignature, generateSharedSecret} from './cryptoService';
-import {WalletContextState} from '@suiet/wallet-kit'
 import {Message} from "@/types/types.ts";
 
-export async function getAllMessages(): Promise<Message[]> {
+async function fetchMessages(endpoint: string): Promise<Message[]> {
     try {
-        const response = await fetch(`http://localhost:3000/messages`);
+        const response = await fetch(`http://localhost:3000/${endpoint}`);
         if (!response.ok) {
             console.error("Failed to fetch messages. Status:", response.status);
             throw new Error('Failed to fetch messages');
         }
-
-        const messages: Message[] = await response.json();
-        return messages;
+        return await response.json();
     } catch (error) {
         console.error('Error fetching messages:', error);
         return [];
     }
 }
+
+export async function getAllMessages(): Promise<Message[]> {
+    return fetchMessages('messages');
+}
+
 
 export async function getAllBySender(sender: string): Promise<Message[]> {
-    try {
-        // console.log(`Calling API for sender: ${sender}`);
-        const response = await fetch(`http://localhost:3000/messages/by-sender/${sender}`);
-        if (!response.ok) {
-            console.error("Failed to fetch messages. Status:", response.status);
-            throw new Error('Failed to fetch messages');
-        }
-
-        const messages: Message[] = await response.json();
-        // console.log("API response:", messages);
-        return messages;
-    } catch (error) {
-        console.error('Error fetching messages:', error);
-        return [];
-    }
+    return fetchMessages(`messages/by-sender/${sender}`);
 }
+
 
 export async function getAllByRecipient(recipient: string): Promise<Message[]> {
-    try {
-        // console.log(`Calling API for recipient: ${recipient}`);
-        const response = await fetch(`http://localhost:3000/messages/by-recipient/${recipient}`);
-        if (!response.ok) {
-            console.error("Failed to fetch messages. Status:", response.status);
-            throw new Error('Failed to fetch messages');
-        }
-
-        const messages: Message[] = await response.json();
-        // console.log("API response:", messages);
-        return messages;
-    } catch (error) {
-        console.error('Error fetching messages:', error);
-        return [];
-    }
-}
-
-export async function getDecryptedMessage(otherAddr: string|null, wallet: WalletContextState|null, message: string): Promise<string> {
-    if (!wallet) {
-        console.log("Wallet is not connected.");
-        return "";
-    }
-
-    let signature = localStorage.getItem('walletSignature');
-    if (!signature) {
-        console.log('No cached signature.')
-        const messageBytes = new TextEncoder().encode("Random message for key derivation");
-        const signatureData = await wallet?.signPersonalMessage({
-        message: messageBytes
-        });
-        if (!signatureData?.signature) {
-        throw new Error("Failed to obtain a valid signature.");
-        }
-        signature = signatureData.signature;
-        localStorage.setItem('walletSignature', signature);
-    }
-
-    const tempPrivKey = deriveKeyFromSignature(signature);
-    if (!otherAddr) {
-        console.log("Other address is not specified.");
-        return "";
-    }
-    const sharedSecret = generateSharedSecret(tempPrivKey, otherAddr);
-    const decryptedText = decryptMessage(message, sharedSecret);
-    return decryptedText;
-}
-
- 
-export async function getMessagesWithAddress(otherAddr: string|null, wallet: WalletContextState | null): Promise<Message[]> {
-    try {
-        const response = await fetch(`http://localhost:3000/messages/with-given-address/${otherAddr}`);
-        if (!response.ok) {
-            console.error("Failed to fetch messages. Status:", response.status);
-            throw new Error('Failed to fetch messages');
-        }
-
-        if (!wallet) {
-            console.log("Wallet is not connected.");
-            return [];
-        }
-
-        let signature = localStorage.getItem('walletSignature');
-        if (!signature) {
-            console.log('No cached signature.')
-            const messageBytes = new TextEncoder().encode("Random message for key derivation");
-            const signatureData = await wallet?.signPersonalMessage({
-            message: messageBytes
-            });
-            if (!signatureData?.signature) {
-            throw new Error("Failed to obtain a valid signature.");
-            }
-            signature = signatureData.signature;
-            localStorage.setItem('walletSignature', signature);
-        }
-
-        const tempPrivKey = deriveKeyFromSignature(signature);
-        if (!otherAddr) {
-            console.log("Other address is not specified.");
-            return [];
-        }
-        const sharedSecret = generateSharedSecret(tempPrivKey, otherAddr);
-
-        const messages: Message[] = await response.json();
-        return messages.map((message) =>
-            ({
-                ...message,
-                text: decryptMessage(message.text, sharedSecret), // Apply the transformation to the content field
-            }));
-    } catch (error) {
-        console.error('Error fetching messages:', error);
-        return [];
-    }
+    return fetchMessages(`messages/by-recipient/${recipient}`);
 }
 

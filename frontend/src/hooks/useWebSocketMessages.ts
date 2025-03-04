@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
 import { Message, broadcastMessageParams } from '@/types/types';
-import { getDecryptedMessage } from '@/api/services/messageDbService';
+import { decryptSingleMessage } from '@/api/services/decryptService';
 import { formatTimestamp } from '@/api/services/messageService';
 import { WalletContextState } from '@suiet/wallet-kit';
 
 export function useWebSocketMessages(
   recipientAddress: string,
+  recipientPub: Uint8Array,
   wallet: WalletContextState | null,
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>
 ) {
@@ -14,10 +15,9 @@ export function useWebSocketMessages(
 
     const handleNewMessage = async (messageData: broadcastMessageParams) => {
       try {
-        const decryptedMessage = await getDecryptedMessage(
-          recipientAddress,
-          wallet,
-          messageData.text
+        const decryptedMessage = await decryptSingleMessage(
+          messageData.text,
+          recipientPub,
         );
     
         const timeString = formatTimestamp(messageData.timestamp);
@@ -47,5 +47,5 @@ export function useWebSocketMessages(
     };
 
     return () => ws.close();
-  }, [recipientAddress, wallet, setMessages]);
+  }, [recipientAddress, recipientPub, wallet, setMessages]);
 } 

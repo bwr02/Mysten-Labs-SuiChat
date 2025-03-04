@@ -1,45 +1,123 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { SidebarConversationParams } from '@/types/types';
 import { WalletContextState } from '@suiet/wallet-kit';
-import { getAllContactedAddresses } from '@/api/services/contactDbService';
-import { getDecryptedMessage } from '@/api/services/messageDbService';
+import { getAllContactedAddresses, getPublicKeyByAddress } from '@/api/services/contactDbService';
+import { decryptSingleMessage } from '@/api/services/decryptService';
 import { formatTimestamp } from '@/api/services/messageService';
 
-export function useConversations(wallet: WalletContextState | null) {
+interface UseConversationsResult {
+  conversations: SidebarConversationParams[];
+  refreshConversations: () => Promise<void>;
+}
+
+export function useConversations(wallet: WalletContextState | null): UseConversationsResult {
   const [conversations, setConversations] = useState<SidebarConversationParams[]>([]);
 
-  const fetchAndDecryptConversations = async () => {
+  const getPublicKeyForAddress = async (recipientAddress: string): Promise<Uint8Array> => {
+    const recipientPubKey = await getPublicKeyByAddress(recipientAddress);
+    if (!recipientPubKey) {
+      throw new Error('No public key available');
+    }
+    return new Uint8Array(Buffer.from(recipientPubKey, 'hex'));
+  };
+
+  const handleNewMessage = async (messageData: any) => {
+    const { sender, recipient, text, timestamp, name, txDigest } = messageData;
+    const otherAddress = sender === wallet?.address ? recipient : sender;
+
     try {
-      const initialContacts = await getAllContactedAddresses();
+      const publicKeyArray = await getPublicKeyForAddress(otherAddress);
+      const decryptedMessage = await decryptSingleMessage(text, publicKeyArray);
+
+      setConversations(prevConversations => {
+        const updatedConversations = prevConversations.filter(conv => conv.address !== otherAddress);
+        const existingConv = prevConversations.find(conv => conv.address === otherAddress);
+        
+        const newConversation: SidebarConversationParams = {
+          address: otherAddress,
+          publicKey: publicKeyArray,
+          name: existingConv?.name || name || otherAddress,
+          message: decryptedMessage || "No Messages",
+          time: formatTimestamp(timestamp),
+        };
+
+        // If this is a sent message (we are the sender), complete the sending state
+        if (sender === wallet?.address) {
+          window.dispatchEvent(new CustomEvent('messageSent', { detail: { txDigest } }));
+        }
+        
+        return [newConversation, ...updatedConversations];
+      });
+    } catch (error) {
+      console.error(`Failed to decrypt message for ${otherAddress}:`, error);
+      setConversations(prevConversations => {
+        const updatedConversations = prevConversations.filter(conv => conv.address !== otherAddress);
+        const existingConv = prevConversations.find(conv => conv.address === otherAddress);
+        
+        const newConversation: SidebarConversationParams = {
+          address: otherAddress,
+          publicKey: null,
+          name: existingConv?.name || name || otherAddress,
+          message: "Message encryption error",
+          time: formatTimestamp(timestamp),
+        };
+        
+        return [newConversation, ...updatedConversations];
+      });
+    }
+  };
+
+  const fetchAndDecryptConversations = useCallback(async () => {
+    if (!wallet) return;
+
+    try {
+      const contacts = await getAllContactedAddresses();
       const decryptedContacts = await Promise.all(
-        initialContacts.map(async (contact) => {
+        contacts.map(async (contact) => {
           try {
-            if (!contact.message) {
-              return { ...contact, message: "No Messages" };
-            }
-            const decryptedMessage = await getDecryptedMessage(
-              contact.address,
-              wallet,
-              contact.message
-            );
-            return { ...contact, message: decryptedMessage || "No Messages" };
+            const publicKeyArray = await getPublicKeyForAddress(contact.address);
+            const decryptedMessage = contact.message 
+              ? await decryptSingleMessage(contact.message, publicKeyArray)
+              : "No Messages";
+
+            return {
+              address: contact.address,
+              publicKey: publicKeyArray,
+              name: contact.name || contact.address,
+              message: decryptedMessage,
+              time: contact.time || "",
+            };
           } catch (error) {
-            console.error(`Failed to decrypt message for ${contact.address}`, error);
-            return { ...contact, message: "(decryption error)" };
+            console.error(`Failed to decrypt message for ${contact.address}:`, error);
+            return {
+              address: contact.address,
+              publicKey: null,
+              name: contact.name || contact.address,
+              message: "Message encryption error",
+              time: contact.time || "",
+            };
           }
         })
       );
-      setConversations(decryptedContacts);
+      
+      const sortedContacts = decryptedContacts.sort((a, b) => {
+        const timeA = a.time ? new Date(a.time).getTime() : 0;
+        const timeB = b.time ? new Date(b.time).getTime() : 0;
+        return timeB - timeA;
+      });
+      
+      setConversations(sortedContacts);
     } catch (error) {
       console.error("Error fetching contacts:", error);
+      setConversations([]);
     }
-  };
+  }, [wallet]);
 
   useEffect(() => {
     if (wallet) {
       fetchAndDecryptConversations();
     }
-  }, [wallet]);
+  }, [wallet, fetchAndDecryptConversations]);
 
   useEffect(() => {
     if (!wallet) return;
@@ -50,25 +128,7 @@ export function useConversations(wallet: WalletContextState | null) {
     wsNewMessage.onmessage = async (event) => {
       const data = JSON.parse(event.data);
       if (data.type === 'new-message') {
-        const { sender, recipient } = data.message;
-        const otherAddress = sender === wallet.address ? recipient : sender;
-
-        try {
-          const decryptedMessage = await getDecryptedMessage(otherAddress, wallet, data.message.text);
-          setConversations((prevConversations) => {
-            const updatedConversations = prevConversations.filter(conv => conv.address !== otherAddress);
-            const existingConversation = prevConversations.find(conv => conv.address === otherAddress);
-            const newConversation = {
-              address: otherAddress,
-              name: existingConversation?.name || data.message.name || otherAddress,
-              message: decryptedMessage || "No Messages",
-              time: formatTimestamp(data.message.timestamp),
-            };
-            return [newConversation, ...updatedConversations];
-          });
-        } catch (error) {
-          console.error(`Failed to decrypt message for ${otherAddress}`, error);
-        }
+        await handleNewMessage(data.message);
       }
     };
 
@@ -79,11 +139,31 @@ export function useConversations(wallet: WalletContextState | null) {
       }
     };
 
+    const handleWsError = (ws: WebSocket, name: string) => {
+      ws.onerror = (error) => {
+        console.error(`${name} WebSocket error:`, error);
+      };
+      ws.onclose = () => {
+        console.log(`${name} WebSocket closed, attempting to reconnect in 5s...`);
+        setTimeout(() => {
+          if (wallet) {
+            fetchAndDecryptConversations();
+          }
+        }, 5000);
+      };
+    };
+
+    handleWsError(wsNewMessage, 'Message');
+    handleWsError(wsEditContact, 'Contact');
+
     return () => {
       wsNewMessage.close();
       wsEditContact.close();
     };
-  }, [wallet]);
+  }, [wallet, fetchAndDecryptConversations]);
 
-  return { conversations };
+  return { 
+    conversations,
+    refreshConversations: fetchAndDecryptConversations
+  };
 } 
