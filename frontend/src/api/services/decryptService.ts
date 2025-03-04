@@ -30,8 +30,6 @@ export function decrypt(
     const success = decipher.finish();
     if (!success) {
       throw new Error("Decryption failed");
-    } else {
-      console.log("Decryption success:", success);
     }
     return decipher.output.toString();
   } catch (error) {

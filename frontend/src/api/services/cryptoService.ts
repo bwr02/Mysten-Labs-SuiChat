@@ -110,7 +110,6 @@ export async function prepareEncryptedMessage(message: string, recipientPubKey: 
     }
     const privateKey = new Uint8Array(Buffer.from(privKeyString, "base64"));
     const sharedSecret = generateSharedSecret(privateKey, recipientPubKey);
-    console.log("sharedSecret in encryption", sharedSecret);
     return encrypt(message, sharedSecret);
 }
 

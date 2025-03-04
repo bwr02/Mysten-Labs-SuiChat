@@ -14,12 +14,9 @@ export function useConversations(wallet: WalletContextState | null): UseConversa
   const [conversations, setConversations] = useState<SidebarConversationParams[]>([]);
 
   const getPublicKeyForAddress = async (recipientAddress: string): Promise<Uint8Array> => {
-    console.log("Getting public key for address:", recipientAddress);
     const recipientPubKey = await getPublicKeyByAddress(recipientAddress);
     if (!recipientPubKey) {
       throw new Error('No public key available');
-    } else {
-        console.log("aloha Public key:", recipientPubKey);
     }
     return new Uint8Array(Buffer.from(recipientPubKey, 'hex'));
   };
