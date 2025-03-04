@@ -22,7 +22,6 @@ export function useConversations(wallet: WalletContextState | null): UseConversa
   };
 
   const handleNewMessage = async (messageData: any) => {
-    console.log("New message data:", messageData);
     const { sender, recipient, text, timestamp, txDigest } = messageData;
     const otherAddress = sender === wallet?.address ? recipient : sender;
 
