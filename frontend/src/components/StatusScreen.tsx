@@ -57,7 +57,7 @@ export default function StatusScreen({ type, message, error }: StatusScreenProps
                     {content.subtitle}
                 </p>
             )}
-            <ConnectButton />
+            <ConnectButton>Connect Wallet</ConnectButton>
         </div>
     );
 } 
