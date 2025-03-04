@@ -78,6 +78,18 @@ export const ContactForm: React.FC<ContactFormProps> = ({
       >
         {isSubmitting ? "Saving..." : editingContact ? "Update Contact" : "Save Contact"}
       </button>
+      <div className="mt-4 text-center">
+          <p className="text-sm text-white">
+              Don't have a SuiNS name?{" "}
+              <a
+                  href="https://suins.io/"
+                  target="_blank"
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                  Register for one
+              </a>
+          </p>
+      </div>
       <button
         type="button"
         onClick={onCancel}
