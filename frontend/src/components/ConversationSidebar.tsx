@@ -13,7 +13,7 @@ export const ConversationSidebar = ({ recipientAddress, setRecipient }: ChatSide
   const handleSelectConversation = useCallback(
     (conv: SidebarConversationParams) => {
       if (conv.publicKey) {
-        setRecipient(conv.address, conv.publicKey);
+        setRecipient(conv.name, conv.publicKey);
       } else {
         console.error("Public key not found for conversation:", conv.address);
       }
