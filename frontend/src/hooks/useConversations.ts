@@ -13,12 +13,15 @@ interface UseConversationsResult {
 export function useConversations(wallet: WalletContextState | null): UseConversationsResult {
   const [conversations, setConversations] = useState<SidebarConversationParams[]>([]);
 
-  const getPublicKeyForAddress = async (address: string): Promise<Uint8Array> => {
-    const storedPublicKey = await getPublicKeyByAddress(address);
-    if (!storedPublicKey) {
+  const getPublicKeyForAddress = async (recipientAddress: string): Promise<Uint8Array> => {
+    console.log("Getting public key for address:", recipientAddress);
+    const recipientPubKey = await getPublicKeyByAddress(recipientAddress);
+    if (!recipientPubKey) {
       throw new Error('No public key available');
+    } else {
+        console.log("aloha Public key:", recipientPubKey);
     }
-    return new Uint8Array(Buffer.from(storedPublicKey, 'hex'));
+    return new Uint8Array(Buffer.from(recipientPubKey, 'hex'));
   };
 
   const handleNewMessage = async (messageData: any) => {

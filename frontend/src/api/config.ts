@@ -2,7 +2,7 @@ import { env } from '../config/env';
 
 export const CONFIG = {
     MESSAGE_CONTRACT: {
-        packageId: '0xb6deae3bf028a25da076f5b90d3fc49b24fc92e177f2791579468880677d253c',
+        packageId: '0x1c0b7bb2210489755d3b914c75c53d5ba28d4f07409a131d6c5828c52f7e6a5f',
     },
     NETWORK_URL: env.NETWORK_URL
 };

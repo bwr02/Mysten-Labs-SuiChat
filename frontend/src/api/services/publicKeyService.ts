@@ -57,10 +57,20 @@ export async function fetchUserPublicKey(
       options: { showContent: true }
     });
 
-    // Get the first object with proper type checking
-    const obj = response.data[0];
-    if (obj.data?.content?.dataType === "moveObject") {
-      const fields = obj.data.content.fields as { public_key: string | number[] };
+    if (!response.data.length) return null;
+
+    // Sort by timestamp in descending order and get the most recent key
+    const sortedObjects = response.data
+      .filter(obj => obj.data?.content?.dataType === "moveObject")
+      .sort((a, b) => {
+        const aTimestamp = ((a.data?.content as unknown as { fields: { timestamp: string } })?.fields?.timestamp) || '0';
+        const bTimestamp = ((b.data?.content as unknown as { fields: { timestamp: string } })?.fields?.timestamp) || '0';
+        return Number(bTimestamp) - Number(aTimestamp);
+      });
+
+    const mostRecent = sortedObjects[0];
+    if (mostRecent?.data?.content?.dataType === "moveObject") {
+      const fields = (mostRecent.data.content as unknown as { fields: { public_key: string | number[] } }).fields;
 
       if (Array.isArray(fields.public_key)) {
         return Uint8Array.from(fields.public_key);
