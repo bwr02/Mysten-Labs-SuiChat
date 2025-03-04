@@ -120,16 +120,23 @@ Open the application at [http://localhost:5173/](http://localhost:5173/).
   - Import Wallet (Using Recovery Phrase).
   - Use the secret recovery phrase from Step 2 to recover your account.
   - Ensure the wallet is set to operate on testnet, not mainnet.
+  - Publish your public key by approving the first transaction to publish object to chain
 
 ### 10. Send a Message
-- Click the address book icon next to the SuiChat header.
-- Enter the recipient's address (examples below):
+- Click the address book icon on the navigation sidebar on the left of the screen.
+- Click the plus icon on the top-right corner and fill out the contact information.
+- Use any of the following Sui addresses to create a contact:
   - **Ashton**: `0x69807a150b291e82423fe41024e7453da050dd0809fbbaaa3cd87c651b66432c`
   - **Ben**: `0x7b8946c19220c8914ee5b5287e9e06cb735d1a3cc783cc6c7c4d47072735b2d0`
+  - **Bonnie**: `0x734105a0cda6c060b30141360cba04cdc8327210524abcb5a4ef2735dcd9098e`
+  - **Chloe**: `0x52e9546226cc1d1616d78f3324dc76e972d5de62e0bdb357d4865a4b9c139379`
   - **Sophia**: `0xcb4634806b80bfc969935294391fa38169b42da5d66303b2710d93af101c9509`
+- Once the contact is saved, click the message icon in the navigation sidebar to go back to the message page.
 - After entering the message, click Send.
 - Approve the transaction in the Chrome extension.
-- 
+- In order for the recipient to see the message, they must add you as a contact.
+- Click the chain icon next to each message to view the message on chain using suiscan.
+
 ### 11. View Local Database
 To view changes in the database:
 
