@@ -25,7 +25,7 @@ export function useConversations(wallet: WalletContextState | null): UseConversa
   };
 
   const handleNewMessage = async (messageData: any) => {
-    const { sender, recipient, text, timestamp, name } = messageData;
+    const { sender, recipient, text, timestamp, name, txDigest } = messageData;
     const otherAddress = sender === wallet?.address ? recipient : sender;
 
     try {
@@ -43,6 +43,11 @@ export function useConversations(wallet: WalletContextState | null): UseConversa
           message: decryptedMessage || "No Messages",
           time: formatTimestamp(timestamp),
         };
+
+        // If this is a sent message (we are the sender), complete the sending state
+        if (sender === wallet?.address) {
+          window.dispatchEvent(new CustomEvent('messageSent', { detail: { txDigest } }));
+        }
         
         return [newConversation, ...updatedConversations];
       });

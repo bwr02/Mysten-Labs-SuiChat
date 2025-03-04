@@ -16,7 +16,8 @@ export const MessageInputField = memo(({ recipientAddress, recipientPubKey, onMe
     recipientPubKey,
     wallet: suiWallet,
     onMessageSent,
-    refreshBalance
+    refreshBalance,
+    setSendingComplete: () => setMessage("")
   });
 
   useTextareaAutosize(textareaRef, message);
