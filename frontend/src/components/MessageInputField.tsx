@@ -5,7 +5,7 @@ import { SendButton } from "./SendButton";
 import { useMessageSending } from "@/hooks/useMessageSending";
 import { useTextareaAutosize } from "@/hooks/useTextareaAutosize";
 
-export const MessageInputField = memo(({ recipientAddress, onMessageSent }: MessageInputFieldProps) => {
+export const MessageInputField = memo(({ recipientAddress, recipientPubKey, onMessageSent }: MessageInputFieldProps) => {
   const { address, loading, error, refreshBalance, suiWallet } = useChatWallet();
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -13,6 +13,7 @@ export const MessageInputField = memo(({ recipientAddress, onMessageSent }: Mess
   const { sending, status, sendMessageHandler } = useMessageSending({
     address: address || "",
     recipientAddress,
+    recipientPubKey,
     wallet: suiWallet,
     onMessageSent,
     refreshBalance

@@ -37,6 +37,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ recipientAddress, recipien
       <div className="w-full px-4 py-3 bg-light-blue border-t border-gray-700 sticky bottom-0">
         <MessageInputField
           recipientAddress={recipientAddress}
+          recipientPubKey={recipientPub}
           onMessageSent={handleMessageSent}
         />
       </div>

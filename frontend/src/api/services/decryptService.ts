@@ -1,6 +1,5 @@
 import { Message, STORAGE_KEYS } from "@/types/types";
 import { generateSharedSecret } from "./cryptoService";
-import { WalletContextState } from "@suiet/wallet-kit";
 import * as forge from "node-forge";
 
 

@@ -48,6 +48,7 @@ export interface ChatSidebarProps {
 
 export interface MessageInputFieldProps {
     recipientAddress: string;
+    recipientPubKey: Uint8Array;
     onMessageSent: (message: string, timestamp: number, txDigest: string) => void;
 }
 
@@ -67,8 +68,9 @@ export interface Contact {
 export interface SendMessageParams {
     senderAddress: string;
     recipientAddress: string;
-    content: string;
-    signature: string;
+    recipientPubKey: Uint8Array;
+    message: string;
+    wallet: WalletContextState;
 }
 
 export interface broadcastMessageParams {

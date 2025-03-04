@@ -6,6 +6,7 @@ import { STORAGE_KEYS } from '../types/types';
 export interface UseMessageSendingProps {
   address: string;
   recipientAddress: string;
+  recipientPubKey: Uint8Array;
   wallet: WalletContextState | null;
   onMessageSent: (message: string, timestamp: number, txId: string) => void;
   refreshBalance: () => Promise<string | null>;
@@ -14,6 +15,7 @@ export interface UseMessageSendingProps {
 export const useMessageSending = ({
   address,
   recipientAddress,
+  recipientPubKey,
   wallet,
   onMessageSent,
   refreshBalance
@@ -34,19 +36,12 @@ export const useMessageSending = ({
 
     try {
       setSending(true);
-      setStatus("Signing message...");
-
-      const signature = localStorage.getItem(STORAGE_KEYS.WALLET_SIGNATURE);
-      if (!signature) {
-        throw new Error("Failed to obtain a valid signature.");
-      }
-
       setStatus("Sending message...");
       const result = await sendMessage({
         senderAddress: address,
         recipientAddress,
-        content: message,
-        signature,
+        recipientPubKey,
+        message,
         wallet,
       });
       

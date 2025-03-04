@@ -103,10 +103,15 @@ export function encrypt(message: string | null, sharedSecret: string): string {
   return forge.util.encode64(combined);
 }
 
-export async function prepareEncryptedMessage(content: string, signature: string): Promise<string> {
-    const { privateKey, publicKey } = deriveKeysFromSignature(signature);
-    const sharedSecret = generateSharedSecret(privateKey, publicKey);
-    return encrypt(content, sharedSecret);
+export async function prepareEncryptedMessage(message: string, recipientPubKey: Uint8Array): Promise<string> {
+    const privKeyString = localStorage.getItem(STORAGE_KEYS.PRIVATE_KEY);
+    if (!privKeyString) {
+      throw new Error("Private key not found. Please reconnect your wallet.");
+    }
+    const privateKey = new Uint8Array(Buffer.from(privKeyString, "base64"));
+    const sharedSecret = generateSharedSecret(privateKey, recipientPubKey);
+    console.log("sharedSecret in encryption", sharedSecret);
+    return encrypt(message, sharedSecret);
 }
 
 export function generateSharedSecret(
