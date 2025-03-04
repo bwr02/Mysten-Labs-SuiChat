@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { SidebarConversationParams } from '@/types/types';
 import { WalletContextState } from '@suiet/wallet-kit';
-import { getAllContactedAddresses, getPublicKeyByAddress } from '@/api/services/contactDbService';
+import { getAllContactedAddresses, getNameByAddress, getPublicKeyByAddress, getSuiNSByAddress } from '@/api/services/contactDbService';
 import { decryptSingleMessage } from '@/api/services/decryptService';
 import { formatTimestamp } from '@/api/services/messageService';
+import { get } from 'http';
 
 interface UseConversationsResult {
   conversations: SidebarConversationParams[];
@@ -22,10 +23,12 @@ export function useConversations(wallet: WalletContextState | null): UseConversa
   };
 
   const handleNewMessage = async (messageData: any) => {
-    const { sender, recipient, text, timestamp, name, txDigest } = messageData;
+    console.log("New message data:", messageData);
+    const { sender, recipient, text, timestamp, txDigest } = messageData;
     const otherAddress = sender === wallet?.address ? recipient : sender;
 
     try {
+      const name = await getNameByAddress(otherAddress) || getSuiNSByAddress(otherAddress);
       const publicKeyArray = await getPublicKeyForAddress(otherAddress);
       const decryptedMessage = await decryptSingleMessage(text, publicKeyArray);
 
