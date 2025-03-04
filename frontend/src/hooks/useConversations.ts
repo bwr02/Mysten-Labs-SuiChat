@@ -4,7 +4,6 @@ import { WalletContextState } from '@suiet/wallet-kit';
 import { getAllContactedAddresses, getNameByAddress, getPublicKeyByAddress, getSuiNSByAddress } from '@/api/services/contactDbService';
 import { decryptSingleMessage } from '@/api/services/decryptService';
 import { formatTimestamp } from '@/api/services/messageService';
-import { get } from 'http';
 
 interface UseConversationsResult {
   conversations: SidebarConversationParams[];
