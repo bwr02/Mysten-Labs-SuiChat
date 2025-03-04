@@ -73,7 +73,10 @@ export default function ContactsPage() {
                                 isHovered={hoveredContact === contact.address}
                                 onHover={setHoveredContact}
                                 onMessage={handleMessageClick}
-                                onEdit={setEditingContact}
+                                onEdit={(contact) => {
+                                    setEditingContact(contact);
+                                    setIsModalOpen(true);
+                                }}
                                 onDelete={removeContact}
                             />
                         ))}
