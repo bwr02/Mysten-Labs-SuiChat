@@ -26,11 +26,18 @@ export const ContactListItem: React.FC<ContactListItemProps> = ({
       onMouseLeave={() => onHover(null)}
     >
       <div>
-        <p className="font-semibold">{contact.name || "(No Name)"}</p>
+        <p className="font-semibold">{contact.name || contact.suins || contact.address}</p>
         {isHovered && (
           <>
-            <p className="text-gray-400">{contact.suins || "(No SuiNS)"}</p>
-            <p className="text-gray-400">{contact.address}</p>
+            {contact.name && (
+              <>
+                <p className="text-gray-400">{contact.suins || "(No SuiNS)"}</p>
+                <p className="text-gray-400">{contact.address}</p>
+              </>
+            )}
+            {!contact.name && contact.suins && (
+              <p className="text-gray-400">{contact.address}</p>
+            )}
           </>
         )}
       </div>
@@ -62,4 +69,4 @@ export const ContactListItem: React.FC<ContactListItemProps> = ({
       </div>
     </li>
   );
-}; 
+};
