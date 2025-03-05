@@ -7,7 +7,7 @@ This application currently only officially supports MacOS 13 and later, which is
 
 This application is designed to run on Chrome with the Suiet Sui Wallet extension. It may not function as expected on other browsers or without the extension.
 
-Currently SuiChat web interface can only be used on localhost on the machine running the server.
+Currently, SuiChat web interface can only be used on localhost on the machine running the server.
 
 ### Prerequisites
 - Homebrew must be installed. Instructions can be found on the homebrew website here https://brew.sh/
@@ -125,12 +125,12 @@ Open the application at [http://localhost:5173/](http://localhost:5173/).
 ### 10. Send a Message
 - Click the address book icon on the navigation sidebar on the left of the screen.
 - Click the plus icon on the top-right corner and fill out the contact information.
-- Use any of the following Sui addresses to create a contact:
-  - **Ashton**: `0x69807a150b291e82423fe41024e7453da050dd0809fbbaaa3cd87c651b66432c`
-  - **Ben**: `0x7b8946c19220c8914ee5b5287e9e06cb735d1a3cc783cc6c7c4d47072735b2d0`
-  - **Bonnie**: `0x734105a0cda6c060b30141360cba04cdc8327210524abcb5a4ef2735dcd9098e`
-  - **Chloe**: `0x52e9546226cc1d1616d78f3324dc76e972d5de62e0bdb357d4865a4b9c139379`
-  - **Sophia**: `0xcb4634806b80bfc969935294391fa38169b42da5d66303b2710d93af101c9509`
+- Use any of the following SuiNS to create a contact:
+  - **Ashton**: `ashtonwong`
+  - **Ben**: `bwr02`
+  - **Bonnie**: `bonnie`
+  - **Chloe**: `chloeta`
+  - **Sophia**: `sophiaw`
 - Once the contact is saved, click the message icon in the navigation sidebar to go back to the message page.
 - After entering the message, click Send.
 - Approve the transaction in the Chrome extension.
