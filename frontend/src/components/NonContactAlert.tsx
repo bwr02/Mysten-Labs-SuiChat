@@ -5,24 +5,31 @@ import { useNavigate } from 'react-router-dom';
 
 interface NonContactAlertProps {
   senderAddress: string;
+  onDismiss?: (address: string) => void;
 }
 
-export const NonContactAlert: React.FC<NonContactAlertProps> = ({ senderAddress }) => {
+export const NonContactAlert: React.FC<NonContactAlertProps> = ({ senderAddress, onDismiss }) => {
   const [dismissed, setDismissed] = useState(false);
   const navigate = useNavigate();
 
   const handleAddContact = () => {
     navigate('/contacts', { state: { addAddress: senderAddress } });
     setDismissed(true);
+    onDismiss?.(senderAddress);
   };
 
-  if (dismissed) return null; // Hide the alert when dismissed
+  const handleDismiss = () => {
+    setDismissed(true);
+    onDismiss?.(senderAddress);
+  };
+
+  if (dismissed) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-[9999] w-full max-w-[400px]">
+    <div className="fixed top-4 right-4 z-[9999] w-full max-w-[400px]" style={{ pointerEvents: 'auto' }}>
       <Alert
         color="warning"
-        style={{ backgroundColor: '#f5ebbf' }} // ✅ Restored your lighter background color
+        style={{ backgroundColor: '#f5ebbf', position: 'relative', zIndex: 9999 }}
         className="rounded-lg shadow-lg"
       >
         {/* Title + Close Button in the Same Row */}
@@ -31,7 +38,7 @@ export const NonContactAlert: React.FC<NonContactAlertProps> = ({ senderAddress 
             <HiInformationCircle className="h-5 w-5 text-yellow-900" />
             <span className="font-medium text-yellow-900">New Message from Non-Contact</span>
           </div>
-          <button onClick={() => setDismissed(true)} className="text-yellow-900 hover:text-yellow-700">
+          <button onClick={handleDismiss} className="text-yellow-900 hover:text-yellow-700">
             <HiX className="h-5 w-5" />
           </button>
         </div>

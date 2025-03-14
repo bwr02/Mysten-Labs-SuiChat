@@ -13,12 +13,17 @@ interface UseConversationsResult {
 export function useConversations(wallet: WalletContextState | null): UseConversationsResult {
   const [conversations, setConversations] = useState<SidebarConversationParams[]>([]);
 
-  const getPublicKeyForAddress = async (recipientAddress: string): Promise<Uint8Array> => {
-    const recipientPubKey = await getPublicKeyByAddress(recipientAddress);
-    if (!recipientPubKey) {
-      throw new Error('No public key available');
+  const getPublicKeyForAddress = async (recipientAddress: string): Promise<Uint8Array | undefined> => {
+    try {
+      const recipientPubKey = await getPublicKeyByAddress(recipientAddress);
+      if (!recipientPubKey) {
+        return undefined;
+      }
+      return new Uint8Array(Buffer.from(recipientPubKey, 'hex'));
+    } catch (error) {
+      console.log('Error getting public key:', error);
+      return undefined;
     }
-    return new Uint8Array(Buffer.from(recipientPubKey, 'hex'));
   };
 
   const handleNewMessage = async (messageData: any) => {
@@ -26,7 +31,44 @@ export function useConversations(wallet: WalletContextState | null): UseConversa
     const otherAddress = sender === wallet?.address ? recipient : sender;
 
     try {
+      // First check if this is a contact
       const publicKeyArray = await getPublicKeyForAddress(otherAddress);
+      console.log('Got public key for address:', otherAddress, publicKeyArray);
+      
+      if (!publicKeyArray) {
+        // If no public key found, this is not a contact
+        // Store non-contact message in localStorage and dispatch event
+        if (sender !== wallet?.address) {
+          console.log('Detected non-contact message from:', otherAddress);
+          const nonContactMessages = JSON.parse(localStorage.getItem('nonContactMessages') || '[]');
+          console.log('Current stored non-contact messages:', nonContactMessages);
+          if (!nonContactMessages.includes(otherAddress)) {
+            nonContactMessages.push(otherAddress);
+            localStorage.setItem('nonContactMessages', JSON.stringify(nonContactMessages));
+            console.log('Updated stored non-contact messages:', nonContactMessages);
+            window.dispatchEvent(new CustomEvent('nonContactMessage', { 
+              detail: { senderAddress: otherAddress }
+            }));
+            console.log('Dispatched nonContactMessage event');
+          }
+        } else {
+          console.log('Message is from self, not showing non-contact alert');
+        }
+        
+        setConversations(prevConversations => {
+          const updatedConversations = prevConversations.filter(conv => conv.address !== otherAddress);
+          const newConversation: SidebarConversationParams = {
+            address: otherAddress,
+            publicKey: null,
+            name: name || otherAddress,
+            message: "This message is from a non-contact. Add as contact to decrypt.",
+            time: formatTimestamp(timestamp),
+          };
+          return [newConversation, ...updatedConversations];
+        });
+        return;
+      }
+
       const decryptedMessage = await decryptSingleMessage(text, publicKeyArray);
 
       setConversations(prevConversations => {

@@ -148,7 +148,7 @@ export async function getPublicKeyByAddress(addr: string): Promise<string|null>{
         const response = await fetch(`http://localhost:3000/contacts/get-public-key/${addr}`);
         if (!response.ok) {
             console.error("Failed to fetch public key. Status:", response.status);
-            throw new Error('Failed to fetch public key');
+            return null;
         }
 
         const publicKey = await response.json();
